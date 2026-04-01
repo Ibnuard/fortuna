@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_anim_easing",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_anim_easing",
+  "parent":{
+    "name":"Fortuna",
+    "path":"Fortuna.yyp",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

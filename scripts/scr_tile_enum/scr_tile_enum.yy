@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_tile_enum",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_tile_enum",
+  "parent":{
+    "name":"Fortuna",
+    "path":"Fortuna.yyp",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
