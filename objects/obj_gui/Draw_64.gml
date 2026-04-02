@@ -4,7 +4,7 @@ draw_sprite_stretched(spr_gui_top_bar, 0, 0, 0, room_width, 200);
 // ─── BOTTOM GUI CONTAINER & BUTTONS ───
 
 // Button Layout Constants
-var _main_w = 240;
+var _main_w = 360;
 var _main_h = 100;
 
 var _side_w = 240; 
