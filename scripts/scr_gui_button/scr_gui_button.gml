@@ -1,8 +1,37 @@
 /// @function draw_gui_button(_x, _y, _w, _h, _sprite, _text, [_text_color], [_font])
 /// @description Draws a styled button with text at the specified coordinates
 function draw_gui_button(_x, _y, _w, _h, _sprite, _text, _text_color = c_white, _font = fnt_gui_button_large) {
+    
+    // -- IM-GUI INTRACTION LOGIC --
+    var _mx = device_mouse_x_to_gui(0);
+    var _my = device_mouse_y_to_gui(0);
+    
+    // Evaluate hitbox on the ORIGINAL static coordinates to prevent jittering
+    var _hover = point_in_rectangle(_mx, _my, _x, _y, _x + _w, _y + _h);
+    var _pressed = _hover && mouse_check_button(mb_left);
+    var _clicked = _hover && mouse_check_button_released(mb_left);
+    
+    // JUICE: Float up on hover
+    if (_hover && !_pressed) {
+        _y -= 6; // Angkat tombol sedikit ke atas
+    }
+    
+    // JUICE: Dip in on press
+    if (_pressed) {
+        var _squash = 2;
+        _y += _squash; // Turunkan atap tombol
+        _h -= _squash; // Penyet tingginya sehingga 9-slice tertekan
+    }
+
     // Draw the button stretched
     draw_sprite_stretched(_sprite, 0, _x, _y, _w, _h);
+    
+    // JUICE: Glow on hover
+    if (_hover && !_pressed) {
+        gpu_set_blendmode(bm_add);
+        draw_sprite_ext(_sprite, 0, _x, _y, _w / sprite_get_width(_sprite), _h / sprite_get_height(_sprite), 0, c_white, 0.15);
+        gpu_set_blendmode(bm_normal);
+    }
     
     // Set text properties
     draw_set_font(_font);
