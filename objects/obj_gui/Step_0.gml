@@ -15,3 +15,41 @@ if (abs(property_y_offset - _target_prop_offset) > 0.5) {
 } else {
     property_y_offset = _target_prop_offset;
 }
+
+// Property Panel Scrolling Interactivity
+if (gui_state == "PROPERTY" && property_y_offset < 790) {
+    var _scroll_speed = 65; // Scroll speed sensitivity per notch
+    
+    if (mouse_wheel_up()) panel_scroll_target -= _scroll_speed;
+    if (mouse_wheel_down()) panel_scroll_target += _scroll_speed;
+    
+    // --- Mobile Touch/Drag Scrolling ---
+    var _my = device_mouse_y_to_gui(0);
+    var _panel_actual_y = _target_prop_offset + (room_height - (room_height * 0.6) + 50);
+    
+    if (mouse_check_button_pressed(mb_left) && _my > _panel_actual_y) {
+        is_dragging_panel = true;
+        drag_start_y = _my;
+        scroll_start = panel_scroll_target;
+    }
+    
+    if (is_dragging_panel) {
+        if (mouse_check_button(mb_left)) {
+            // Drag smoothly based on delta
+            panel_scroll_target = scroll_start + (drag_start_y - _my);
+        } else {
+            is_dragging_panel = false;
+        }
+    }
+    
+    // Clamp so we can't scroll past the bounds
+    panel_scroll_target = clamp(panel_scroll_target, 0, panel_max_scroll);
+    
+    // Rubber-band smooth scrolling
+    panel_scroll_y = lerp(panel_scroll_y, panel_scroll_target, 0.2);
+} else {
+    // Reset when hidden
+    panel_scroll_target = 0;
+    panel_scroll_y = 0;
+    is_dragging_panel = false;
+}

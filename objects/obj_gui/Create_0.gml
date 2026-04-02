@@ -6,3 +6,14 @@ animation_speed = 0.13; // Smoothness multiplier (closer to 0 is smoother/slower
 gui_state = "MAIN"; // "MAIN" or "PROPERTY"
 target_bottom_offset = 0; // Where main UI should go (0 = visible, 250 = hidden down)
 property_y_offset = 800;  // Where prop UI currently is (0 = visible, 800 = hidden down)
+
+// Property Panel Scrolling & Surfaces
+panel_scroll_y = 0;
+panel_scroll_target = 0;
+panel_max_scroll = 0;
+surf_panel = -1;
+
+// Touch / Mouse Drag state
+is_dragging_panel = false;
+drag_start_y = 0;
+scroll_start = 0;
