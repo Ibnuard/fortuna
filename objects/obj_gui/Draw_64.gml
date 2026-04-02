@@ -94,6 +94,7 @@ if (property_y_offset < 790) { // Only draw and calculate if visible
     var _mx = device_mouse_x_to_gui(0);
     var _my = device_mouse_y_to_gui(0);
     var _close_hover = point_in_rectangle(_mx, _my, _close_x, _close_y, _close_x + _close_w, _close_y + _close_h);
+    var _close_pressed = _close_hover && mouse_check_button(mb_left);
     
     if (_close_hover) {
         if (mouse_check_button_released(mb_left)) {
@@ -101,8 +102,30 @@ if (property_y_offset < 790) { // Only draw and calculate if visible
         }
     }
     
-    // Draw smaller close button (Using offset logic to ensure it doesn't move weirdly if origin differs)
-    draw_sprite_ext(spr_panel_close, 0, _close_x, _close_y, _close_scale, _close_scale, 0, c_white, 1);
+    var _draw_scale = _close_scale;
+    var _draw_x = _close_x;
+    var _draw_y = _close_y;
+    
+    // JUICE: Scale down when pressed
+    if (_close_pressed) {
+        _draw_scale = _close_scale * 0.9;
+        // Shift position so it shrinks nicely towards the center 
+        // (assuming Top-Left origin since our hitbox uses Top-Left logic)
+        var _shrink_w = _close_w - (sprite_get_width(spr_panel_close) * _draw_scale);
+        var _shrink_h = _close_h - (sprite_get_height(spr_panel_close) * _draw_scale);
+        _draw_x += _shrink_w / 2;
+        _draw_y += _shrink_h / 2;
+    }
+    
+    // Draw close button
+    draw_sprite_ext(spr_panel_close, 0, _draw_x, _draw_y, _draw_scale, _draw_scale, 0, c_white, 1);
+    
+    // JUICE: Glow on hover (but purely visual, no scale change)
+    if (_close_hover && !_close_pressed) {
+        gpu_set_blendmode(bm_add);
+        draw_sprite_ext(spr_panel_close, 0, _draw_x, _draw_y, _draw_scale, _draw_scale, 0, c_white, 0.25);
+        gpu_set_blendmode(bm_normal);
+    }
     
     // ─── Draw Slot Info Text ───
     
