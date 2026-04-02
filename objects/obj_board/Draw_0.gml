@@ -17,12 +17,16 @@ for (var oi = 0; oi < array_length(draw_order); oi++) {
     if (_x + half_w <= board_x) continue;
     
     var dist_norm = clamp(abs(_x - board_center_x) / step_size, 0, 1);
-    var lift      = lerp(lift_max, 0, dist_norm);
-    var _y        = tile_y - lift;
+    
+    // Calculate absolute ground level for shadow to prevent protruding
+    var base_shd_x = 6;
+    var base_shd_y = 15; // 1:2.5 ratio for baseline
+    
+    var shd_draw_y = tile_y + base_shd_y;
     
     var local_t = clamp((intro_anim_t - ((i + 2) * 0.1)) / 0.6, 0, 1);
     var t_ease = 1 - power(1 - local_t, 3);
-    _y += lerp(-1200, 0, t_ease);
+    shd_draw_y += lerp(-1200, 0, t_ease); // Drop with animation
     
     var tile_left = _x - half_w;
     var clip_px   = max(0, board_x - tile_left);
@@ -31,12 +35,13 @@ for (var oi = 0; oi < array_length(draw_order); oi++) {
     var draw_x    = tile_left + clip_px;
     if (src_w <= 0) continue;
     
-    var shd_off = lerp(18, 8, dist_norm);
-    draw_set_alpha(lerp(0.75, 0.32, dist_norm));
+    var shd_draw_x = draw_x + base_shd_x + lerp(8, 0, dist_norm); // Extra X shift for depth
+    
+    draw_set_alpha(lerp(0.65, 0.32, dist_norm));
     draw_sprite_part_ext(
         tiles[loop_index(player_index + i)].sprite, 0,
         src_x, 0, src_w, spr_h,
-        draw_x + shd_off, _y + shd_off,
+        shd_draw_x, shd_draw_y,
         sc, sc, c_black, 1
     );
 }
