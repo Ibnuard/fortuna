@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "gamemaker-expert": {
+      "source": "leihaht/gamemaker-skills",
+      "sourceType": "github",
+      "computedHash": "0029fd05808127e09a892d5acd275e1cc45dffcb08d65acad57056a54b17f31d"
+    }
+  }
+}
