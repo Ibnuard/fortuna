@@ -39,7 +39,7 @@ var _left_x   = _center_x - _gap - _side_w;
 var _right_x  = _center_x + _main_w + _gap;
 
 // Draw Left Button (Red)
-if (draw_gui_button(_left_x, _side_y, _side_w, _side_h, spr_button_red, "Property", c_white, fnt_gui_button_medium)) {
+if (draw_gui_button(_left_x, _side_y, _side_w, _side_h, spr_button_red, "Inventory", c_white, fnt_gui_button_medium)) {
     gui_state = "PROPERTY"; // Trigger slide out
 }
 
@@ -85,6 +85,15 @@ var _prop_panel_y = _prop_target_y + property_y_offset;
 
 // Render only if the panel is on screen
 if (property_y_offset < 790) {
+    
+    // --- JUICY OVERLAY BACKGROUND ---
+    // Smoothly fade in a dark overlay depending on how far the panel has slid up
+    var _overlay_alpha = lerp(0.65, 0, clamp(property_y_offset / 800, 0, 1));
+    draw_set_color(c_black);
+    draw_set_alpha(_overlay_alpha);
+    draw_rectangle(0, 0, room_width, room_height, false);
+    draw_set_color(c_white);
+    draw_set_alpha(1.0);
     
     // Draw Panel Base
     draw_sprite_stretched(spr_gui_bottom_container, 0, _prop_panel_x, _prop_panel_y, _prop_panel_w, _prop_panel_h);
