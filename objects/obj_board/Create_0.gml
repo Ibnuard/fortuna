@@ -34,6 +34,21 @@ lift_max    = 18;
 
 // Cari obj_pawn yang sudah ada di room
 pawn = instance_find(obj_pawn, 0);
-pawn.pawn_sprite = spr_pawn;
-pawn.hop_height  = 28;
-pawn.hop_speed   = 1 / 12;
+if (instance_exists(pawn)) {
+    pawn.pawn_sprite = spr_pawn;
+    pawn.hop_height  = 28;
+    pawn.hop_speed   = 1 / 12;
+}
+
+// Ganti warna background room secara otomatis (menggantikan sprite BG yg dihapus)
+var _layers = layer_get_all();
+for (var i = 0; i < array_length(_layers); i++) {
+    var _elms = layer_get_all_elements(_layers[i]);
+    if (is_array(_elms)) {
+        for (var j = 0; j < array_length(_elms); j++) {
+            if (layer_get_element_type(_elms[j]) == layerelementtype_background) {
+                layer_background_blend(_elms[j], #0D2E19);
+            }
+        }
+    }
+}

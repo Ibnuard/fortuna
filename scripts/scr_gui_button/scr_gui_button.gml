@@ -19,7 +19,7 @@ function draw_gui_button(_x, _y, _w, _h, _sprite, _text, _text_color = c_white, 
     // Drop shadow
     draw_set_color(c_black);
     draw_set_alpha(0.3);
-    draw_text(_text_x, _text_y + 4, _text);
+    draw_text(_text_x + 3, _text_y + 4, _text);
     draw_set_alpha(1.0);
     
     // Main text
