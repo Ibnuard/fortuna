@@ -58,4 +58,6 @@ function draw_gui_button(_x, _y, _w, _h, _sprite, _text, _text_color = c_white, 
     // Reset alignment to prevent bugs elsewhere
     draw_set_halign(fa_left);
     draw_set_valign(fa_top);
+    
+    return _clicked;
 }
