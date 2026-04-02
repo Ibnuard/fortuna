@@ -54,17 +54,26 @@ draw_gui_button(_right_x, _side_y, _side_w, _side_h, spr_button_blue, "Shop", c_
 
 if (property_y_offset < 790) { // Only draw and calculate if visible
     
+    // --- Dynamic Card Logic ---
+    var _card_count  = 5; // Placeholder (bisa dinamis sesuai Pawn nanti)
+    var _filled_slot = 2; // Placeholder 
+    
     // Cards Scaling & Sizing
     var _card_spr = spr_card_placeholder;
     var _card_scale = 0.74; // Shrink to make UI look more breathable
     var _card_w = sprite_get_width(_card_spr) * _card_scale;
     var _card_h = sprite_get_height(_card_spr) * _card_scale;
     var _card_gap = 16;
-    var _total_cards_w = (_card_w * 6) + (_card_gap * 5);
+    
+    // Auto-calculate dynamic total width based on the number of cards
+    var _total_cards_w = (_card_w * _card_count) + (_card_gap * max(0, _card_count - 1));
     
     // Panel Dimensions
     var _prop_panel_w = _total_cards_w + 100; // 50px padding on left and right
-    var _prop_panel_h = _card_h + 170; // Increased to 170 to give identical visual 50px margin at bottom
+    
+    // Add an extra 20px height dedicated specifically for the Text Header
+    var _header_space = 20; 
+    var _prop_panel_h = _card_h + 170 + _header_space; 
     var _prop_panel_x = room_width / 2 - (_prop_panel_w / 2);
     
     // Submerge the panel so the bottom rounded corners are cut off off-screen
@@ -95,23 +104,40 @@ if (property_y_offset < 790) { // Only draw and calculate if visible
     // Draw smaller close button (Using offset logic to ensure it doesn't move weirdly if origin differs)
     draw_sprite_ext(spr_panel_close, 0, _close_x, _close_y, _close_scale, _close_scale, 0, c_white, 1);
     
-    // ─── Draw 6 Card Placeholders (Origin-Agnostic Centering) ───
+    // ─── Draw Slot Info Text ───
     
-    // Retrieve the sprite's configured pivot/origin point and scale it
+    draw_set_font(fnt_main);
+    draw_set_halign(fa_center);
+    draw_set_valign(fa_middle);
+    
+    var _text_x = _prop_panel_x + (_prop_panel_w / 2);
+    // Draw it beautifully nestled inside the new flat _header_space we carved out
+    var _text_y = _prop_panel_y + 32 + (_header_space / 2); 
+    var _text_str = "Properties (" + string(_filled_slot) + "/" + string(_card_count) + ")";
+    
+    // Simple Shadow
+    draw_set_color(c_black); draw_set_alpha(0.3);
+    draw_text(_text_x + 2, _text_y + 3, _text_str);
+    // Main Text
+    draw_set_alpha(1.0); draw_set_color(c_white);
+    draw_text(_text_x, _text_y, _text_str);
+    
+    draw_set_halign(fa_left); draw_set_valign(fa_top);
+    
+    // ─── Draw Card Placeholders (Origin-Agnostic Centering) ───
+    
     var _origin_x = sprite_get_xoffset(_card_spr) * _card_scale;
     var _origin_y = sprite_get_yoffset(_card_spr) * _card_scale;
     
-    // Calculate the absolute visual Top-Left coordinate of where the FIRST card should be
-    var _visual_start_x = _prop_panel_x + 50; // Exact 50px left padding matching the width calculation
+    var _visual_start_x = _prop_panel_x + 50; 
     
-    // Exact 50px top padding (equals the mathematical 50px left/right/bottom margins)
-    var _visual_start_y = _prop_panel_y + 50;
+    // Exact 50px top padding + the dedicated header space for text
+    var _visual_start_y = _prop_panel_y + 50 + _header_space;
     
-    // Add the origin offset so `draw_sprite_ext` aligns the visual bounds perfectly
     var _start_x = _visual_start_x + _origin_x;
     var _card_y = _visual_start_y + _origin_y;
     
-    for (var i = 0; i < 6; i++) {
+    for (var i = 0; i < _card_count; i++) {
         draw_sprite_ext(_card_spr, 0, _start_x + (i * (_card_w + _card_gap)), _card_y, _card_scale, _card_scale, 0, c_white, 1);
     }
 }
