@@ -25,8 +25,8 @@
   "nineSlice":null,
   "origin":0,
   "parent":{
-    "name":"Fortuna",
-    "path":"Fortuna.yyp",
+    "name":"Tiles",
+    "path":"folders/Sprite/Tiles.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",

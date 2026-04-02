@@ -1,7 +1,7 @@
 // Board Rendering
 
 board_x  = 320;
-board_y  = 150;
+board_y  = 200;
 board_h  = 680;
 
 var board_area_w = room_width - board_x;

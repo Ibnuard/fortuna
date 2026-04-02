@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"scr_anim_easing",
   "parent":{
-    "name":"Fortuna",
-    "path":"Fortuna.yyp",
+    "name":"Script",
+    "path":"folders/Script.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

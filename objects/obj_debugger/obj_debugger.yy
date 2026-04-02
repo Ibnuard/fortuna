@@ -8,8 +8,8 @@
   "name":"obj_debugger",
   "overriddenProperties":[],
   "parent":{
-    "name":"Fortuna",
-    "path":"Fortuna.yyp",
+    "name":"Object",
+    "path":"folders/Object.yy",
   },
   "parentObjectId":null,
   "persistent":false,

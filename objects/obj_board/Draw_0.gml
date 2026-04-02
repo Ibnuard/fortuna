@@ -26,7 +26,7 @@ for (var oi = 0; oi < array_length(draw_order); oi++) {
     var draw_x    = tile_left + clip_px;
     if (src_w <= 0) continue;
     
-    var shd_off = lerp(20, 10, dist_norm);
+    var shd_off = lerp(18, 8, dist_norm);
     draw_set_alpha(lerp(0.75, 0.32, dist_norm));
     draw_sprite_part_ext(
         tiles[loop_index(player_index + i)].sprite, 0,
