@@ -1,6 +1,6 @@
 {
   "$GMFont":"",
-  "%Name":"fnt_gui_button",
+  "%Name":"fnt_gui_button_large",
   "AntiAlias":1,
   "applyKerning":0,
   "ascender":44,
@@ -117,7 +117,7 @@
   "last":0,
   "lineHeight":58,
   "maintainGms1Font":false,
-  "name":"fnt_gui_button",
+  "name":"fnt_gui_button_large",
   "parent":{
     "name":"Font",
     "path":"folders/Font.yy",

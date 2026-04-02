@@ -28,7 +28,8 @@
   },
   "name":"Fortuna",
   "resources":[
-    {"id":{"name":"fnt_gui_button","path":"fonts/fnt_gui_button/fnt_gui_button.yy",},},
+    {"id":{"name":"fnt_gui_button_large","path":"fonts/fnt_gui_button_large/fnt_gui_button_large.yy",},},
+    {"id":{"name":"fnt_gui_button_medium","path":"fonts/fnt_gui_button_medium/fnt_gui_button_medium.yy",},},
     {"id":{"name":"fnt_main","path":"fonts/fnt_main/fnt_main.yy",},},
     {"id":{"name":"obj_board","path":"objects/obj_board/obj_board.yy",},},
     {"id":{"name":"obj_debugger","path":"objects/obj_debugger/obj_debugger.yy",},},
@@ -44,6 +45,7 @@
     {"id":{"name":"scr_tile_utils","path":"scripts/scr_tile_utils/scr_tile_utils.yy",},},
     {"id":{"name":"spr_button_blue","path":"sprites/spr_button_blue/spr_button_blue.yy",},},
     {"id":{"name":"spr_button_main","path":"sprites/spr_button_main/spr_button_main.yy",},},
+    {"id":{"name":"spr_button_red","path":"sprites/spr_button_red/spr_button_red.yy",},},
     {"id":{"name":"spr_gui_bottom_container","path":"sprites/spr_gui_bottom_container/spr_gui_bottom_container.yy",},},
     {"id":{"name":"spr_gui_top_bar","path":"sprites/spr_gui_top_bar/spr_gui_top_bar.yy",},},
     {"id":{"name":"spr_layout_guide","path":"sprites/spr_layout_guide/spr_layout_guide.yy",},},
