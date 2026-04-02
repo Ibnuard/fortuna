@@ -27,6 +27,9 @@ anim_t      = 0.0;
 anim_speed  = 1 / 12;
 anim_offset = 0.0;
 
+intro_active = true;
+intro_anim_t = 0.0;
+
 lift_max    = 18;
 
 // Cari obj_pawn yang sudah ada di room

@@ -19,6 +19,11 @@ for (var oi = 0; oi < array_length(draw_order); oi++) {
     var dist_norm = clamp(abs(_x - board_center_x) / step_size, 0, 1);
     var lift      = lerp(lift_max, 0, dist_norm);
     var _y        = tile_y - lift;
+    
+    var local_t = clamp((intro_anim_t - ((i + 2) * 0.1)) / 0.6, 0, 1);
+    var t_ease = 1 - power(1 - local_t, 3);
+    _y += lerp(-1200, 0, t_ease);
+    
     var tile_left = _x - half_w;
     var clip_px   = max(0, board_x - tile_left);
     var src_x     = clip_px / sc;
@@ -46,6 +51,11 @@ for (var oi = 0; oi < array_length(draw_order); oi++) {
     var dist_norm = clamp(abs(_x - board_center_x) / step_size, 0, 1);
     var lift      = lerp(lift_max, 0, dist_norm);
     var _y        = tile_y - lift;
+
+    var local_t = clamp((intro_anim_t - ((i + 2) * 0.1)) / 0.6, 0, 1);
+    var t_ease = 1 - power(1 - local_t, 3);
+    _y += lerp(-1200, 0, t_ease);
+
     var tile_left = _x - half_w;
     var clip_px   = max(0, board_x - tile_left);
     var src_x     = clip_px / sc;
@@ -66,16 +76,21 @@ for (var oi = 0; oi < array_length(draw_order); oi++) {
 {
     var closest_x    = board_center_x;
     var closest_dist = 999999;
+    var closest_i    = 0;
     for (var i = -mid; i <= mid; i++) {
         var _x = board_center_x + i * step_size + anim_offset;
         var d  = abs(_x - board_center_x);
-        if (d < closest_dist) { closest_dist = d; closest_x = _x; }
+        if (d < closest_dist) { closest_dist = d; closest_x = _x; closest_i = i; }
     }
     
     var dist_norm = clamp(closest_dist / step_size, 0, 1);
     var lift      = lerp(lift_max, 0, dist_norm);
     var bx        = closest_x - tile_w / 2;
     var by        = tile_y - lift;
+    
+    var local_t = clamp((intro_anim_t - ((closest_i + 2) * 0.1)) / 0.6, 0, 1);
+    var t_ease = 1 - power(1 - local_t, 3);
+    by += lerp(-1200, 0, t_ease);
     
     var gap       = 1;  // jarak dari tepi tile
     var thickness = 8;  // tebal border
