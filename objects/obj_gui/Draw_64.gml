@@ -183,14 +183,17 @@ var _gui_w = display_get_gui_width();
 var _gui_h = display_get_gui_height();
 
 if (shader_is_compiled(shd_game_fx)) {
-    gpu_set_blendmode(bm_normal); // Default blend: just draw alpha over it
+    gpu_set_blendmode(bm_normal); 
     shader_set(shd_game_fx);
     var _u_res = shader_get_uniform(shd_game_fx, "u_resolution");
+    var _u_vig = shader_get_uniform(shd_game_fx, "u_vignette_mix");
+    var _u_scn = shader_get_uniform(shd_game_fx, "u_scanline_mix");
+    
     shader_set_uniform_f(_u_res, _gui_w, _gui_h);
+    shader_set_uniform_f(_u_vig, 1.0); // Apply Vignette
+    shader_set_uniform_f(_u_scn, 0.0); // No Scanlines yet
     
-    // Draw BLACK rectangle. Alpha-mask in shader handles the darkening.
     draw_rectangle_color(0, 0, _gui_w, _gui_h, c_black, c_black, c_black, c_black, false);
-    
     shader_reset();
 }
 
@@ -224,7 +227,16 @@ if (draw_gui_button(_left_x, _main_y + stagger_btn_left, _side_w, _side_h, spr_b
 }
 
 var _roll_y = _main_y + stagger_btn_center;
-draw_gui_button(_center_x, _roll_y, _main_w, _main_h, spr_button_main, "", c_white, fnt_gui_button_medium);
+if (draw_gui_button(_center_x, _roll_y, _main_w, _main_h, spr_button_main, "", c_white, fnt_gui_button_medium)) {
+    if (gui_state == "MAIN") {
+        gui_state = "DICE";
+        dice_roll_timer = 60; // 1 second at 60fps
+        dice_pop_y = 1000;    // Reset animation start
+        dice_can_exit = false;
+        randomize();          // Ensure true randomness
+    }
+}
+
 
 // Waving Text for Roll Button
 var _wave_str = "Roll The Dice!";
@@ -406,4 +418,80 @@ if (property_y_offset < 790) {
     }
 }
 
+// ─── DICE ROLL POPUP RENDERING ───
+if (gui_state == "DICE" || dice_pop_y < 990) {
+    var _gui_w = display_get_gui_width();
+    var _gui_h = display_get_gui_height();
+    
+    // 1. Dark Overlay (Fades in with the popup position)
+    var _dice_overlay_alpha = lerp(0, 0.6, clamp(1.0 - (dice_pop_y / 1000), 0, 1));
+    draw_set_color(c_black);
+    draw_set_alpha(_dice_overlay_alpha);
+    draw_rectangle(0, 0, _gui_w, _gui_h, false);
+    draw_set_alpha(1.0);
+    
+    // 2. Calculating Dynamic Dimensions
+    var _dice_scale = 0.7; // Smaller dice as requested
+    var _margin = 20;
+    var _gap = 20;
+    
+    var _dw = sprite_get_width(spr_dice) * _dice_scale;
+    var _dh = sprite_get_height(spr_dice) * _dice_scale;
+    
+    var _total_w = (3 * _dw) + (2 * _gap) + (2 * _margin);
+    var _total_h = _dh + (2 * _margin);
+    
+    // 3. Popup Centering
+    var _popup_x = (_gui_w / 2) - (_total_w / 2);
+    var _popup_y = (_gui_h / 2) - (_total_h / 2) + dice_pop_y;
+    
+    // Draw Dynamic Container
+    draw_sprite_stretched(spr_dice_container, 0, _popup_x, _popup_y, _total_w, _total_h);
+    
+    // 4. Dice Rendering (Centered within their slots in the container)
+    var _shake_mag = (dice_roll_timer > 0) ? 6 : 0;
+    var _dice_y = _popup_y + _margin + (_dh / 2);
+    
+    for (var i = 0; i < 3; i++) {
+        var _dice_x = _popup_x + _margin + (i * (_dw + _gap)) + (_dw / 2);
+        
+        var _dx = _dice_x;
+        var _dy = _dice_y;
+        
+        // Apply Shake Jitter
+        if (_shake_mag > 0) {
+            _dx += random_range(-_shake_mag, _shake_mag);
+            _dy += random_range(-_shake_mag, _shake_mag);
+        }
+        
+        draw_sprite_ext(spr_dice, dice_values[i], _dx, _dy, _dice_scale, _dice_scale, 0, c_white, 1);
+    }
+    
+    // 5. Instructional Text (Blinking below the container)
+    if (dice_can_exit) {
+        draw_set_font(fnt_main);
+        draw_set_halign(fa_center);
+        draw_set_valign(fa_top);
+        draw_set_color(c_white);
+        draw_set_alpha(abs(sin(current_time/300))); 
+        draw_text(_gui_w / 2, _popup_y + _total_h + 20, "Click anywhere to continue");
+        draw_set_alpha(1.0);
+    }
+}
 
+
+// ─── FINAL SCANLINE PASS (Drawn over EVERYTHING for that high-intensity CRT mesh) ───
+if (shader_is_compiled(shd_game_fx)) {
+    gpu_set_blendmode(bm_normal);
+    shader_set(shd_game_fx);
+    var _u_res = shader_get_uniform(shd_game_fx, "u_resolution");
+    var _u_vig = shader_get_uniform(shd_game_fx, "u_vignette_mix");
+    var _u_scn = shader_get_uniform(shd_game_fx, "u_scanline_mix");
+    
+    shader_set_uniform_f(_u_res, display_get_gui_width(), display_get_gui_height());
+    shader_set_uniform_f(_u_vig, 0.0); // No Vignette (already applied to BG)
+    shader_set_uniform_f(_u_scn, 1.0); // Apply Scanlines
+    
+    draw_rectangle_color(0, 0, display_get_gui_width(), display_get_gui_height(), c_black, c_black, c_black, c_black, false);
+    shader_reset();
+}

@@ -36,3 +36,10 @@ stagger_turn_badge = 80;    // Turn badge Y offset (starts below)
 stagger_btn_center = 80;    // Roll button
 stagger_btn_left = 80;      // Inventory button
 stagger_btn_right = 80;     // Shop button
+
+// ─── DICE ROLL POPUP ───
+dice_values = [0, 0, 0];       // Current face values (0-5)
+dice_roll_timer = 0;           // Timer to stop rolling/shuffling
+dice_pop_y = 1000;             // Vertical offset for popup (starts below screen)
+dice_can_exit = false;         // Flag to allow clicking away after roll ends
+

@@ -85,3 +85,34 @@ if (gui_state == "PROPERTY" && property_y_offset < 790) {
     panel_scroll_y = 0;
     is_dragging_panel = false;
 }
+
+// ─── DICE ROLL POPUP LOGIC ───
+var _dice_target_y = (gui_state == "DICE") ? 0 : 1000;
+dice_pop_y = lerp(dice_pop_y, _dice_target_y, animation_speed);
+
+if (gui_state == "DICE") {
+    // While the roll timer is active, keep shuffling values
+    if (dice_roll_timer > 0) {
+        dice_roll_timer--;
+        
+        // Randomize dice faces (0-5)
+        for (var i = 0; i < 3; i++) {
+            dice_values[i] = irandom_range(0, 5);
+        }
+        
+        if (dice_roll_timer == 0) {
+            dice_can_exit = true; // Roll finished, player can click to dismiss
+        }
+    }
+    
+    // Dismiss popup on click if roll is done
+    if (dice_can_exit && mouse_check_button_pressed(mb_left)) {
+        gui_state = "MAIN";
+        dice_can_exit = false;
+    }
+} else {
+    // Reset timer and exit flag when not in DICE state
+    dice_roll_timer = 0;
+    dice_can_exit = false;
+}
+
