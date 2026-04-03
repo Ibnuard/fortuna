@@ -409,19 +409,18 @@ if (property_y_offset < 790) {
     }
 }
 
-// ─── CRT SCANLINE OVERLAY (Balatro-style) ───
-// Drawn last so it overlays everything on screen
+// ─── CRT SCANLINE + VIGNETTE OVERLAY (Shader-based, Balatro-style) ───
 var _gui_w = display_get_gui_width();
 var _gui_h = display_get_gui_height();
-var _line_spacing = 6; // Wider gaps between lines
-var _line_thick = 2;   // 2px dark band
 
-draw_set_color(c_black);
-draw_set_alpha(0.2); // Clearly visible
-
-for (var _sy = 0; _sy < _gui_h; _sy += _line_spacing) {
-    draw_rectangle(0, _sy, _gui_w, _sy + _line_thick - 1, false);
+if (shader_is_compiled(shd_game_fx)) {
+    gpu_set_blendmode_ext(bm_dest_colour, bm_zero); // Multiply blend
+    shader_set(shd_game_fx);
+    var _u_res = shader_get_uniform(shd_game_fx, "u_resolution");
+    shader_set_uniform_f(_u_res, _gui_w, _gui_h);
+    
+    draw_rectangle_color(0, 0, _gui_w, _gui_h, c_white, c_white, c_white, c_white, false);
+    
+    shader_reset();
+    gpu_set_blendmode(bm_normal);
 }
-
-draw_set_alpha(1.0);
-draw_set_color(c_white);
