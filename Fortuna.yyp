@@ -43,6 +43,7 @@
     {"id":{"name":"scr_tile_enum","path":"scripts/scr_tile_enum/scr_tile_enum.yy",},},
     {"id":{"name":"scr_tile_factory","path":"scripts/scr_tile_factory/scr_tile_factory.yy",},},
     {"id":{"name":"scr_tile_utils","path":"scripts/scr_tile_utils/scr_tile_utils.yy",},},
+    {"id":{"name":"shd_game_fx","path":"shaders/shd_game_fx/shd_game_fx.yy",},},
     {"id":{"name":"spr_button_blue","path":"sprites/spr_button_blue/spr_button_blue.yy",},},
     {"id":{"name":"spr_button_emerald","path":"sprites/spr_button_emerald/spr_button_emerald.yy",},},
     {"id":{"name":"spr_button_main","path":"sprites/spr_button_main/spr_button_main.yy",},},

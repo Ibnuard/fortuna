@@ -1,0 +1,12 @@
+{
+  "$GMShader":"",
+  "%Name":"shd_game_fx",
+  "name":"shd_game_fx",
+  "parent":{
+    "name":"Fortuna",
+    "path":"Fortuna.yyp",
+  },
+  "resourceType":"GMShader",
+  "resourceVersion":"2.0",
+  "type":1,
+}
