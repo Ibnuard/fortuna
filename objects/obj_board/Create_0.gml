@@ -1,19 +1,19 @@
 // Board Rendering
 
-board_x  = 320;
+board_x  = 40; // Symmetric padding from screen edges
 board_y  = 200;
 board_h  = 680;
 
-var board_area_w = room_width - board_x;
+var board_area_w = room_width - (board_x * 2); // Full width minus symmetric padding
 
-tile_gap = 14;
-var total_gap  = tile_gap * 4;
-var tile_scr_w = floor((board_area_w * 0.95 - total_gap) / 5);
+tile_gap = 12;
+var total_gap  = tile_gap * 8; // 8 gaps between 9 tiles
+var tile_scr_w = floor((board_area_w - total_gap) / 9);
 sc = tile_scr_w / 130;
 
 tile_w = floor(130 * sc);
 tile_h = floor(182 * sc);
-tile_count = 5;
+tile_count = 9;
 
 board_center_x = board_x + board_area_w / 2;
 tile_y = board_y + (board_h - tile_h) / 2;

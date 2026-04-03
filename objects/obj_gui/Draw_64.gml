@@ -131,8 +131,8 @@ if (draw_gui_button(_map_btn_x, _map_btn_y, _map_btn_w, _map_btn_h, spr_button_m
 // ─── BOTTOM GUI CONTAINER & BUTTONS ───
 
 // Button Layout Constants
-var _main_w = 360;
-var _main_h = 100;
+var _main_w = 280;
+var _main_h = 80;
 
 var _side_w = 240; 
 var _side_h = 90;
@@ -141,22 +141,24 @@ var _gap    = 24;
 
 // Dinamically Calculate Panel Dimensions (Tight Padding)
 var _total_btn_w = (_side_w * 2) + _main_w + (_gap * 2);
-var _padding_x = 48; // Space from buttons to panel edge
+var _padding_x = 48;
 var _panel_w = _total_btn_w + (_padding_x * 2); 
-var _panel_h = 220; // Ditinggikan agar area atas tombol lebih lega
+var _panel_h = 220; // Original height
 
-// Center the Panel
-var _target_y = 860; // Offset dinaikkan sedikit (lebih ke atas)
+// Center the Panel (original submerged position)
+var _target_y = 860;
 var _panel_draw_y = _target_y + bottom_y_offset;
 var _panel_x = room_width / 2 - (_panel_w / 2);
 
 draw_sprite_stretched(spr_gui_bottom_container, 0, _panel_x, _panel_draw_y, _panel_w, _panel_h);
 
-// Vertical Center Alignment (With -8px visual offset to account for button shadows)
+// Vertical Center Alignment for SIDE buttons only (With -8px visual offset)
 var _mid_y = _panel_draw_y + (_panel_h / 2) - 8; 
-var _main_y = _mid_y - (_main_h / 2);
-// Aligning bottoms for a unified 3D perspective base
-var _side_y = _main_y + _main_h - _side_h;
+var _side_mid_y = _mid_y - (_side_h / 2);
+
+// Center button is LIFTED above the side buttons
+// Place it higher, then put Turn text right below it
+var _main_y = _side_mid_y - 16; // Lift center button above side buttons
 
 // Center Main Button Geometry
 var _center_x = room_width / 2 - (_main_w / 2);
@@ -166,15 +168,26 @@ var _left_x   = _center_x - _gap - _side_w;
 var _right_x  = _center_x + _main_w + _gap;
 
 // Draw Left Button (Red)
-if (draw_gui_button(_left_x, _side_y, _side_w, _side_h, spr_button_red, "Inventory", c_white, fnt_gui_button_medium)) {
+if (draw_gui_button(_left_x, _side_mid_y, _side_w, _side_h, spr_button_red, "Inventory", c_white, fnt_gui_button_medium)) {
     gui_state = "PROPERTY"; // Trigger slide out
 }
 
-// Draw Center Button (Main)
-draw_gui_button(_center_x, _main_y, _main_w, _main_h, spr_button_main, "Roll The Dice!", c_white);
+// Draw Center Button (Main) — Lifted up
+draw_gui_button(_center_x, _main_y, _main_w, _main_h, spr_button_main, "Roll The Dice!", c_white, fnt_gui_button_medium);
+
+// Turn Info Text — Right below the center button
+var _turn_str = "Turn 3 / 12"; // Mockup value
+draw_set_font(fnt_main);
+draw_set_halign(fa_center);
+draw_set_valign(fa_top);
+draw_set_color(c_black); draw_set_alpha(0.3);
+draw_text(room_width / 2 + 2, _main_y + _main_h + 6, _turn_str);
+draw_set_alpha(1.0); draw_set_color(c_white);
+draw_text(room_width / 2, _main_y + _main_h + 4, _turn_str);
+draw_set_halign(fa_left); draw_set_valign(fa_top);
 
 // Draw Right Button (Blue)
-draw_gui_button(_right_x, _side_y, _side_w, _side_h, spr_button_blue, "Shop", c_white, fnt_gui_button_medium);
+draw_gui_button(_right_x, _side_mid_y, _side_w, _side_h, spr_button_blue, "Shop", c_white, fnt_gui_button_medium);
 
 
 // ─── PROPERTY OVERLAY PANEL ───
