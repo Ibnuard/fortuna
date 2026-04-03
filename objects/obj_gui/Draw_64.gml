@@ -25,6 +25,11 @@ draw_set_font(fnt_main); // Setup font dynamically for measuring layout
 var _map_btn_w = 190; 
 var _map_btn_h = 64;  
 
+// Smaller Utility Buttons for Map/Stat
+var _sm_btn_w = 110;
+var _sm_btn_h = 56;
+var _inner_gap = 12;
+
 // Calculate Label Constraints
 var _label_str = "Target";
 draw_set_font(fnt_gui_button_medium); // Make TARGET bigger
@@ -40,7 +45,8 @@ var _cur_w = string_width(_str_cur);
 var _tgt_w_text = string_width(_str_tgt);
 
 var _total_num_w = _cur_w + _tgt_w_text;
-var _num_x_start = room_width - _pad_x - _total_num_w;
+// Shift numbers to the left to make room for buttons on the right
+var _num_x_start = room_width - _pad_x - (_sm_btn_w * 2) - (_inner_gap * 2) - _total_num_w - 20; 
 
 // --- DRAW TARGET BAR (Stretched dynamically between labels) ---
 var _tgt_x = _label_x + _label_w + 20; // Start after TARGET label
@@ -119,13 +125,22 @@ for (var i = 0; i <= _segments; i++) {
 draw_primitive_end();
 
 // --- 3. TOP BAR BUTTONS (Drawn natively over the curve to retain pixel-perfect click zones) ---
-// Place Map Info button on the LEFT
+// Place "Option" button on the LEFT
 var _map_btn_x = _pad_x; 
 var _map_btn_y = (_topbar_h / 2) - (_map_btn_h / 2);
 
-// GUNAKAN fnt_main AGAR PIXELNYA SAMA KASARNYA DENGAN TULISAN TARGET
-if (draw_gui_button(_map_btn_x, _map_btn_y, _map_btn_w, _map_btn_h, spr_button_main, "View Map", c_white, fnt_main)) {
-    // Placeholder Map interaction
+draw_gui_button(_map_btn_x, _map_btn_y, _map_btn_w, _map_btn_h, spr_button_main, "Option", c_white, fnt_main);
+
+// Place "Map" and "Stat" buttons on the RIGHT
+var _stat_btn_x = room_width - _pad_x - _sm_btn_w;
+var _map_top_x  = _stat_btn_x - _inner_gap - _sm_btn_w;
+var _top_btn_y  = (_topbar_h / 2) - (_sm_btn_h / 2);
+
+if (draw_gui_button(_map_top_x, _top_btn_y, _sm_btn_w, _sm_btn_h, spr_button_emerald, "Map", c_white, fnt_main)) {
+    // Open Map logic
+}
+if (draw_gui_button(_stat_btn_x, _top_btn_y, _sm_btn_w, _sm_btn_h, spr_button_purple, "Stats", c_white, fnt_main)) {
+    // Open Stat logic
 }
 
 // ─── BOTTOM GUI CONTAINER & BUTTONS ───
@@ -144,7 +159,7 @@ var _panel_w = _total_btn_w + (_padding_x * 2);
 var _panel_h = 240; // Taller panel for better spacing
 
 // Center the Panel (submerged deeper to hide rounded corners)
-var _target_y = 910; 
+var _target_y = 855; 
 var _panel_draw_y = _target_y + bottom_y_offset;
 var _panel_x = room_width / 2 - (_panel_w / 2);
 
@@ -152,28 +167,28 @@ draw_sprite_stretched(spr_gui_bottom_container, 0, _panel_x, _panel_draw_y, _pan
 
 // ─── TILTED TURN BADGE (On Top Edge) ───
 var _turn_str = "Turn 3 / 12";
-var _badge_angle = -5; // Slightly reduced tilt for readability
+var _badge_angle = 0; // Straight as requested
 var _badge_w = 200; // Enlarged
-var _badge_h = 68;  // Enlarged
+var _badge_h = 80;  // Taller boxy look
 var _badge_x = room_width / 2;
 var _badge_y = _panel_draw_y - 2; // Slight overlap on the border line
 
-// Draw spr_container rotated (Origin set to 100, 50 in sprite editor)
+// Draw spr_container (Origin set to 100, 50 in sprite editor)
 draw_set_alpha(1.0);
-draw_sprite_ext(spr_container, 0, _badge_x, _badge_y, _badge_w/200, _badge_h/100, _badge_angle, c_white, 1);
+draw_sprite_ext(spr_container, 0, _badge_x, _badge_y + 10, _badge_w/200, _badge_h/100, _badge_angle, c_white, 1);
 
-// Text inside rotated badge
+// Text inside badge (Larger scale to fill space)
 draw_set_font(fnt_main);
 draw_set_halign(fa_center); draw_set_valign(fa_middle);
 draw_set_color(c_black); draw_set_alpha(0.3);
-draw_text_transformed(_badge_x + 2, _badge_y + 2, _turn_str, 1.1, 1.1, _badge_angle); // scaled shadow
+draw_text_transformed(_badge_x + 2, _badge_y + 12, _turn_str, 1.6, 1.6, _badge_angle); // scaled shadow
 draw_set_color(c_white); draw_set_alpha(1.0);
-draw_text_transformed(_badge_x, _badge_y, _turn_str, 1.1, 1.1, _badge_angle); // scaled text
+draw_text_transformed(_badge_x, _badge_y + 8, _turn_str, 1.6, 1.6, _badge_angle); // scaled text
 draw_set_halign(fa_left); draw_set_valign(fa_top);
 
 // ─── BUTTONS (Aligned Center) ───
-// Vertical Alignment (Shifted down to "respect" the turn badge area)
-var _mid_y = _panel_draw_y + (_panel_h / 2) + 24; 
+// Vertical Alignment (Raised further towards the badge)
+var _mid_y = _panel_draw_y + (_panel_h / 2) - 10; 
 var _main_y = _mid_y - (_main_h / 2);
 var _side_y = _main_y; 
 
