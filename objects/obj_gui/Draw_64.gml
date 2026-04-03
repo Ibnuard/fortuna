@@ -26,26 +26,36 @@ var _map_btn_w = 190; // KECILKAN DARI 280
 var _map_btn_h = 50;  // KECILKAN DARI 80
 
 // Calculate Label Constraints
-var _label_str = "TARGET";
+var _label_str = "Target";
+draw_set_font(fnt_gui_button_medium); // Make TARGET bigger
 var _label_x = _pad_x + _map_btn_w + 30; // 30px gap after Map Info Button
 var _label_w = string_width(_label_str);
 
 // Calculate Number String Constraints
-var _tgt_str = "$12.400 / $30.000";
-var _num_w = string_width(_tgt_str);
-var _num_x = room_width - _pad_x; // Align numbers to rightmost edge padding
+var _str_cur = "$12.400";
+var _str_tgt = " / $30.000";
+
+draw_set_font(fnt_gui_button_medium); // Current is larger
+var _cur_w = string_width(_str_cur);
+
+draw_set_font(fnt_main); // Target is smaller
+var _tgt_w_text = string_width(_str_tgt);
+
+var _total_num_w = _cur_w + _tgt_w_text;
+var _num_x_start = room_width - _pad_x - _total_num_w;
 
 // --- DRAW TARGET BAR (Stretched dynamically between labels) ---
 var _tgt_x = _label_x + _label_w + 20; // Start after TARGET label
-var _tgt_w = (_num_x - _num_w - 20) - _tgt_x; // Stop right before the Number String
+var _tgt_w = (_num_x_start - 20) - _tgt_x; // Stop right before the Number String
 var _tgt_h = _map_btn_h; // SAMAKAN TINGGI BAR DENGAN TOMBOL! Biar rapi satu jalur (50px)
 var _tgt_y = _center_y - (_tgt_h / 2);
 
 // Draw "TARGET" Label
+draw_set_font(fnt_gui_button_medium); // BESAR
 draw_set_halign(fa_left); draw_set_valign(fa_middle);
-draw_set_color(make_color_rgb(2, 74, 56)); // Dark shadow for Teal
+draw_set_color(make_color_rgb(40, 40, 40)); // Dark shadow 
 draw_text(_label_x + 3, _center_y + 3, _label_str);
-draw_set_color(make_color_rgb(6, 214, 160)); // Teal #06d6a0
+draw_set_color(c_white); // Putih seperti diminta
 draw_text(_label_x, _center_y, _label_str);
 
 // Teal Progress Fill
@@ -60,11 +70,22 @@ draw_set_color(c_white);
 draw_sprite_stretched(spr_target_bar, 0, _tgt_x, _tgt_y, _tgt_w, _tgt_h);
 
 // Draw Numbers String outside the Bar
-draw_set_halign(fa_right); draw_set_valign(fa_middle);
+draw_set_halign(fa_left); draw_set_valign(fa_middle);
+
+// 1. Current (Bigger & Gold)
+draw_set_font(fnt_gui_button_medium); 
 draw_set_color(c_black);
-draw_text(_num_x + 3, _center_y + 3, _tgt_str); 
+draw_text(_num_x_start + 3, _center_y + 3, _str_cur); 
+draw_set_color(make_color_rgb(248, 194, 58)); // Gold HTML Variable
+draw_text(_num_x_start, _center_y, _str_cur);
+
+// 2. Limit/Target (Smaller & White)
+draw_set_font(fnt_main);
+var _tgt_num_x = _num_x_start + _cur_w;
+draw_set_color(c_black);
+draw_text(_tgt_num_x + 3, _center_y + 3, _str_tgt); 
 draw_set_color(c_white);
-draw_text(_num_x, _center_y, _tgt_str);
+draw_text(_tgt_num_x, _center_y, _str_tgt);
 
 draw_set_halign(fa_left); draw_set_valign(fa_top);
 
