@@ -200,8 +200,53 @@ if (draw_gui_button(_left_x, _main_y + stagger_btn_left, _side_w, _side_h, spr_b
     gui_state = "PROPERTY";
 }
 
-// Draw Center Button (Staggered)
-draw_gui_button(_center_x, _main_y + stagger_btn_center, _main_w, _main_h, spr_button_main, "Roll The Dice!", c_white, fnt_gui_button_medium);
+// Draw Center Button (Staggered) — drawn WITHOUT text, wave text added below
+var _roll_y = _main_y + stagger_btn_center;
+draw_gui_button(_center_x, _roll_y, _main_w, _main_h, spr_button_main, "", c_white, fnt_gui_button_medium);
+
+// ─── WAVING TEXT on Roll The Dice! ───
+var _wave_str = "Roll The Dice!";
+var _wave_len = string_length(_wave_str);
+draw_set_font(fnt_gui_button_medium);
+
+// Match hover/press offset from draw_gui_button
+var _mx = device_mouse_x_to_gui(0);
+var _my = device_mouse_y_to_gui(0);
+var _roll_hover = point_in_rectangle(_mx, _my, _center_x, _roll_y, _center_x + _main_w, _roll_y + _main_h);
+var _roll_press = _roll_hover && mouse_check_button(mb_left);
+var _juice_y = 0;
+if (_roll_hover && !_roll_press) _juice_y = -6; // Float up
+if (_roll_press) _juice_y = 2; // Dip in
+
+// Calculate total text width for centering
+var _total_w = string_width(_wave_str);
+var _start_x = _center_x + (_main_w / 2) - (_total_w / 2);
+var _face_h = _main_h - 10 + ((_roll_press) ? -2 : 0); // Squash on press
+var _base_y = _roll_y + _juice_y + (_face_h / 2);
+
+// Wave parameters
+var _wave_amp = 3.0;    // Pixel amplitude of the wave
+var _wave_speed = 4.0;  // Speed of the wave
+var _wave_freq = 0.4;   // Phase offset per character
+
+var _cx = _start_x;
+for (var _ci = 0; _ci < _wave_len; _ci++) {
+    var _ch = string_char_at(_wave_str, _ci + 1);
+    var _ch_w = string_width(_ch);
+    var _wave_y = sin((current_time / 1000 * _wave_speed) + (_ci * _wave_freq)) * _wave_amp;
+    
+    // Shadow
+    draw_set_halign(fa_left); draw_set_valign(fa_middle);
+    draw_set_color(c_black); draw_set_alpha(0.3);
+    draw_text(_cx + 3, _base_y + _wave_y + 4, _ch);
+    
+    // Main character
+    draw_set_color(c_white); draw_set_alpha(1.0);
+    draw_text(_cx, _base_y + _wave_y, _ch);
+    
+    _cx += _ch_w;
+}
+draw_set_halign(fa_left); draw_set_valign(fa_top);
 
 // Draw Right Button (Staggered)
 draw_gui_button(_right_x, _main_y + stagger_btn_right, _side_w, _side_h, spr_button_blue, "Shop", c_white, fnt_gui_button_medium);
