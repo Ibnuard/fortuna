@@ -119,22 +119,22 @@ for (var i = 0; i <= _segments; i++) {
     var _arc = sin(_ratio * pi);
     var _y_offset = _arc * _curve_intensity; 
     
-    draw_vertex_texture(_x, 0 + _y_offset, _ratio, 0); // Top Edge
-    draw_vertex_texture(_x, _topbar_h + _y_offset, _ratio, 1); // Bottom Edge
+    draw_vertex_texture(_x, top_y_offset + 0 + _y_offset, _ratio, 0); // Top Edge
+    draw_vertex_texture(_x, top_y_offset + _topbar_h + _y_offset, _ratio, 1); // Bottom Edge
 }
 draw_primitive_end();
 
-// --- 3. TOP BAR BUTTONS (Drawn natively over the curve to retain pixel-perfect click zones) ---
-// Place "Option" button on the LEFT
+// --- 3. TOP BAR BUTTONS (Staggered entry over the curve) ---
+// Place "Option" button on the LEFT (staggered)
 var _map_btn_x = _pad_x; 
-var _map_btn_y = (_topbar_h / 2) - (_map_btn_h / 2);
+var _map_btn_y = top_y_offset + (_topbar_h / 2) - (_map_btn_h / 2) + stagger_option;
 
 draw_gui_button(_map_btn_x, _map_btn_y, _map_btn_w, _map_btn_h, spr_button_main, "Option", c_white, fnt_main);
 
-// Place "Map" and "Stat" buttons on the RIGHT
+// Place "Map" and "Stat" buttons on the RIGHT (staggered)
 var _stat_btn_x = room_width - _pad_x - _sm_btn_w;
 var _map_top_x  = _stat_btn_x - _inner_gap - _sm_btn_w;
-var _top_btn_y  = (_topbar_h / 2) - (_sm_btn_h / 2);
+var _top_btn_y  = top_y_offset + (_topbar_h / 2) - (_sm_btn_h / 2) + stagger_map_stat;
 
 if (draw_gui_button(_map_top_x, _top_btn_y, _sm_btn_w, _sm_btn_h, spr_button_emerald, "Map", c_white, fnt_main)) {
     // Open Map logic
@@ -165,50 +165,46 @@ var _panel_x = room_width / 2 - (_panel_w / 2);
 
 draw_sprite_stretched(spr_gui_bottom_container, 0, _panel_x, _panel_draw_y, _panel_w, _panel_h);
 
-// ─── TILTED TURN BADGE (On Top Edge) ───
+// ─── TURN BADGE (Staggered) ───
 var _turn_str = "Turn 3 / 12";
-var _badge_angle = 0; // Straight as requested
-var _badge_w = 200; // Enlarged
-var _badge_h = 80;  // Taller boxy look
+var _badge_angle = 0;
+var _badge_w = 200;
+var _badge_h = 80;
 var _badge_x = room_width / 2;
-var _badge_y = _panel_draw_y - 2; // Slight overlap on the border line
+var _badge_y = _panel_draw_y - 2 + stagger_turn_badge;
 
 // Draw spr_container (Origin set to 100, 50 in sprite editor)
 draw_set_alpha(1.0);
 draw_sprite_ext(spr_container, 0, _badge_x, _badge_y + 10, _badge_w/200, _badge_h/100, _badge_angle, c_white, 1);
 
-// Text inside badge (Larger scale to fill space)
+// Text inside badge
 draw_set_font(fnt_main);
 draw_set_halign(fa_center); draw_set_valign(fa_middle);
 draw_set_color(c_black); draw_set_alpha(0.3);
-draw_text_transformed(_badge_x + 2, _badge_y + 12, _turn_str, 1.6, 1.6, _badge_angle); // scaled shadow
+draw_text_transformed(_badge_x + 2, _badge_y + 12, _turn_str, 1.6, 1.6, _badge_angle);
 draw_set_color(c_white); draw_set_alpha(1.0);
-draw_text_transformed(_badge_x, _badge_y + 8, _turn_str, 1.6, 1.6, _badge_angle); // scaled text
+draw_text_transformed(_badge_x, _badge_y + 8, _turn_str, 1.6, 1.6, _badge_angle);
 draw_set_halign(fa_left); draw_set_valign(fa_top);
 
-// ─── BUTTONS (Aligned Center) ───
-// Vertical Alignment (Raised further towards the badge)
+// ─── BUTTONS (Staggered Entry) ───
 var _mid_y = _panel_draw_y + (_panel_h / 2) - 10; 
 var _main_y = _mid_y - (_main_h / 2);
-var _side_y = _main_y; 
 
 // Center Main Button Geometry
 var _center_x = room_width / 2 - (_main_w / 2);
-
-// Calculate Left & Right Button X
 var _left_x   = _center_x - _gap - _side_w;
 var _right_x  = _center_x + _main_w + _gap;
 
-// Draw Left Button (Red)
-if (draw_gui_button(_left_x, _side_y, _side_w, _side_h, spr_button_red, "Inventory", c_white, fnt_gui_button_medium)) {
-    gui_state = "PROPERTY"; // Trigger slide out
+// Draw Left Button (Staggered)
+if (draw_gui_button(_left_x, _main_y + stagger_btn_left, _side_w, _side_h, spr_button_red, "Inventory", c_white, fnt_gui_button_medium)) {
+    gui_state = "PROPERTY";
 }
 
-// Draw Center Button (Main)
-draw_gui_button(_center_x, _main_y, _main_w, _main_h, spr_button_main, "Roll The Dice!", c_white, fnt_gui_button_medium);
+// Draw Center Button (Staggered)
+draw_gui_button(_center_x, _main_y + stagger_btn_center, _main_w, _main_h, spr_button_main, "Roll The Dice!", c_white, fnt_gui_button_medium);
 
-// Draw Right Button (Blue)
-draw_gui_button(_right_x, _side_y, _side_w, _side_h, spr_button_blue, "Shop", c_white, fnt_gui_button_medium);
+// Draw Right Button (Staggered)
+draw_gui_button(_right_x, _main_y + stagger_btn_right, _side_w, _side_h, spr_button_blue, "Shop", c_white, fnt_gui_button_medium);
 
 
 

@@ -18,3 +18,21 @@ surf_topbar = -1; // Specific canvas for the CRT curved top bar
 is_dragging_panel = false;
 drag_start_y = 0;
 scroll_start = 0;
+
+// ─── INTRO ANIMATION (Slide + Stagger) ───
+intro_timer = 0;           // Global frame counter for sequencing
+top_y_offset = -220;       // Top bar starts above screen
+top_y_target = 0;          // Target: flush with top
+
+// Stagger offsets for individual elements (start off-screen/invisible)
+// Top bar elements
+stagger_option = -60;       // Option button Y offset
+stagger_target_bar = -60;   // Target bar + label Y offset  
+stagger_cash = -60;         // Cash display Y offset
+stagger_map_stat = -60;     // Map/Stat buttons Y offset
+
+// Bottom panel elements
+stagger_turn_badge = 80;    // Turn badge Y offset (starts below)
+stagger_btn_center = 80;    // Roll button
+stagger_btn_left = 80;      // Inventory button
+stagger_btn_right = 80;     // Shop button

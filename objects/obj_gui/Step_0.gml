@@ -9,6 +9,38 @@ if (abs(bottom_y_offset - target_bottom_offset) > 0.5) {
     bottom_y_offset = target_bottom_offset;
 }
 
+// ─── INTRO STAGGER ANIMATION ───
+intro_timer += 1;
+var _spd = 0.10; // Smooth lerp speed for stagger elements
+
+// Top bar slide-in
+if (intro_timer > 5) {
+    top_y_offset = lerp(top_y_offset, top_y_target, _spd);
+    if (abs(top_y_offset - top_y_target) < 0.5) top_y_offset = top_y_target;
+}
+
+// Staggered top bar elements (each waits a bit longer)
+if (intro_timer > 15) { stagger_option    = lerp(stagger_option,    0, _spd); }
+if (intro_timer > 25) { stagger_target_bar = lerp(stagger_target_bar, 0, _spd); }
+if (intro_timer > 30) { stagger_cash       = lerp(stagger_cash,       0, _spd); }
+if (intro_timer > 35) { stagger_map_stat   = lerp(stagger_map_stat,   0, _spd); }
+
+// Staggered bottom panel elements
+if (intro_timer > 20) { stagger_turn_badge = lerp(stagger_turn_badge, 0, _spd); }
+if (intro_timer > 30) { stagger_btn_center = lerp(stagger_btn_center, 0, _spd); }
+if (intro_timer > 35) { stagger_btn_left   = lerp(stagger_btn_left,   0, _spd); }
+if (intro_timer > 38) { stagger_btn_right  = lerp(stagger_btn_right,  0, _spd); }
+
+// Snap small values to 0
+if (abs(stagger_option) < 0.5) stagger_option = 0;
+if (abs(stagger_target_bar) < 0.5) stagger_target_bar = 0;
+if (abs(stagger_cash) < 0.5) stagger_cash = 0;
+if (abs(stagger_map_stat) < 0.5) stagger_map_stat = 0;
+if (abs(stagger_turn_badge) < 0.5) stagger_turn_badge = 0;
+if (abs(stagger_btn_center) < 0.5) stagger_btn_center = 0;
+if (abs(stagger_btn_left) < 0.5) stagger_btn_left = 0;
+if (abs(stagger_btn_right) < 0.5) stagger_btn_right = 0;
+
 // Smoothly animate the property panel
 if (abs(property_y_offset - _target_prop_offset) > 0.5) {
     property_y_offset = lerp(property_y_offset, _target_prop_offset, animation_speed);
