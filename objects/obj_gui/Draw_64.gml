@@ -15,15 +15,15 @@ draw_clear_alpha(c_black, 0);
 draw_sprite_stretched(spr_gui_top_bar, 0, 0, 5, room_width, _topbar_h); 
 
 // --- TOP BAR HUD MODULES ---
-// --- TOP BAR HUD MODULES ---
 var _pad_x = 40; 
-var _center_y = _topbar_h / 2;
+var _center_y = _topbar_h / 2; // Mathematical center (90px)
+var _visual_mid_y = _center_y - 3; // Visual "Face" Center (87px) to align with 9-slice area
 
 draw_set_font(fnt_main); // Setup font dynamically for measuring layout
 
 // --- IMPROVEMENT: Resized Top Bar Button ---
-var _map_btn_w = 190; // KECILKAN DARI 280
-var _map_btn_h = 50;  // KECILKAN DARI 80
+var _map_btn_w = 190; 
+var _map_btn_h = 64;  
 
 // Calculate Label Constraints
 var _label_str = "Target";
@@ -35,10 +35,8 @@ var _label_w = string_width(_label_str);
 var _str_cur = "$12.400";
 var _str_tgt = " / $30.000";
 
-draw_set_font(fnt_gui_button_medium); // Current is larger
+draw_set_font(fnt_gui_button_medium); // BOTH are now the same size as requested
 var _cur_w = string_width(_str_cur);
-
-draw_set_font(fnt_main); // Target is smaller
 var _tgt_w_text = string_width(_str_tgt);
 
 var _total_num_w = _cur_w + _tgt_w_text;
@@ -47,23 +45,27 @@ var _num_x_start = room_width - _pad_x - _total_num_w;
 // --- DRAW TARGET BAR (Stretched dynamically between labels) ---
 var _tgt_x = _label_x + _label_w + 20; // Start after TARGET label
 var _tgt_w = (_num_x_start - 20) - _tgt_x; // Stop right before the Number String
-var _tgt_h = _map_btn_h; // SAMAKAN TINGGI BAR DENGAN TOMBOL! Biar rapi satu jalur (50px)
-var _tgt_y = _center_y - (_tgt_h / 2);
+var _tgt_h = _map_btn_h; // 50px
+var _tgt_y = _center_y - (_tgt_h / 2); // Physical alignment (starts at 65px)
 
 // Draw "TARGET" Label
 draw_set_font(fnt_gui_button_medium); // BESAR
 draw_set_halign(fa_left); draw_set_valign(fa_middle);
 draw_set_color(make_color_rgb(40, 40, 40)); // Dark shadow 
-draw_text(_label_x + 3, _center_y + 3, _label_str);
-draw_set_color(c_white); // Putih seperti diminta
-draw_text(_label_x, _center_y, _label_str);
+draw_text(_label_x + 3, _visual_mid_y + 4, _label_str); // Harmonized shadow offset (+4)
+draw_set_color(c_white); 
+draw_text(_label_x, _visual_mid_y, _label_str);
 
 // Teal Progress Fill
 var _fill_pct = 0.41; // Mockup target percentage
-var _inner_pad = 4;   // Perkecil border compensation agar fill lebih padat
-var _fill_w = (_tgt_w - (_inner_pad * 2)) * _fill_pct;
+// Precision adjustment: Fill must stay inside the 12px top and 18px bottom borders of the 9-slice
+var _inner_y1 = _tgt_y + 12; // Start after top border
+var _inner_y2 = _tgt_y + _tgt_h - 18; // End before 18px bottom border shadow
+var _fill_pad = 4;
+var _fill_w = (_tgt_w - 24) * _fill_pct; // Adjusted width padding based on 12px left/right borders
+
 draw_set_color(make_color_rgb(6, 214, 160)); // Teal #06d6a0
-draw_rectangle(_tgt_x + _inner_pad, _tgt_y + _inner_pad, _tgt_x + _inner_pad + _fill_w, _tgt_y + _tgt_h - _inner_pad, false);
+draw_rectangle(_tgt_x + 12, _inner_y1 + _fill_pad, _tgt_x + 12 + _fill_w, _inner_y2 - _fill_pad, false);
 draw_set_color(c_white);
 
 // Outline Sprite (Stretched 9-slice target bar)
@@ -72,20 +74,24 @@ draw_sprite_stretched(spr_target_bar, 0, _tgt_x, _tgt_y, _tgt_w, _tgt_h);
 // Draw Numbers String outside the Bar
 draw_set_halign(fa_left); draw_set_valign(fa_middle);
 
-// 1. Current (Bigger & Gold)
+// 1. Current (Gold)
 draw_set_font(fnt_gui_button_medium); 
-draw_set_color(c_black);
-draw_text(_num_x_start + 3, _center_y + 3, _str_cur); 
-draw_set_color(make_color_rgb(248, 194, 58)); // Gold HTML Variable
-draw_text(_num_x_start, _center_y, _str_cur);
+draw_set_color(c_black); draw_set_alpha(0.3);
+draw_text(_num_x_start + 3, _visual_mid_y + 4, _str_cur); 
+draw_set_alpha(1.0);
+draw_set_color(make_color_rgb(248, 194, 58)); // Gold
+draw_text(_num_x_start, _visual_mid_y, _str_cur);
 
-// 2. Limit/Target (Smaller & White)
-draw_set_font(fnt_main);
+// 2. Limit/Target (Matched Font Size & White)
+draw_set_font(fnt_gui_button_medium); // MATCHED current font
 var _tgt_num_x = _num_x_start + _cur_w;
-draw_set_color(c_black);
-draw_text(_tgt_num_x + 3, _center_y + 3, _str_tgt); 
+draw_set_color(c_black); draw_set_alpha(0.3);
+draw_text(_tgt_num_x + 3, _visual_mid_y + 4, _str_tgt); 
+draw_set_alpha(1.0);
 draw_set_color(c_white);
-draw_text(_tgt_num_x, _center_y, _str_tgt);
+draw_text(_tgt_num_x, _visual_mid_y, _str_tgt);
+
+draw_set_halign(fa_left); draw_set_valign(fa_top);
 
 draw_set_halign(fa_left); draw_set_valign(fa_top);
 
@@ -137,18 +143,18 @@ var _gap    = 24;
 var _total_btn_w = (_side_w * 2) + _main_w + (_gap * 2);
 var _padding_x = 48; // Space from buttons to panel edge
 var _panel_w = _total_btn_w + (_padding_x * 2); 
-var _panel_h = 190; // Shrink panel height massively from 300 to 190
+var _panel_h = 220; // Ditinggikan agar area atas tombol lebih lega
 
 // Center the Panel
-var _target_y = 890; // Slide it down slightly to compensate for lost height padding
+var _target_y = 860; // Offset dinaikkan sedikit (lebih ke atas)
 var _panel_draw_y = _target_y + bottom_y_offset;
 var _panel_x = room_width / 2 - (_panel_w / 2);
 
 draw_sprite_stretched(spr_gui_bottom_container, 0, _panel_x, _panel_draw_y, _panel_w, _panel_h);
 
-// Vertical Center Alignment (Buttons placed relative to panel center)
-var _mid_y = _panel_draw_y + (_panel_h / 2) - 12; // Modifiers to counter heavy shadows
-var _main_y = _mid_y - (_main_h / 2) - 5;
+// Vertical Center Alignment (With -8px visual offset to account for button shadows)
+var _mid_y = _panel_draw_y + (_panel_h / 2) - 8; 
+var _main_y = _mid_y - (_main_h / 2);
 // Aligning bottoms for a unified 3D perspective base
 var _side_y = _main_y + _main_h - _side_h;
 
