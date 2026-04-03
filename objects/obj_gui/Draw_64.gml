@@ -131,34 +131,51 @@ if (draw_gui_button(_map_btn_x, _map_btn_y, _map_btn_w, _map_btn_h, spr_button_m
 // ─── BOTTOM GUI CONTAINER & BUTTONS ───
 
 // Button Layout Constants
-var _main_w = 280;
-var _main_h = 80;
-
+var _main_w = 320; 
+var _main_h = 90;
 var _side_w = 240; 
 var _side_h = 90;
-
 var _gap    = 24; 
 
-// Dinamically Calculate Panel Dimensions (Tight Padding)
+// Dinamically Calculate Panel Dimensions
 var _total_btn_w = (_side_w * 2) + _main_w + (_gap * 2);
 var _padding_x = 48;
 var _panel_w = _total_btn_w + (_padding_x * 2); 
-var _panel_h = 220; // Original height
+var _panel_h = 240; // Taller panel for better spacing
 
-// Center the Panel (original submerged position)
-var _target_y = 860;
+// Center the Panel (submerged deeper to hide rounded corners)
+var _target_y = 910; 
 var _panel_draw_y = _target_y + bottom_y_offset;
 var _panel_x = room_width / 2 - (_panel_w / 2);
 
 draw_sprite_stretched(spr_gui_bottom_container, 0, _panel_x, _panel_draw_y, _panel_w, _panel_h);
 
-// Vertical Center Alignment for SIDE buttons only (With -8px visual offset)
-var _mid_y = _panel_draw_y + (_panel_h / 2) - 8; 
-var _side_mid_y = _mid_y - (_side_h / 2);
+// ─── TILTED TURN BADGE (On Top Edge) ───
+var _turn_str = "Turn 3 / 12";
+var _badge_angle = -5; // Slightly reduced tilt for readability
+var _badge_w = 200; // Enlarged
+var _badge_h = 68;  // Enlarged
+var _badge_x = room_width / 2;
+var _badge_y = _panel_draw_y - 2; // Slight overlap on the border line
 
-// Center button is LIFTED above the side buttons
-// Place it higher, then put Turn text right below it
-var _main_y = _side_mid_y - 16; // Lift center button above side buttons
+// Draw spr_container rotated (Origin set to 100, 50 in sprite editor)
+draw_set_alpha(1.0);
+draw_sprite_ext(spr_container, 0, _badge_x, _badge_y, _badge_w/200, _badge_h/100, _badge_angle, c_white, 1);
+
+// Text inside rotated badge
+draw_set_font(fnt_main);
+draw_set_halign(fa_center); draw_set_valign(fa_middle);
+draw_set_color(c_black); draw_set_alpha(0.3);
+draw_text_transformed(_badge_x + 2, _badge_y + 2, _turn_str, 1.1, 1.1, _badge_angle); // scaled shadow
+draw_set_color(c_white); draw_set_alpha(1.0);
+draw_text_transformed(_badge_x, _badge_y, _turn_str, 1.1, 1.1, _badge_angle); // scaled text
+draw_set_halign(fa_left); draw_set_valign(fa_top);
+
+// ─── BUTTONS (Aligned Center) ───
+// Vertical Alignment (Shifted down to "respect" the turn badge area)
+var _mid_y = _panel_draw_y + (_panel_h / 2) + 24; 
+var _main_y = _mid_y - (_main_h / 2);
+var _side_y = _main_y; 
 
 // Center Main Button Geometry
 var _center_x = room_width / 2 - (_main_w / 2);
@@ -168,26 +185,16 @@ var _left_x   = _center_x - _gap - _side_w;
 var _right_x  = _center_x + _main_w + _gap;
 
 // Draw Left Button (Red)
-if (draw_gui_button(_left_x, _side_mid_y, _side_w, _side_h, spr_button_red, "Inventory", c_white, fnt_gui_button_medium)) {
+if (draw_gui_button(_left_x, _side_y, _side_w, _side_h, spr_button_red, "Inventory", c_white, fnt_gui_button_medium)) {
     gui_state = "PROPERTY"; // Trigger slide out
 }
 
-// Draw Center Button (Main) — Lifted up
+// Draw Center Button (Main)
 draw_gui_button(_center_x, _main_y, _main_w, _main_h, spr_button_main, "Roll The Dice!", c_white, fnt_gui_button_medium);
 
-// Turn Info Text — Right below the center button
-var _turn_str = "Turn 3 / 12"; // Mockup value
-draw_set_font(fnt_main);
-draw_set_halign(fa_center);
-draw_set_valign(fa_top);
-draw_set_color(c_black); draw_set_alpha(0.3);
-draw_text(room_width / 2 + 2, _main_y + _main_h + 6, _turn_str);
-draw_set_alpha(1.0); draw_set_color(c_white);
-draw_text(room_width / 2, _main_y + _main_h + 4, _turn_str);
-draw_set_halign(fa_left); draw_set_valign(fa_top);
-
 // Draw Right Button (Blue)
-draw_gui_button(_right_x, _side_mid_y, _side_w, _side_h, spr_button_blue, "Shop", c_white, fnt_gui_button_medium);
+draw_gui_button(_right_x, _side_y, _side_w, _side_h, spr_button_blue, "Shop", c_white, fnt_gui_button_medium);
+
 
 
 // ─── PROPERTY OVERLAY PANEL ───
