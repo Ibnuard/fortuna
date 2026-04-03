@@ -1,0 +1,536 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); color: var(--color-text-primary); padding: 12px 0; }
+
+.tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 0.5px solid var(--color-border-tertiary); padding-bottom: 0; }
+.tab { font-size: 13px; padding: 6px 14px; border-radius: 6px 6px 0 0; cursor: pointer; color: var(--color-text-secondary); border: 0.5px solid transparent; border-bottom: none; position: relative; bottom: -1px; }
+.tab.active { color: var(--color-text-primary); background: var(--color-background-primary); border-color: var(--color-border-tertiary); font-weight: 500; }
+.tab:hover:not(.active) { color: var(--color-text-primary); }
+
+.page { display: none; }
+.page.active { display: block; }
+
+.section-label { font-size: 11px; color: var(--color-text-secondary); letter-spacing: 0.04em; text-transform: uppercase; margin: 20px 0 8px; }
+.section-label:first-child { margin-top: 0; }
+.card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 14px 16px; margin-bottom: 8px; }
+.card-title { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+.card-sub { font-size: 13px; color: var(--color-text-secondary); line-height: 1.65; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 6px; margin-bottom: 6px; }
+.badge-green { background: var(--color-background-success); color: var(--color-text-success); }
+.badge-red { background: var(--color-background-danger); color: var(--color-text-danger); }
+.badge-amber { background: var(--color-background-warning); color: var(--color-text-warning); }
+.badge-blue { background: var(--color-background-info); color: var(--color-text-info); }
+.badge-gray { background: var(--color-background-secondary); color: var(--color-text-secondary); }
+.badge-purple { background: #EEEDFE; color: #3C3489; }
+.divider { border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 10px 0; }
+.pill-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.pill { font-size: 12px; padding: 3px 10px; border-radius: 20px; border: 0.5px solid var(--color-border-secondary); color: var(--color-text-secondary); white-space: nowrap; }
+.pill-active { border-color: var(--color-border-info); color: var(--color-text-info); background: var(--color-background-info); }
+.arrow { font-size: 12px; color: var(--color-text-secondary); }
+.num { font-size: 22px; font-weight: 500; line-height: 1; }
+.num-label { font-size: 12px; color: var(--color-text-secondary); margin-top: 3px; }
+.stat-box { text-align: center; padding: 10px 8px; background: var(--color-background-secondary); border-radius: 8px; }
+.highlight { background: var(--color-background-warning); border: 0.5px solid var(--color-border-tertiary); border-radius: 8px; padding: 10px 12px; margin-top: 8px; }
+.highlight-text { font-size: 13px; color: var(--color-text-warning); line-height: 1.6; }
+.fatecard { border: 0.5px solid var(--color-border-tertiary); border-radius: 8px; padding: 10px 12px; }
+.fatecard-type { font-size: 10px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 4px; }
+.fatecard-name { font-size: 13px; font-weight: 500; margin-bottom: 3px; }
+.fatecard-effect { font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; }
+.build-card { border: 0.5px solid var(--color-border-tertiary); border-radius: 10px; padding: 12px; }
+.build-name { font-size: 13px; font-weight: 500; margin-bottom: 6px; }
+.build-cards { display: flex; flex-direction: column; gap: 4px; }
+.build-pill { font-size: 11px; padding: 2px 8px; border-radius: 4px; background: var(--color-background-secondary); color: var(--color-text-secondary); }
+.map-row { display: flex; gap: 8px; align-items: stretch; margin-bottom: 8px; }
+.map-num { min-width: 36px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 500; background: var(--color-background-secondary); border-radius: 8px; }
+.map-body { flex: 1; border: 0.5px solid var(--color-border-tertiary); border-radius: 8px; padding: 10px 14px; }
+.map-title { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+.map-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+</style>
+</head>
+<body>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('loop')">Game Loop</div>
+  <div class="tab" onclick="switchTab('cards')">Fate Cards</div>
+  <div class="tab" onclick="switchTab('progression')">Progression</div>
+  <div class="tab" onclick="switchTab('maps')">Maps &amp; Balance</div>
+  <div class="tab" onclick="switchTab('builds')">Build Paths</div>
+</div>
+
+<!-- PAGE: GAME LOOP -->
+<div class="page active" id="page-loop">
+  <div class="section-label">Core loop — satu turn</div>
+  <div class="card">
+    <div class="pill-row">
+      <span class="pill pill-active">1 Lempar dadu</span>
+      <span class="arrow">→</span>
+      <span class="pill pill-active">2 Modifikasi?</span>
+      <span class="arrow">→</span>
+      <span class="pill pill-active">3 Pindah</span>
+      <span class="arrow">→</span>
+      <span class="pill pill-active">4 Tile effect</span>
+      <span class="arrow">→</span>
+      <span class="pill pill-active">5 Hold card timing</span>
+      <span class="arrow">→</span>
+      <span class="pill pill-active">6 Cek menang/kalah</span>
+    </div>
+    <div class="divider"></div>
+    <div class="grid2">
+      <div>
+        <div class="badge badge-gray">Step 2 — Modifikasi Dadu</div>
+        <div class="card-sub">Pakai kartu Hold "Reroll", "Geser ±2", atau "Pilih angka". Ini resource terbatas — kapan dipakainya jadi keputusan penting.</div>
+      </div>
+      <div>
+        <div class="badge badge-gray">Step 5 — Hold Card Window</div>
+        <div class="card-sub">Setelah tile effect diketahui tapi sebelum resolve — ini window untuk pakai kartu Hold reaktif seperti "Blok kerugian" atau "Ganda income".</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Tile Effects</div>
+  <div class="grid2">
+    <div class="card">
+      <div class="badge badge-purple">Property Tile</div>
+      <div class="card-title">Beli / Upgrade / Lewat</div>
+      <div class="card-sub">
+        Belum dimiliki → beli (jika mampu) atau lewat.<br>
+        Milik sendiri → upgrade bangunan (Toko → Hotel).<br>
+        Setiap lewat tile milik sendiri → terima <strong style="font-weight:500">self-rent kecil</strong> (10% harga tile).
+      </div>
+    </div>
+    <div class="card">
+      <div class="badge badge-amber">Fate Card Tile</div>
+      <div class="card-title">Ambil 1 kartu dari deck</div>
+      <div class="card-sub">
+        Instant → langsung resolve, tidak bisa ditolak.<br>
+        Passive → masuk slot passive (max 5 slot).<br>
+        Hold → masuk tangan (max 3 slot). Jika penuh, buang 1.
+      </div>
+    </div>
+    <div class="card">
+      <div class="badge badge-red">Jail Tile</div>
+      <div class="card-title">Masuk penjara — pilih keluar</div>
+      <div class="card-sub">
+        Bayar denda (mahal, langsung bebas).<br>
+        Lempar doubles — berhasil dalam 3× atau bayar denda.<br>
+        Pakai Hold card "Bail Out" (gratis).
+      </div>
+    </div>
+    <div class="card">
+      <div class="badge badge-blue">Casino Tile</div>
+      <div class="card-title">Pilih bet size → roll khusus</div>
+      <div class="card-sub">
+        Bet kecil: menang 1.5× / kalah −50%.<br>
+        Bet besar: menang 3× / kalah −80%.<br>
+        Passive "Penjudi" → tambah 1 opsi bet medium.
+      </div>
+    </div>
+    <div class="card">
+      <div class="badge badge-green">Start Tile</div>
+      <div class="card-title">Selesai 1 lap penuh</div>
+      <div class="card-sub">
+        Terima bonus uang (makin besar di map akhir).<br>
+        Semua properti bayar passive rent.<br>
+        Terima 1 fate card (acak, bisa pilih dari 2).
+      </div>
+    </div>
+    <div class="card">
+      <div class="badge badge-gray">Market Tile</div>
+      <div class="card-title">Beli fate card dengan cash</div>
+      <div class="card-sub">
+        3 kartu ditampilkan, harga berbeda.<br>
+        Refresh bayar biaya kecil.<br>
+        Passive "Broker" → diskon 20% semua harga market.
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Kondisi Menang &amp; Kalah</div>
+  <div class="grid2">
+    <div class="card">
+      <div class="badge badge-green">Menang — per map</div>
+      <div class="card-title">Capai target uang dalam N putaran</div>
+      <div class="card-sub">Target = modal awal × multiplier map. Putaran tersisa selalu terlihat di HUD. Setelah menang → masuk layar "Pilih 3 Kartu" sebelum map berikutnya.</div>
+    </div>
+    <div class="card">
+      <div class="badge badge-red">Kalah — Bangkrut</div>
+      <div class="card-title">Cash ≤ 0 dan tidak ada properti yang bisa digadai</div>
+      <div class="card-sub">Selagi ada properti → bisa gadai untuk survive. Jika semua sudah digadai dan cash habis → Game Over. Run berakhir.</div>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <div class="badge badge-amber">Soft Fail</div>
+    <div class="highlight-text">Habis N putaran tapi belum capai target → bukan game over. Map diulang dari awal dengan penalti: modal berkurang 20% dan kartu hold hangus. Bisa coba ulang maksimal 1×. Gagal lagi → game over.</div>
+  </div>
+</div>
+
+<!-- PAGE: FATE CARDS -->
+<div class="page" id="page-cards">
+  <div class="section-label">Instant Cards — langsung resolve</div>
+  <div class="grid3">
+    <div class="fatecard">
+      <div class="fatecard-type badge-green badge">income</div>
+      <div class="fatecard-name">Windfall</div>
+      <div class="fatecard-effect">Terima +500 cash. Jika punya passive "Akuntan", jumlahnya ×1.5.</div>
+    </div>
+    <div class="fatecard">
+      <div class="fatecard-type badge-green badge">income</div>
+      <div class="fatecard-name">Subsidi Pemerintah</div>
+      <div class="fatecard-effect">Terima cash = jumlah properti yang kamu miliki × 200.</div>
+    </div>
+    <div class="fatecard">
+      <div class="fatecard-type badge-red badge">kerugian</div>
+      <div class="fatecard-name">Audit Pajak</div>
+      <div class="fatecard-effect">Bayar 15% dari total cash kamu sekarang ke bank.</div>
+    </div>
+    <div class="fatecard">
+      <div class="fatecard-type badge-red badge">kerugian</div>
+      <div class="fatecard-name">Bencana Alam</div>
+      <div class="fatecard-effect">1 properti random kehilangan semua bangunannya.</div>
+    </div>
+    <div class="fatecard">
+      <div class="fatecard-type badge-blue badge">event</div>
+      <div class="fatecard-name">Lelang Properti</div>
+      <div class="fatecard-effect">Beli 1 properti di map ini seharga 50% dari harga normal. Satu kali saja.</div>
+    </div>
+    <div class="fatecard">
+      <div class="fatecard-type badge-blue badge">event</div>
+      <div class="fatecard-name">Boom Ekonomi</div>
+      <div class="fatecard-effect">Semua properti milikmu bayar passive rent sekarang juga.</div>
+    </div>
+  </div>
+
+  <div class="section-label">Passive Cards — aktif selamanya (max 5 slot)</div>
+  <div class="grid3">
+    <div class="fatecard">
+      <div class="fatecard-type badge-purple badge">rent build</div>
+      <div class="fatecard-name">Akuntan</div>
+      <div class="fatecard-effect">+15% semua income dari sewa dan passive rent.</div>
+    </div>
+    <div class="fatecard">
+      <div class="fatecard-type badge-purple badge">rent build</div>
+      <div class="fatecard-name">Developer</div>
+      <div class="fatecard-effect">Biaya bangun Toko dan Hotel berkurang 30%.</div>
+    </div>
+    <div class="fatecard">
+      <div class="fatecard-type badge-purple badge">dice build</div>
+      <div class="fatecard-name">Intuisi Jalan</div>
+      <div class="fatecard-effect">Sekali per putaran, bisa geser hasil dadu ±1 gratis.</div>
+    </div>
+    <div class="fatecard">
+      <div class="fatecard-type badge-purple badge">dice build</div>
+      <div class="fatecard-name">Dadu Jinak</div>
+      <div class="fatecard-effect">Setelah roll, lihat hasil sebelum memutuskan pakai modifier Hold.</div>
+    </div>
+    <div class="fatecard">
+      <div class="fatecard-type badge-purple badge">survival</div>
+      <div class="fatecard-name">Asuransi Total</div>
+      <div class="fatecard-effect">Blok 1× kerugian besar per map. Kemudian kartu ini hangus.</div>
+    </div>
+    <div class="fatecard">
+      <div class="fatecard-type badge-purple badge">casino build</div>
+      <div class="fatecard-name">Penjudi Ulung</div>
+      <div class="fatecard-effect">Di Casino, opsi bet medium tersedia. Menang ×2 / kalah −30%.</div>
+    </div>
+  </div>
+
+  <div class="section-label">Hold Cards — disimpan, dipakai kapan saja (max 3 slot)</div>
+  <div class="grid3">
+    <div class="fatecard">
+      <div class="fatecard-type badge-blue badge">escape</div>
+      <div class="fatecard-name">Bail Out</div>
+      <div class="fatecard-effect">Keluar dari Jail gratis, langsung tanpa roll. Sekali pakai.</div>
+    </div>
+    <div class="fatecard">
+      <div class="fatecard-type badge-blue badge">dice</div>
+      <div class="fatecard-name">Reroll</div>
+      <div class="fatecard-effect">Lempar ulang dadu setelah melihat hasilnya. Sekali pakai.</div>
+    </div>
+    <div class="fatecard">
+      <div class="fatecard-type badge-blue badge">protection</div>
+      <div class="fatecard-name">Penangkal</div>
+      <div class="fatecard-effect">Blok efek 1 Instant card negatif sebelum resolve. Sekali pakai.</div>
+    </div>
+    <div class="fatecard">
+      <div class="fatecard-type badge-blue badge">income</div>
+      <div class="fatecard-name">Double Down</div>
+      <div class="fatecard-effect">Pakai sebelum resolve tile — gandakan income dari tile itu. Sekali pakai.</div>
+    </div>
+    <div class="fatecard">
+      <div class="fatecard-type badge-blue badge">movement</div>
+      <div class="fatecard-name">Teleport</div>
+      <div class="fatecard-effect">Pindah ke tile manapun di board tanpa efek tile tersebut. Sekali pakai.</div>
+    </div>
+    <div class="fatecard">
+      <div class="fatecard-type badge-blue badge">property</div>
+      <div class="fatecard-name">Akuisisi Paksa</div>
+      <div class="fatecard-effect">Beli properti manapun seharga 70% harga normal, di mana pun posisimu. Sekali pakai.</div>
+    </div>
+  </div>
+
+  <div class="section-label">Sumber mendapat Fate Card</div>
+  <div class="card">
+    <div class="grid3">
+      <div>
+        <div class="badge badge-amber">Fate Card Tile</div>
+        <div class="card-sub">Ambil 1 acak dari deck. Deck dikocok tiap map baru. Komposisi deck berubah tiap map (makin banyak negatif di map lanjut).</div>
+      </div>
+      <div>
+        <div class="badge badge-gray">Market Tile</div>
+        <div class="card-sub">3 kartu ditampilkan dengan harga. Bisa pilih beli atau tidak. Refresh bayar 100 cash. Kartu market cenderung lebih kuat dari deck biasa.</div>
+      </div>
+      <div>
+        <div class="badge badge-green">Start Tile</div>
+        <div class="card-sub">Tiap lewat Start, pilih 1 dari 2 kartu acak. Ini hadiah konsisten — mendorong player aktif jalan, bukan diam di tile tertentu.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: PROGRESSION -->
+<div class="page" id="page-progression">
+
+  <div class="section-label">Layar Transisi Antar Map — "Pilih 3 Kartu"</div>
+  <div class="card">
+    <div class="card-title">Setelah map clear, semua kartu passive + hold ditampilkan</div>
+    <div class="card-sub">Player memilih maksimal 3 kartu total untuk dibawa. Sisanya hangus. Ini adalah decision point terpenting dalam satu run — sering kali lebih sulit dari map itu sendiri.</div>
+    <div class="divider"></div>
+    <div class="grid2">
+      <div>
+        <div class="badge badge-blue">Aturan Pemilihan</div>
+        <div class="card-sub">
+          Bisa pilih kombinasi bebas: 3 passive, 3 hold, atau 2+1.<br><br>
+          Kartu yang tidak dipilih benar-benar hilang — tidak ada "simpan di bank".<br><br>
+          Jika total kartu ≤ 3, semua otomatis terbawa.
+        </div>
+      </div>
+      <div>
+        <div class="badge badge-amber">Tension yang Muncul</div>
+        <div class="card-sub">
+          Passive "Asuransi Total" sudah terpakai — buang saja?<br><br>
+          Hold "Bail Out" belum dipakai — berguna di map berikutnya?<br><br>
+          Dua passive rent vs satu passive dice — arah build mana yang dilanjut?
+        </div>
+      </div>
+    </div>
+    <div class="highlight">
+      <div class="highlight-text">💡 Setelah pilih 3, player juga terima reward map: pilih 1 dari 3 kartu baru (bisa passive atau hold). Kartu baru ini langsung masuk — jadi total bisa jalan ke map berikutnya dengan 4 kartu di awal, tapi slot tetap berlaku (passive max 5, hold max 3).</div>
+    </div>
+  </div>
+
+  <div class="section-label">Modal Antar Map</div>
+  <div class="card">
+    <div class="grid3">
+      <div class="stat-box">
+        <div class="num">100%</div>
+        <div class="num-label">Cash dibawa utuh</div>
+      </div>
+      <div class="stat-box">
+        <div class="num">0</div>
+        <div class="num-label">Properti tidak dibawa</div>
+      </div>
+      <div class="stat-box">
+        <div class="num">3</div>
+        <div class="num-label">Kartu max dibawa</div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="card-sub">Properti tidak dibawa karena tiap map punya layout board berbeda. Tapi nilai properti yang sudah dijual sebelum transisi masuk ke cash — jadi player perlu decide: jual properti dulu atau tidak sebelum map selesai.</div>
+    <div class="highlight" style="margin-top:8px">
+      <div class="highlight-text">💡 Sell Window: di 3 putaran terakhir sebelum target tercapai, semua properti bisa dijual dengan harga penuh (biasanya 50%). Ini reward untuk yang sudah plan dengan baik.</div>
+    </div>
+  </div>
+
+  <div class="section-label">Soft Fail Penalty — jika gagal capai target</div>
+  <div class="card">
+    <div class="pill-row">
+      <span class="pill">Habis waktu belum capai target</span>
+      <span class="arrow">→</span>
+      <span class="pill pill-active">Map diulang</span>
+      <span class="arrow">→</span>
+      <span class="pill">Modal −20%</span>
+      <span class="arrow">+</span>
+      <span class="pill">Hold cards hangus</span>
+      <span class="arrow">+</span>
+      <span class="pill">Passive tetap</span>
+    </div>
+    <div class="divider"></div>
+    <div class="card-sub">Passive card tetap karena itu identitas build kamu. Hold card hangus sebagai penalti. Bisa retry 1× saja — gagal lagi baru game over.</div>
+  </div>
+</div>
+
+<!-- PAGE: MAPS & BALANCE -->
+<div class="page" id="page-maps">
+
+  <div class="section-label">Scaling Per Map</div>
+  <div class="map-row">
+    <div class="map-num">1</div>
+    <div class="map-body">
+      <div class="map-title">Kota Kecil</div>
+      <div class="card-sub">Tutorial implisit. Properti murah, target rendah, banyak kartu positif.</div>
+      <div class="map-meta">
+        <span class="pill">12 tiles</span>
+        <span class="pill">Target: modal × 1.5</span>
+        <span class="pill">15 putaran</span>
+        <span class="pill">Deck: 70% positif</span>
+      </div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num">2</div>
+    <div class="map-body">
+      <div class="map-title">Kota Industri</div>
+      <div class="card-sub">Properti lebih mahal, mulai ada tile Jail dan Casino. Deck mulai seimbang.</div>
+      <div class="map-meta">
+        <span class="pill">20 tiles</span>
+        <span class="pill">Target: modal × 2</span>
+        <span class="pill">18 putaran</span>
+        <span class="pill">Deck: 50/50</span>
+      </div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num">3</div>
+    <div class="map-body">
+      <div class="map-title">Kota Metropolitan</div>
+      <div class="card-sub">Board besar, properti premium muncul. Tile khusus lebih banyak. Penalti lebih berat.</div>
+      <div class="map-meta">
+        <span class="pill">32 tiles</span>
+        <span class="pill">Target: modal × 2.5</span>
+        <span class="pill">20 putaran</span>
+        <span class="pill">Deck: 40% positif</span>
+      </div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num">4</div>
+    <div class="map-body">
+      <div class="map-title">Pusat Keuangan</div>
+      <div class="card-sub">Volatilitas tinggi. Properti mahal tapi rent tinggi. Casino risk besar. Market tile lebih sering muncul.</div>
+      <div class="map-meta">
+        <span class="pill">40 tiles</span>
+        <span class="pill">Target: modal × 3</span>
+        <span class="pill">18 putaran</span>
+        <span class="pill">Deck: 35% positif</span>
+      </div>
+    </div>
+  </div>
+  <div class="map-row">
+    <div class="map-num">5</div>
+    <div class="map-body">
+      <div class="map-title">Wall Street — Boss Map</div>
+      <div class="card-sub">Event "Market Crash" bisa hapus 30% cash sekali. Target sangat tinggi. Butuh build yang solid dari map sebelumnya untuk survive.</div>
+      <div class="map-meta">
+        <span class="pill">52 tiles</span>
+        <span class="pill">Target: modal × 4</span>
+        <span class="pill">16 putaran</span>
+        <span class="pill">Deck: 25% positif</span>
+        <span class="pill pill-active">Boss Event</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Komposisi Tile Per Map</div>
+  <div class="card">
+    <div class="grid3">
+      <div class="stat-box">
+        <div class="num">60%</div>
+        <div class="num-label">Property tiles</div>
+      </div>
+      <div class="stat-box">
+        <div class="num">25%</div>
+        <div class="num-label">Fate Card tiles</div>
+      </div>
+      <div class="stat-box">
+        <div class="num">15%</div>
+        <div class="num-label">Special tiles</div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="card-sub">Special tiles (15%) terdiri dari: 1 Start, 1–2 Jail, 1–2 Casino, 1 Market, sisanya tile netral (rest, no effect). Di map awal Market belum ada — muncul mulai map 2.</div>
+  </div>
+</div>
+
+<!-- PAGE: BUILD PATHS -->
+<div class="page" id="page-builds">
+  <div class="section-label">Contoh Build Path — Kombinasi 3 Kartu Antar Map</div>
+
+  <div class="grid2">
+    <div class="build-card">
+      <div class="badge badge-green">Rent Snowball</div>
+      <div class="build-name">Beli semua properti, maximise passive rent per lap</div>
+      <div class="build-cards">
+        <div class="build-pill">Passive: Akuntan (+15% rent)</div>
+        <div class="build-pill">Passive: Developer (build murah)</div>
+        <div class="build-pill">Hold: Double Down (gandakan tile income)</div>
+      </div>
+      <div class="divider"></div>
+      <div class="card-sub">Strategy: prioritas lewat Start sesering mungkin. Beli properti murah dulu, upgrade bertahap. Sangat kuat di mid-game.</div>
+    </div>
+    <div class="build-card">
+      <div class="badge badge-amber">Casino Runner</div>
+      <div class="build-name">Gambling adalah income utama, properti sebagai backup</div>
+      <div class="build-cards">
+        <div class="build-pill">Passive: Penjudi Ulung (bet medium)</div>
+        <div class="build-pill">Passive: Intuisi Jalan (geser dadu ke Casino)</div>
+        <div class="build-pill">Hold: Reroll (hindari hasil buruk)</div>
+      </div>
+      <div class="divider"></div>
+      <div class="card-sub">Strategy: arahkan dadu ke Casino tile. High risk-high reward. Sangat kuat jika beruntung, bisa bangkrut cepat jika tidak.</div>
+    </div>
+    <div class="build-card">
+      <div class="badge badge-blue">Control Freak</div>
+      <div class="build-name">Kontrol pergerakan, hindari tile berbahaya</div>
+      <div class="build-cards">
+        <div class="build-pill">Passive: Dadu Jinak (lihat hasil dulu)</div>
+        <div class="build-pill">Passive: Intuisi Jalan (geser ±1)</div>
+        <div class="build-pill">Hold: Teleport (escape tile buruk)</div>
+      </div>
+      <div class="divider"></div>
+      <div class="card-sub">Strategy: hampir tidak pernah masuk Jail. Income lebih kecil tapi konsisten. Sangat kuat di map dengan banyak tile negatif.</div>
+    </div>
+    <div class="build-card">
+      <div class="badge badge-red">Survivalist</div>
+      <div class="build-name">Bertahan dari kerugian besar, cari peluang di celah</div>
+      <div class="build-cards">
+        <div class="build-pill">Passive: Asuransi Total (blok 1 kerugian)</div>
+        <div class="build-pill">Hold: Penangkal (blok instant negatif)</div>
+        <div class="build-pill">Hold: Bail Out (Jail gratis)</div>
+      </div>
+      <div class="divider"></div>
+      <div class="card-sub">Strategy: defensive. Income lambat tapi tidak mudah bangkrut. Bagus untuk player yang baru kenal game atau di boss map.</div>
+    </div>
+  </div>
+
+  <div class="section-label">Passive Sinergi — 2 Kartu Sejenis</div>
+  <div class="card">
+    <div class="grid2">
+      <div>
+        <div class="badge badge-purple">Akuntan + Developer</div>
+        <div class="card-sub">Income naik + biaya turun = ROI properti berlipat ganda. Build paling kuat untuk target uang tinggi.</div>
+      </div>
+      <div>
+        <div class="badge badge-purple">Dadu Jinak + Intuisi Jalan</div>
+        <div class="card-sub">Lihat hasil dadu dulu, lalu masih bisa geser ±1. Kontrol pergerakan hampir sempurna.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('page-' + id).classList.add('active');
+}
+</script>
+</body>
+</html>

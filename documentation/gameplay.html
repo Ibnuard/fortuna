@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monopoly Roguelike — Pixel Sim</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --felt:      #1a472a;
+    --felt-dark: #0d2e18;
+    --felt-edge: #2d7a45;
+    --felt-deep: #071a0d;
+    --gold:      #f8c23a;
+    --gold-shd:  #7a5200;
+    --red:       #e63950;
+    --purple:    #9b5de5;
+    --teal:      #06d6a0;
+    --blue:      #00b4d8;
+    --px: 'Press Start 2P', monospace;
+    --ui: 'Nunito', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0a0a0f;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    min-height: 100vh;
+    font-family: var(--ui);
+  }
+
+  /* ── OUTER FRAME ── */
+  #frame {
+    width: min(96vw, 960px);
+    aspect-ratio: 16/9;
+    background: var(--felt);
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    /* pixel-style hard shadow */
+    box-shadow:
+      6px 6px 0 #000,
+      0 0 0 3px var(--felt-edge),
+      0 0 0 6px #000;
+    image-rendering: pixelated;
+  }
+
+  /* felt texture — crosshatch with CSS, blocky */
+  #frame::before {
+    content: '';
+    position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      repeating-linear-gradient(0deg,   rgba(0,0,0,0.06) 0, rgba(0,0,0,0.06) 1px, transparent 1px, transparent 6px),
+      repeating-linear-gradient(90deg,  rgba(0,0,0,0.06) 0, rgba(0,0,0,0.06) 1px, transparent 1px, transparent 6px);
+    image-rendering: pixelated;
+  }
+
+  /* ── TOP BAR ── */
+  #topbar {
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 13%; z-index: 10;
+    background: var(--felt-dark);
+    border-bottom: 4px solid var(--felt-edge);
+    box-shadow: 0 4px 0 var(--felt-deep);
+    display: flex; align-items: center;
+    padding: 0 1.5%; gap: 1.5%;
+  }
+
+  .px-badge {
+    font-family: var(--px);
+    font-size: clamp(5px, 0.75vw, 9px);
+    padding: 5px 10px;
+    background: var(--gold);
+    color: #3d2500;
+    border-radius: 0;
+    /* hard pixel shadow */
+    box-shadow: 3px 3px 0 var(--gold-shd);
+    white-space: nowrap; flex-shrink: 0;
+    image-rendering: pixelated;
+  }
+
+  .tgt-wrap { flex: 1; display: flex; align-items: center; gap: 8px; }
+  .tgt-label {
+    font-family: var(--px); font-size: clamp(4px, 0.6vw, 8px);
+    color: var(--teal); white-space: nowrap;
+  }
+  .tgt-track {
+    flex: 1; height: 10px;
+    background: var(--felt-deep);
+    border: 2px solid var(--felt-edge);
+    border-radius: 0;
+    overflow: hidden;
+    image-rendering: pixelated;
+  }
+  #tgt-fill {
+    height: 100%;
+    background: var(--teal);
+    transition: width 0.5s steps(20);
+    image-rendering: pixelated;
+  }
+  #tgt-num {
+    font-family: var(--px); font-size: clamp(4px, 0.6vw, 8px);
+    color: #fff; white-space: nowrap;
+  }
+  #turn-badge {
+    font-family: var(--px); font-size: clamp(4px, 0.6vw, 8px);
+    color: var(--teal);
+    background: var(--felt-deep);
+    border: 2px solid var(--felt-edge);
+    padding: 4px 8px;
+    white-space: nowrap; flex-shrink: 0;
+    box-shadow: 2px 2px 0 var(--felt-deep);
+  }
+
+  /* ── BOARD CANVAS AREA ── */
+  #board-wrap {
+    position: absolute; left: 0; right: 0;
+    top: 13%; bottom: 23%;
+    background: var(--felt-dark);
+    border-top: 4px solid var(--felt-edge);
+    border-bottom: 4px solid var(--felt-edge);
+    box-shadow: inset 0 6px 0 var(--felt-deep), inset 0 -6px 0 var(--felt-deep);
+    overflow: hidden;
+  }
+
+  #board-canvas {
+    position: absolute; left: 0; top: 0;
+    width: 100%; height: 100%;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+
+  /* ── PIXEL TOKEN (DOM overlay on canvas) ── */
+  #token {
+    position: absolute;
+    z-index: 25; pointer-events: none;
+    transition: left 0.25s steps(8), top 0.1s;
+  }
+  #token-inner {
+    width: clamp(18px, 2.8vw, 36px);
+    height: clamp(18px, 2.8vw, 36px);
+    background: #fff;
+    border: 3px solid #ccc;
+    border-radius: 0;
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.6);
+    display: flex; align-items: center; justify-content: center;
+    font-size: clamp(10px, 1.6vw, 20px);
+    image-rendering: pixelated;
+    animation: tokenBob 0.6s steps(4) infinite;
+  }
+  @keyframes tokenBob {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-4px); }
+  }
+  #token-inner.hop {
+    animation: tokenHop 0.24s steps(6) forwards;
+  }
+  @keyframes tokenHop {
+    0%   { transform: translateY(0) scaleY(1); }
+    35%  { transform: translateY(-10px) scaleY(1.1); }
+    70%  { transform: translateY(-2px) scaleY(0.9); }
+    100% { transform: translateY(0) scaleY(1); }
+  }
+
+  /* ── LEFT PANEL ── */
+  #panel-left {
+    position: absolute; left: 1.2%; top: 15%;
+    width: 15%; display: flex; flex-direction: column; gap: 3%;
+    z-index: 10;
+  }
+
+  .stat-box {
+    background: var(--felt-dark);
+    border: 3px solid var(--felt-edge);
+    padding: 8% 10%;
+    box-shadow: 4px 4px 0 var(--felt-deep);
+    border-radius: 0;
+  }
+  .stat-px-label {
+    font-family: var(--px); font-size: clamp(4px, 0.55vw, 7px);
+    color: var(--teal); margin-bottom: 5px; letter-spacing: 0.05em;
+  }
+  .stat-px-val {
+    font-family: var(--px); font-size: clamp(8px, 1.2vw, 16px);
+    color: #fff; line-height: 1.2;
+  }
+  .stat-px-sub {
+    font-family: var(--px); font-size: clamp(3px, 0.45vw, 6px);
+    color: var(--teal); margin-top: 4px;
+  }
+  .px-bar { width: 100%; height: 6px; background: var(--felt-deep); border: 2px solid var(--felt-edge); margin-top: 6px; image-rendering: pixelated; }
+  .px-bar-fill { height: 100%; background: var(--gold); image-rendering: pixelated; transition: width 0.4s steps(10); }
+
+  /* ── RIGHT PANEL ── */
+  #panel-right {
+    position: absolute; right: 1.2%; top: 15%;
+    width: 17%; display: flex; flex-direction: column; gap: 3%;
+    z-index: 10;
+  }
+
+  .hand-box {
+    background: var(--felt-dark);
+    border: 3px solid var(--felt-edge);
+    padding: 6% 8%;
+    box-shadow: 4px 4px 0 var(--felt-deep);
+  }
+  .hand-px-label {
+    font-family: var(--px); font-size: clamp(4px, 0.5vw, 7px);
+    color: var(--teal); margin-bottom: 6px;
+  }
+  .hand-cards { display: flex; gap: 4%; justify-content: center; align-items: flex-end; height: 6vw; min-height: 48px; }
+
+  /* PIXEL CARDS — hard corners, hard shadow */
+  .hcard {
+    flex: 1; max-width: 32%;
+    background: #f5f0e8;
+    border: 3px solid #bbb;
+    border-radius: 0;
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.6);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 6% 3%; cursor: pointer;
+    min-height: 48px;
+    transition: transform 0.1s steps(2), box-shadow 0.1s steps(2);
+    position: relative;
+    image-rendering: pixelated;
+  }
+  /* pixel card stripe at top */
+  .hcard::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 6px;
+    image-rendering: pixelated;
+  }
+  .hcard.c-purple::before { background: var(--purple); }
+  .hcard.c-red::before    { background: var(--red); }
+
+  .hcard:nth-child(1) { transform: rotate(-4deg) translateY(6px); }
+  .hcard:nth-child(2) { transform: rotate(1deg) translateY(-4px); z-index: 2; }
+  .hcard:nth-child(3) { transform: rotate(5deg) translateY(6px); }
+  .hcard:hover {
+    transform: rotate(0deg) translateY(-10px) !important;
+    box-shadow: 6px 6px 0 rgba(0,0,0,0.7);
+    z-index: 10;
+  }
+
+  .hcard-suit { font-size: clamp(8px, 1.2vw, 16px); line-height: 1; }
+  .hcard-name {
+    font-family: var(--px); font-size: clamp(3px, 0.45vw, 6px);
+    color: #222; text-align: center; line-height: 1.4; margin-top: 3px;
+  }
+  .hcard-tag {
+    font-family: var(--px); font-size: clamp(3px, 0.4vw, 5px);
+    padding: 2px 4px; margin-top: 3px;
+    background: var(--purple); color: #fff;
+    border-radius: 0;
+  }
+  .hcard-empty {
+    flex: 1; max-width: 32%;
+    border: 3px dashed rgba(255,255,255,0.15);
+    min-height: 48px;
+    border-radius: 0;
+  }
+
+  /* ── DICE AREA ── */
+  .dice-row { display: flex; gap: 6%; align-items: center; }
+  #dice-display {
+    flex: 1; background: var(--felt-deep);
+    border: 3px solid var(--felt-edge);
+    padding: 6% 0;
+    display: flex; align-items: center; justify-content: center; gap: 10%;
+    box-shadow: 4px 4px 0 var(--felt-deep);
+  }
+  .die {
+    width: clamp(18px, 2.2vw, 28px);
+    height: clamp(18px, 2.2vw, 28px);
+    background: #f5f0e8;
+    border: 3px solid #999;
+    border-radius: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: clamp(10px, 1.5vw, 20px);
+    box-shadow: 3px 3px 0 #555;
+    font-weight: 900;
+    image-rendering: pixelated;
+  }
+  .die.rolling { animation: dieRoll 0.08s steps(2) infinite; }
+  @keyframes dieRoll {
+    0%   { transform: rotate(-6deg) scale(1.05); }
+    50%  { transform: rotate(6deg)  scale(0.96); }
+    100% { transform: rotate(-6deg) scale(1.05); }
+  }
+
+  #btn-roll {
+    font-family: var(--px);
+    font-size: clamp(5px, 0.7vw, 9px);
+    background: var(--gold);
+    color: #3d2500;
+    border: 3px solid #e0a020;
+    border-radius: 0;
+    box-shadow: 4px 4px 0 var(--gold-shd);
+    padding: 8% 12%;
+    cursor: pointer;
+    flex-shrink: 0;
+    white-space: nowrap;
+    transition: transform 0.08s steps(2), box-shadow 0.08s steps(2);
+    image-rendering: pixelated;
+  }
+  #btn-roll:hover:not(:disabled) {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--gold-shd);
+  }
+  #btn-roll:active:not(:disabled) {
+    transform: translate(3px, 3px);
+    box-shadow: 1px 1px 0 var(--gold-shd);
+  }
+  #btn-roll:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ── PASSIVE BADGES ── */
+  #passive-row {
+    position: absolute; bottom: 3%; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 1%; align-items: center; z-index: 10;
+  }
+  .pbadge {
+    font-family: var(--px); font-size: clamp(4px, 0.55vw, 7px);
+    background: var(--felt-dark);
+    border: 2px solid var(--purple);
+    color: #d4b8ff;
+    padding: 3px 8px;
+    box-shadow: 2px 2px 0 var(--felt-deep);
+    white-space: nowrap;
+    border-radius: 0;
+  }
+
+  /* ── POPUP ── */
+  #popup {
+    position: absolute; left: 50%; bottom: 26%; z-index: 50;
+    transform: translateX(-50%) translateY(6px);
+    pointer-events: none; opacity: 0;
+    transition: opacity 0.1s steps(3), transform 0.1s steps(3);
+    white-space: nowrap;
+  }
+  #popup.show {
+    opacity: 1; transform: translateX(-50%) translateY(-4px);
+  }
+  #popup-inner {
+    font-family: var(--px); font-size: clamp(5px, 0.75vw, 10px);
+    background: #f5f0e8;
+    border: 3px solid var(--red);
+    color: #c42d3e;
+    padding: 6px 14px;
+    border-radius: 0;
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.6);
+    image-rendering: pixelated;
+  }
+
+  /* ── DICE BIG ── */
+  #dice-big {
+    position: absolute; left: 50%; top: 32%; z-index: 60;
+    transform: translate(-50%, -50%) scale(0);
+    pointer-events: none; opacity: 0;
+    font-family: var(--px);
+    font-size: clamp(28px, 6vw, 72px);
+    color: #fff;
+    text-shadow: 4px 4px 0 rgba(0,0,0,0.8);
+    transition: transform 0.15s steps(4), opacity 0.15s steps(3);
+    image-rendering: pixelated;
+  }
+  #dice-big.show {
+    opacity: 1; transform: translate(-50%, -50%) scale(1);
+  }
+
+  /* ── SCREEN FLASH ── */
+  #flash {
+    position: absolute; inset: 0; z-index: 90;
+    pointer-events: none; border-radius: 4px;
+    opacity: 0; transition: opacity 0.08s steps(2);
+  }
+  #flash.go { opacity: 0.4; }
+
+  /* ── SCANLINE OVERLAY (retro feel) ── */
+  #scanlines {
+    position: absolute; inset: 0; z-index: 95; pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(0,0,0,0.07) 3px,
+      rgba(0,0,0,0.07) 4px
+    );
+    image-rendering: pixelated;
+  }
+
+  /* ── COIN ── */
+  .coin {
+    position: absolute; pointer-events: none;
+    font-size: clamp(10px, 1.5vw, 20px);
+    animation: coinPop 0.6s steps(8) forwards;
+    z-index: 55;
+    image-rendering: pixelated;
+  }
+  @keyframes coinPop {
+    0%   { opacity: 1; transform: translate(0,0) scale(1); }
+    60%  { opacity: 1; }
+    100% { opacity: 0; transform: translate(var(--cx), var(--cy)) scale(0.4); }
+  }
+
+  /* ── HINT ── */
+  #hint {
+    position: absolute; bottom: 27%; left: 50%; transform: translateX(-50%);
+    font-family: var(--px); font-size: clamp(4px, 0.6vw, 8px);
+    color: rgba(255,255,255,0.3);
+    white-space: nowrap; z-index: 5;
+    animation: blink 1s steps(2) infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:0.3} 50%{opacity:0.7} }
+</style>
+</head>
+<body>
+
+<div id="frame">
+  <div id="flash"></div>
+  <div id="scanlines"></div>
+
+  <!-- TOP BAR -->
+  <div id="topbar">
+    <div class="px-badge">MAP 2/5</div>
+    <div class="tgt-wrap">
+      <div class="tgt-label">TARGET</div>
+      <div class="tgt-track"><div id="tgt-fill" style="width:41%"></div></div>
+      <div id="tgt-num">$12400/$30000</div>
+    </div>
+    <div id="turn-badge">TURN 8/20</div>
+  </div>
+
+  <!-- BOARD CANVAS -->
+  <div id="board-wrap">
+    <canvas id="board-canvas"></canvas>
+  </div>
+
+  <!-- TOKEN -->
+  <div id="token"><div id="token-inner">🎩</div></div>
+
+  <!-- DICE BIG -->
+  <div id="dice-big"></div>
+
+  <!-- POPUP -->
+  <div id="popup"><div id="popup-inner"></div></div>
+
+  <!-- LEFT -->
+  <div id="panel-left">
+    <div class="stat-box">
+      <div class="stat-px-label">CASH</div>
+      <div class="stat-px-val" id="cash-val">$12400</div>
+      <div class="stat-px-sub" id="cash-sub">+480 diterima</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-px-label">PROPERTI</div>
+      <div class="stat-px-val">4</div>
+      <div class="stat-px-sub">3 TOKO 1 HOTEL</div>
+      <div class="px-bar"><div class="px-bar-fill" style="width:40%"></div></div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div id="panel-right">
+    <div class="hand-box">
+      <div class="hand-px-label">HAND</div>
+      <div class="hand-cards">
+        <div class="hcard c-purple">
+          <div class="hcard-suit" style="color:#9b5de5">★</div>
+          <div class="hcard-name">BAIL OUT</div>
+          <div class="hcard-tag">HOLD</div>
+        </div>
+        <div class="hcard c-red">
+          <div class="hcard-suit" style="color:#e63950">♥</div>
+          <div class="hcard-name">GANDA INC</div>
+          <div class="hcard-tag">HOLD</div>
+        </div>
+        <div class="hcard-empty"></div>
+      </div>
+    </div>
+    <div class="hand-box dice-row">
+      <div id="dice-display">
+        <div class="die" id="die1">⚄</div>
+        <div class="die" id="die2">⚁</div>
+      </div>
+      <button id="btn-roll" onclick="startRoll()">ROLL!</button>
+    </div>
+  </div>
+
+  <!-- PASSIVE -->
+  <div id="passive-row">
+    <div class="pbadge">* AKUNTAN</div>
+    <div class="pbadge">* INTUISI</div>
+    <div class="pbadge">* DEVELOPER</div>
+  </div>
+
+  <div id="hint">[ PRESS ROLL ]</div>
+</div>
+
+<script>
+// ── TILE DATA ──
+const TILES = [
+  { id:'start',  color:'#f8c23a', dark:'#7a5200', textCol:'#3d2500', icon:'★', label:'START',     sub:'GO!' ,   effect:'bonus',  msg:'DAPAT $2000 BONUS!',     cash:2000  },
+  { id:'prop1',  color:'#e63950', dark:'#8a0010', textCol:'#fff',    icon:'H', label:'SUDIRMAN',  sub:'$1200',  effect:'own',    msg:'SEWA SENDIRI +$120',     cash:120,  owned:true },
+  { id:'fate1',  color:'#9b5de5', dark:'#4a1a8a', textCol:'#fff',    icon:'?', label:'FATE',      sub:'DRAW',   effect:'fate',   msg:'PASSIVE: AKUNTAN +15%',  cash:0     },
+  { id:'prop2',  color:'#e63950', dark:'#8a0010', textCol:'#fff',    icon:'H', label:'THAMRIN',   sub:'$1800',  effect:'buy',    msg:'BELI $1800?',            cash:-1800 },
+  { id:'casino', color:'#00b4d8', dark:'#003a50', textCol:'#fff',    icon:'♠', label:'CASINO',    sub:'BET!',   effect:'casino', msg:'BET! MENANG x2?',        cash:0     },
+  { id:'prop3',  color:'#e63950', dark:'#8a0010', textCol:'#fff',    icon:'B', label:'GATOT SUB', sub:'$2400',  effect:'rent',   msg:'BAYAR SEWA $480!',       cash:-480  },
+  { id:'market', color:'#06d6a0', dark:'#024a38', textCol:'#032',    icon:'$', label:'MARKET',    sub:'SHOP',   effect:'market', msg:'3 KARTU TERSEDIA!',      cash:0     },
+  { id:'prop4',  color:'#e63950', dark:'#8a0010', textCol:'#fff',    icon:'H', label:'KUNINGAN',  sub:'$2100',  effect:'buy',    msg:'BELI $2100?',            cash:-2100 },
+  { id:'jail',   color:'#555',    dark:'#222',    textCol:'#bbb',    icon:'X', label:'JAIL',      sub:'OOPS',   effect:'jail',   msg:'MASUK PENJARA!',         cash:-500  },
+  { id:'fate2',  color:'#9b5de5', dark:'#4a1a8a', textCol:'#fff',    icon:'?', label:'FATE',      sub:'DRAW',   effect:'fate',   msg:'WINDFALL +$500!',        cash:500   },
+  { id:'prop5',  color:'#e63950', dark:'#8a0010', textCol:'#fff',    icon:'H', label:'SENAYAN',   sub:'$1500',  effect:'own',    msg:'SEWA SENDIRI +$150',     cash:150,  owned:true },
+  { id:'fate3',  color:'#9b5de5', dark:'#4a1a8a', textCol:'#fff',    icon:'?', label:'FATE',      sub:'DRAW',   effect:'fate',   msg:'HOLD: BAIL OUT!',        cash:0     },
+];
+
+// ── STATE ──
+let pos = 0;
+let cash = 12400;
+let turn = 8;
+let busy = false;
+
+// ── CANVAS BOARD ──
+const canvas = document.getElementById('board-canvas');
+const ctx = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = false;
+
+// Pixel scale: we draw at LOW res, display scaled up
+const PX = 3; // scale factor — 3× pixel perfect
+let TILE_W, TILE_H, BOARD_W, BOARD_H;
+const VISIBLE = 9; // tiles visible
+const PIVOT = 4;   // active tile index from left
+
+function resizeCanvas() {
+  const wrap = document.getElementById('board-wrap');
+  canvas.width  = wrap.clientWidth;
+  canvas.height = wrap.clientHeight;
+  BOARD_W = canvas.width;
+  BOARD_H = canvas.height;
+  TILE_W = Math.floor(BOARD_W / VISIBLE);
+  TILE_H = Math.floor(BOARD_H * 0.86);
+  drawBoard(pos, false);
+  updateToken();
+}
+
+function drawBoard(centerPos, animated) {
+  ctx.clearRect(0, 0, BOARD_W, BOARD_H);
+  ctx.imageSmoothingEnabled = false;
+
+  const tripled = [...TILES, ...TILES, ...TILES];
+  const baseIdx = TILES.length + centerPos;
+  const startIdx = baseIdx - PIVOT;
+
+  for (let i = 0; i < VISIBLE + 2; i++) {
+    const tIdx = ((startIdx + i) % tripled.length + tripled.length) % tripled.length;
+    const tile = tripled[tIdx];
+    const x = (i - 0) * TILE_W + 4;
+    const y = Math.floor((BOARD_H - TILE_H) / 2);
+    const isActive = (i === PIVOT);
+
+    drawTile(ctx, tile, x, y, TILE_W - 6, TILE_H, isActive);
+  }
+}
+
+function drawTile(ctx, tile, x, y, w, h, active) {
+  const shadowOff = active ? 5 : 3;
+  const liftY = active ? -6 : 0;
+  const ty = y + liftY;
+
+  // pixel shadow (hard, offset)
+  ctx.fillStyle = 'rgba(0,0,0,0.7)';
+  ctx.fillRect(x + shadowOff, ty + shadowOff, w, h);
+
+  // main card body
+  ctx.fillStyle = tile.color;
+  ctx.fillRect(x, ty, w, h);
+
+  // top stripe (darker)
+  const stripeH = Math.floor(h * 0.22);
+  ctx.fillStyle = tile.dark;
+  ctx.fillRect(x, ty, w, stripeH);
+
+  // owned pip (gold dot)
+  if (tile.owned) {
+    const pip = Math.floor(w * 0.14);
+    ctx.fillStyle = '#f8c23a';
+    ctx.fillRect(x + w - pip - 4, ty + 4, pip, pip);
+    ctx.fillStyle = '#000';
+    ctx.fillRect(x + w - pip - 3, ty + 5, pip - 2, pip - 2);
+    ctx.fillStyle = '#f8c23a';
+    ctx.fillRect(x + w - pip - 2, ty + 6, pip - 4, pip - 4);
+  }
+
+  // active glow border (3px bright)
+  if (active) {
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(x + 2, ty + 2, w - 4, h - 4);
+    // inner border
+    ctx.strokeStyle = tile.color;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x + 5, ty + 5, w - 10, h - 10);
+  }
+
+  // ICON — big pixel letter in stripe
+  ctx.fillStyle = tile.textCol;
+  const iconSz = Math.floor(stripeH * 0.7);
+  ctx.font = `bold ${iconSz}px "Press Start 2P", monospace`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(tile.icon, x + w/2, ty + stripeH/2);
+
+  // LABEL (pixel font, center)
+  const labelSz = Math.max(6, Math.floor(w * 0.088));
+  ctx.font = `${labelSz}px "Press Start 2P", monospace`;
+  ctx.fillStyle = active ? '#fff' : tile.textCol;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  // word wrap label (max 2 lines)
+  const words = tile.label.split(' ');
+  if (words.length > 1) {
+    ctx.fillText(words[0], x + w/2, ty + stripeH + (h - stripeH) * 0.38);
+    ctx.fillText(words.slice(1).join(' '), x + w/2, ty + stripeH + (h - stripeH) * 0.56);
+  } else {
+    ctx.fillText(tile.label, x + w/2, ty + stripeH + (h - stripeH) * 0.44);
+  }
+
+  // SUB
+  const subSz = Math.max(5, Math.floor(w * 0.07));
+  ctx.font = `${subSz}px "Press Start 2P", monospace`;
+  ctx.fillStyle = active ? '#ffff88' : 'rgba(255,255,255,0.65)';
+  ctx.textAlign = 'center';
+  ctx.fillText(tile.sub, x + w/2, ty + h - Math.floor(h * 0.1));
+}
+
+// ── TOKEN POSITIONING ──
+function updateToken() {
+  const wrap = document.getElementById('board-wrap');
+  const wrapRect = wrap.getBoundingClientRect();
+  const frameRect = document.getElementById('frame').getBoundingClientRect();
+  const tokenEl = document.getElementById('token');
+  const tokenW = document.getElementById('token-inner').clientWidth;
+
+  // active tile x center on canvas
+  const tx = PIVOT * TILE_W + TILE_W/2 - tokenW/2 + 4;
+  const ty = (BOARD_H - TILE_H) / 2 - document.getElementById('token-inner').clientHeight - 4;
+
+  tokenEl.style.left = (wrapRect.left - frameRect.left + tx) + 'px';
+  tokenEl.style.top  = (wrapRect.top  - frameRect.top  + ty - 6) + 'px';
+}
+
+// ── DICE ──
+const FACES = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+function faceOf(n) { return FACES[n-1]; }
+
+function startRoll() {
+  if (busy) return;
+  busy = true;
+  document.getElementById('btn-roll').disabled = true;
+  document.getElementById('hint').style.display = 'none';
+  hidePopup();
+
+  const d1 = document.getElementById('die1');
+  const d2 = document.getElementById('die2');
+  d1.classList.add('rolling');
+  d2.classList.add('rolling');
+
+  let ticks = 0;
+  const max = 16 + Math.floor(Math.random() * 8);
+  const iv = setInterval(() => {
+    d1.textContent = faceOf(Math.ceil(Math.random()*6));
+    d2.textContent = faceOf(Math.ceil(Math.random()*6));
+    ticks++;
+    if (ticks >= max) {
+      clearInterval(iv);
+      const r1 = Math.ceil(Math.random()*6);
+      const r2 = Math.ceil(Math.random()*6);
+      d1.textContent = faceOf(r1);
+      d2.textContent = faceOf(r2);
+      d1.classList.remove('rolling');
+      d2.classList.remove('rolling');
+      showDiceBig(r1 + r2, () => moveToken(r1 + r2));
+    }
+  }, 75);
+}
+
+function showDiceBig(n, cb) {
+  const el = document.getElementById('dice-big');
+  el.textContent = n;
+  el.classList.add('show');
+  flashScreen('#fff');
+  setTimeout(() => {
+    el.classList.remove('show');
+    setTimeout(cb, 150);
+  }, 650);
+}
+
+// ── MOVE step by step ──
+async function moveToken(steps) {
+  for (let i = 0; i < steps; i++) {
+    pos = (pos + 1) % TILES.length;
+    hopToken();
+    drawBoard(pos, true);
+    await wait(260);
+  }
+  await wait(120);
+  onLanded();
+}
+
+function hopToken() {
+  const inner = document.getElementById('token-inner');
+  inner.classList.remove('hop');
+  void inner.offsetWidth;
+  inner.classList.add('hop');
+  inner.addEventListener('animationend', () => inner.classList.remove('hop'), { once: true });
+}
+
+async function onLanded() {
+  const tile = TILES[pos];
+  flashScreen(tile.color);
+  await wait(100);
+  showPopup(tile.msg);
+
+  if (tile.cash !== 0) {
+    await wait(350);
+    cash += tile.cash;
+    if (cash < 0) cash = 0;
+    animateCash(tile.cash);
+    if (tile.cash > 0) spawnCoins();
+  }
+
+  turn++;
+  document.getElementById('turn-badge').textContent = `TURN ${turn}/20`;
+  updateTargetBar();
+
+  await wait(2200);
+  hidePopup();
+  busy = false;
+  document.getElementById('btn-roll').disabled = false;
+  document.getElementById('hint').style.display = '';
+}
+
+// ── UI HELPERS ──
+function showPopup(msg) {
+  document.getElementById('popup-inner').textContent = msg;
+  document.getElementById('popup').classList.add('show');
+}
+function hidePopup() { document.getElementById('popup').classList.remove('show'); }
+
+function flashScreen(color) {
+  const f = document.getElementById('flash');
+  f.style.background = color;
+  f.classList.add('go');
+  setTimeout(() => f.classList.remove('go'), 180);
+}
+
+function animateCash(delta) {
+  const sub = document.getElementById('cash-sub');
+  const sign = delta > 0 ? '+' : '';
+  sub.textContent = sign + delta.toLocaleString() + (delta > 0 ? ' MASUK' : ' KELUAR');
+  sub.style.color = delta > 0 ? '#06d6a0' : '#e63950';
+  // count anim
+  const start = cash - delta, end = cash;
+  const t0 = performance.now();
+  const dur = 400;
+  function step(now) {
+    const p = Math.min((now - t0) / dur, 1);
+    // step easing (pixel feel)
+    const stepped = Math.floor(p * 12) / 12;
+    document.getElementById('cash-val').textContent = '$' + Math.round(start + (end - start) * stepped).toLocaleString();
+    if (p < 1) requestAnimationFrame(step);
+    else document.getElementById('cash-val').textContent = '$' + end.toLocaleString();
+  }
+  requestAnimationFrame(step);
+}
+
+function updateTargetBar() {
+  const pct = Math.min(cash / 30000 * 100, 100);
+  document.getElementById('tgt-fill').style.width = pct + '%';
+  document.getElementById('tgt-num').textContent = '$' + cash.toLocaleString() + '/$30000';
+}
+
+function spawnCoins() {
+  const frame = document.getElementById('frame');
+  const cx = frame.clientWidth / 2;
+  const cy = frame.clientHeight / 2;
+  for (let i = 0; i < 8; i++) {
+    setTimeout(() => {
+      const c = document.createElement('div');
+      c.className = 'coin';
+      const a = (Math.PI * 2 * i / 8) + (Math.random() - .5) * .8;
+      const d = 50 + Math.random() * 70;
+      c.style.setProperty('--cx', Math.cos(a)*d + 'px');
+      c.style.setProperty('--cy', Math.sin(a)*d + 'px');
+      c.style.left = (cx + (Math.random()*30-15)) + 'px';
+      c.style.top  = (cy + (Math.random()*30-15)) + 'px';
+      c.textContent = '🪙';
+      frame.appendChild(c);
+      setTimeout(() => c.remove(), 700);
+    }, i * 45);
+  }
+}
+
+function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ── INIT ──
+window.addEventListener('load', () => {
+  resizeCanvas();
+  // font load then redraw
+  document.fonts.ready.then(() => {
+    resizeCanvas();
+    updateToken();
+  });
+});
+window.addEventListener('resize', () => {
+  resizeCanvas();
+  updateToken();
+});
+</script>
+</body>
+</html>

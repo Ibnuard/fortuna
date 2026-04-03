@@ -2,7 +2,7 @@
 // We render the 9-slice sprite flat to a surface first, 
 // then warp the surface pixels via vertex geometry for a CRT cembung effect!
 
-var _topbar_h = 200;
+var _topbar_h = 180;
 
 if (!surface_exists(surf_topbar)) {
     surf_topbar = surface_create(room_width, _topbar_h);
@@ -12,7 +12,62 @@ if (!surface_exists(surf_topbar)) {
 surface_set_target(surf_topbar);
 draw_clear_alpha(c_black, 0);
 // Kembalikan Y ke 0 agar teksturnya penuh dan tidak ada garis transparan bocor di atas
-draw_sprite_stretched(spr_gui_top_bar, 0, 0, 0, room_width, _topbar_h); 
+draw_sprite_stretched(spr_gui_top_bar, 0, 0, 5, room_width, _topbar_h); 
+
+// --- TOP BAR HUD MODULES ---
+// --- TOP BAR HUD MODULES ---
+var _pad_x = 40; 
+var _center_y = _topbar_h / 2;
+
+draw_set_font(fnt_main); // Setup font dynamically for measuring layout
+
+// --- IMPROVEMENT: Resized Top Bar Button ---
+var _map_btn_w = 190; // KECILKAN DARI 280
+var _map_btn_h = 50;  // KECILKAN DARI 80
+
+// Calculate Label Constraints
+var _label_str = "TARGET";
+var _label_x = _pad_x + _map_btn_w + 30; // 30px gap after Map Info Button
+var _label_w = string_width(_label_str);
+
+// Calculate Number String Constraints
+var _tgt_str = "$12.400 / $30.000";
+var _num_w = string_width(_tgt_str);
+var _num_x = room_width - _pad_x; // Align numbers to rightmost edge padding
+
+// --- DRAW TARGET BAR (Stretched dynamically between labels) ---
+var _tgt_x = _label_x + _label_w + 20; // Start after TARGET label
+var _tgt_w = (_num_x - _num_w - 20) - _tgt_x; // Stop right before the Number String
+var _tgt_h = _map_btn_h; // SAMAKAN TINGGI BAR DENGAN TOMBOL! Biar rapi satu jalur (50px)
+var _tgt_y = _center_y - (_tgt_h / 2);
+
+// Draw "TARGET" Label
+draw_set_halign(fa_left); draw_set_valign(fa_middle);
+draw_set_color(make_color_rgb(2, 74, 56)); // Dark shadow for Teal
+draw_text(_label_x + 3, _center_y + 3, _label_str);
+draw_set_color(make_color_rgb(6, 214, 160)); // Teal #06d6a0
+draw_text(_label_x, _center_y, _label_str);
+
+// Teal Progress Fill
+var _fill_pct = 0.41; // Mockup target percentage
+var _inner_pad = 4;   // Perkecil border compensation agar fill lebih padat
+var _fill_w = (_tgt_w - (_inner_pad * 2)) * _fill_pct;
+draw_set_color(make_color_rgb(6, 214, 160)); // Teal #06d6a0
+draw_rectangle(_tgt_x + _inner_pad, _tgt_y + _inner_pad, _tgt_x + _inner_pad + _fill_w, _tgt_y + _tgt_h - _inner_pad, false);
+draw_set_color(c_white);
+
+// Outline Sprite (Stretched 9-slice target bar)
+draw_sprite_stretched(spr_target_bar, 0, _tgt_x, _tgt_y, _tgt_w, _tgt_h);
+
+// Draw Numbers String outside the Bar
+draw_set_halign(fa_right); draw_set_valign(fa_middle);
+draw_set_color(c_black);
+draw_text(_num_x + 3, _center_y + 3, _tgt_str); 
+draw_set_color(c_white);
+draw_text(_num_x, _center_y, _tgt_str);
+
+draw_set_halign(fa_left); draw_set_valign(fa_top);
+
 surface_reset_target();
 
 // 2. Map surface to a curved mesh
@@ -35,6 +90,16 @@ for (var i = 0; i <= _segments; i++) {
     draw_vertex_texture(_x, _topbar_h + _y_offset, _ratio, 1); // Bottom Edge
 }
 draw_primitive_end();
+
+// --- 3. TOP BAR BUTTONS (Drawn natively over the curve to retain pixel-perfect click zones) ---
+// Place Map Info button on the LEFT
+var _map_btn_x = _pad_x; 
+var _map_btn_y = (_topbar_h / 2) - (_map_btn_h / 2);
+
+// GUNAKAN fnt_main AGAR PIXELNYA SAMA KASARNYA DENGAN TULISAN TARGET
+if (draw_gui_button(_map_btn_x, _map_btn_y, _map_btn_w, _map_btn_h, spr_button_main, "View Map", c_white, fnt_main)) {
+    // Placeholder Map interaction
+}
 
 // ─── BOTTOM GUI CONTAINER & BUTTONS ───
 
