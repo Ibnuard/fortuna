@@ -1,6 +1,6 @@
 //
-// CRT Scanlines + Vignette — Balatro-style
-// Outputs a multiply factor (white = no change, darker = darken)
+// CRT Scanlines + Vignette — Balatro-style Overlay
+// Outputs BLACK with varying alpha to darken the screen
 //
 varying vec2 v_vTexcoord;
 varying vec4 v_vColour;
@@ -18,10 +18,14 @@ void main()
     // ── Vignette ──
     vec2 vc = uv - 0.5;
     float dist = length(vc * vec2(1.2, 1.0));
-    float vignette = smoothstep(0.85, 0.35, dist);
-    float vig_factor = mix(0.55, 1.0, vignette);
+    float vignette = smoothstep(0.8, 0.4, dist);
+    float vig_factor = mix(0.4, 1.0, vignette);
     
-    // Output multiply factor as color
+    // The total "darkening" factor
     float factor = scanline * vig_factor;
-    gl_FragColor = vec4(factor, factor, factor, 1.0);
+    
+    // Output black with alpha based on how much we want to darken
+    // factor 1.0 (center) -> alpha 0.0 (transparent)
+    // factor 0.4 (corners) -> alpha 0.6 (dark)
+    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0 - factor);
 }
