@@ -93,6 +93,13 @@ dice_pop_y = lerp(dice_pop_y, _dice_target_y, animation_speed);
 if (gui_state == "DICE") {
     switch (dice_phase) {
         case "ENTERING":
+            // Reset selection state and panel height when roll starts
+            for (var k = 0; k < 3; k++) {
+                dice_selected[k] = false;
+                dice_select_y[k] = 0;
+            }
+            dice_panel_h_extra = 0;
+            
             // Wait for popup to nearly reach the target center
             if (abs(dice_pop_y) < 5) {
                 dice_pop_y = 0;
@@ -119,24 +126,39 @@ if (gui_state == "DICE") {
                 }
             } else {
                 dice_phase = "FINISHED";
-                dice_can_exit = true; // Player can now click to dismiss
+                dice_can_exit = true; 
+                dice_flash_alpha = 0.8; // Trigger juice flash
             }
             break;
             
         case "FINISHED":
-            // Wait for user to click to return to MAIN
-            if (mouse_check_button_pressed(mb_left)) {
-                gui_state = "MAIN";
-                dice_phase = "IDLE";
-                dice_can_exit = false;
+            // Expand panel height for the Confirm button
+            dice_panel_h_extra = lerp(dice_panel_h_extra, 100, 0.1);
+            
+            // Animation logic for selection lift
+            for (var i = 0; i < 3; i++) {
+                var _target_y = dice_selected[i] ? -30 : 0;
+                // Add a subtle 'float' if selected
+                if (dice_selected[i]) _target_y += sin(current_time / 400) * 4;
+                dice_select_y[i] = lerp(dice_select_y[i], _target_y, 0.15);
             }
             break;
     }
+
+
+
 } else {
     // Reset state when not in DICE state
     dice_phase = "IDLE";
     dice_timer = 0;
     dice_can_exit = false;
 }
+
+// Gradually fade out the flash effect
+if (dice_flash_alpha > 0) {
+    dice_flash_alpha = lerp(dice_flash_alpha, 0, 0.15);
+    if (dice_flash_alpha < 0.01) dice_flash_alpha = 0;
+}
+
 
 

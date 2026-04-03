@@ -44,5 +44,14 @@ dice_pop_y = 1000;             // Vertical offset for popup (starts below screen
 dice_can_exit = false;         // Flag to allow clicking away after roll ends
 dice_phase = "IDLE";           // Animation phase sequence
 dice_timer = 0;                // Internal countdown for phases
+dice_flash_alpha = 0;          // White flash intensity when roll stops
+dice_selected = [false, false, false]; // Tracking which of the 3 dice are picked
+dice_select_y = [0, 0, 0];     // Individual 'lift' animation for each die
+dice_panel_h_extra = 0;        // Dynamic expansion height for selection UI
+c_gold = make_color_rgb(255, 215, 0); // Gold color constant
+
+
+
+
 
 

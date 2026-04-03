@@ -440,8 +440,9 @@ if (gui_state == "DICE" || dice_pop_y < 990) {
     var _dw = sprite_get_width(spr_dice) * _dice_scale;
     var _dh = sprite_get_height(spr_dice) * _dice_scale;
     
+    // Height expands dynamically based on dice_panel_h_extra
     var _total_w = (3 * _dw) + (2 * _gap) + (2 * _margin);
-    var _total_h = _dh + (2 * _margin);
+    var _total_h = _dh + (2 * _margin) + dice_panel_h_extra; 
     
     // 3. Popup Centering
     var _popup_x = (_gui_w / 2) - (_total_w / 2);
@@ -454,30 +455,90 @@ if (gui_state == "DICE" || dice_pop_y < 990) {
     var _is_rolling = (dice_phase == "ROLLING");
     var _shake_mag = _is_rolling ? 6 : 0;
     var _dice_y_slot = _popup_y + _margin;
+    var _sel_count = dice_selected[0] + dice_selected[1] + dice_selected[2];
     
     for (var i = 0; i < 3; i++) {
         var _dice_x_slot = _popup_x + _margin + (i * (_dw + _gap));
         
+        // Use animated Y offset (lift)
         var _dx = _dice_x_slot;
-        var _dy = _dice_y_slot;
+        var _dy = _dice_y_slot + dice_select_y[i];
         
-        // Apply Shake Jitter
+        // Apply Shake Jitter (only during ROLLING)
         if (_shake_mag > 0) {
             _dx += random_range(-_shake_mag, _shake_mag);
             _dy += random_range(-_shake_mag, _shake_mag);
         }
         
-        draw_sprite_ext(spr_dice, dice_values[i], _dx, _dy, _dice_scale, _dice_scale, 0, c_white, 1);
+        // --- SELECTION GLOW (Behind the die) ---
+        if (dice_selected[i] && dice_phase == "FINISHED") {
+            gpu_set_blendmode(bm_add);
+            // Draw a slightly larger, transparent gold highlight
+            var _glow_scale = _dice_scale * 1.15;
+            var _gx = _dx - (_dw * 0.075);
+            var _gy = _dy - (_dh * 0.075);
+            draw_sprite_ext(spr_dice, dice_values[i], _gx, _gy, _glow_scale, _glow_scale, 0, c_gold, 0.4);
+            gpu_set_blendmode(bm_normal);
+        }
+        
+        // --- DRAW DIE FACE ---
+        var _color = c_white;
+        if (dice_selected[i]) _color = c_gold; 
+        draw_sprite_ext(spr_dice, dice_values[i], _dx, _dy, _dice_scale, _dice_scale, 0, _color, 1);
+        
+        // --- NUMERIC INDICATOR (Above Die) ---
+        if (dice_phase == "FINISHED") {
+            draw_set_font(fnt_main);
+            draw_set_halign(fa_center);
+            draw_set_color(c_black); draw_set_alpha(0.5);
+            draw_text(_dx + (_dw/2) + 2, _dy - 35 + 2, string(dice_values[i] + 1));
+            draw_set_color(c_white); draw_set_alpha(1.0);
+            draw_text(_dx + (_dw/2), _dy - 35, string(dice_values[i] + 1));
+        }
+        
+        // --- INTERACTION (Clicking the Die) ---
+        if (dice_phase == "FINISHED") {
+            var _mx = device_mouse_x_to_gui(0);
+            var _my = device_mouse_y_to_gui(0);
+            if (point_in_rectangle(_mx, _my, _dx, _dy, _dx + _dw, _dy + _dh)) {
+                if (mouse_check_button_pressed(mb_left)) {
+                    if (dice_selected[i]) {
+                        dice_selected[i] = false;
+                    } else if (_sel_count < 2) {
+                        dice_selected[i] = true;
+                    }
+                }
+            }
+        }
     }
     
-    // 5. Instructional Text (only when roll is done)
-    if (dice_can_exit) {
+    // 5. Instructional Text & Confirm Button (only when roll is done and panel has expanded)
+    if (dice_phase == "FINISHED" && dice_panel_h_extra > 50) {
+        var _ui_alpha = clamp((dice_panel_h_extra - 50) / 50, 0, 1);
+        var _sel_count = dice_selected[0] + dice_selected[1] + dice_selected[2];
+        
         draw_set_font(fnt_main);
         draw_set_halign(fa_center);
         draw_set_valign(fa_top);
         draw_set_color(c_white);
-        draw_set_alpha(abs(sin(current_time/300))); 
-        draw_text(_gui_w / 2, _popup_y + _total_h + 24, "Click anywhere to continue");
+        draw_set_alpha(_ui_alpha);
+        
+        if (_sel_count < 2) {
+            draw_set_alpha(_ui_alpha * abs(sin(current_time/300))); 
+            draw_text(_gui_w / 2, _popup_y + _total_h - 45, "Select 2 Dice to Keep");
+        } else {
+            // SHOW CONFIRM BUTTON (Centered at bottom)
+            var _conf_w = 260;
+            var _conf_h = 55;
+            var _conf_x = (_gui_w / 2) - (_conf_w / 2);
+            var _conf_y = _popup_y + _total_h - 75;
+            
+            if (draw_gui_button(_conf_x, _conf_y, _conf_w, _conf_h, spr_button_main, "Confirm Selection", c_white, fnt_gui_button_medium)) {
+                gui_state = "MAIN";
+                dice_phase = "IDLE";
+                dice_can_exit = false;
+            }
+        }
         draw_set_alpha(1.0);
     }
 }
@@ -498,3 +559,12 @@ if (shader_is_compiled(shd_game_fx)) {
     draw_rectangle_color(0, 0, display_get_gui_width(), display_get_gui_height(), c_black, c_black, c_black, c_black, false);
     shader_reset();
 }
+
+// ─── JUICE EFFECTS (Screen Flash) ───
+if (dice_flash_alpha > 0) {
+    draw_set_color(c_white);
+    draw_set_alpha(dice_flash_alpha);
+    draw_rectangle(0, 0, display_get_gui_width(), display_get_gui_height(), false);
+    draw_set_alpha(1.0);
+}
+
