@@ -1,5 +1,40 @@
-// Top Bar
-draw_sprite_stretched(spr_gui_top_bar, 0, 0, 0, room_width, 200);
+// ─── BALATRO-STYLE CURVED TOP BAR ───
+// We render the 9-slice sprite flat to a surface first, 
+// then warp the surface pixels via vertex geometry for a CRT cembung effect!
+
+var _topbar_h = 200;
+
+if (!surface_exists(surf_topbar)) {
+    surf_topbar = surface_create(room_width, _topbar_h);
+}
+
+// 1. Draw 9-slice perfectly flat internally
+surface_set_target(surf_topbar);
+draw_clear_alpha(c_black, 0);
+// Kembalikan Y ke 0 agar teksturnya penuh dan tidak ada garis transparan bocor di atas
+draw_sprite_stretched(spr_gui_top_bar, 0, 0, 0, room_width, _topbar_h); 
+surface_reset_target();
+
+// 2. Map surface to a curved mesh
+var _tex = surface_get_texture(surf_topbar);
+draw_primitive_begin_texture(pr_trianglestrip, _tex);
+
+var _segments = 24; // 24 slices is very smooth
+// Dikurangi setengahnya agar jauh lebih halus (subtle), gaya Balatro itu tipis!
+var _curve_intensity = -5; // Minus means it curves/bulges UPWARDS in the center 
+
+for (var i = 0; i <= _segments; i++) {
+    var _ratio = i / _segments;
+    var _x = _ratio * room_width;
+    
+    // Sine arc: 0 at edges, 1 at center
+    var _arc = sin(_ratio * pi);
+    var _y_offset = _arc * _curve_intensity; 
+    
+    draw_vertex_texture(_x, 0 + _y_offset, _ratio, 0); // Top Edge
+    draw_vertex_texture(_x, _topbar_h + _y_offset, _ratio, 1); // Bottom Edge
+}
+draw_primitive_end();
 
 // ─── BOTTOM GUI CONTAINER & BUTTONS ───
 

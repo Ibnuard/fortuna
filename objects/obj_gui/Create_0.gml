@@ -12,6 +12,7 @@ panel_scroll_y = 0;
 panel_scroll_target = 0;
 panel_max_scroll = 0;
 surf_panel = -1;
+surf_topbar = -1; // Specific canvas for the CRT curved top bar
 
 // Touch / Mouse Drag state
 is_dragging_panel = false;
