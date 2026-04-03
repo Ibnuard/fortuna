@@ -50,6 +50,7 @@
     {"id":{"name":"spr_gui_bottom_container","path":"sprites/spr_gui_bottom_container/spr_gui_bottom_container.yy",},},
     {"id":{"name":"spr_gui_top_bar","path":"sprites/spr_gui_top_bar/spr_gui_top_bar.yy",},},
     {"id":{"name":"spr_layout_guide","path":"sprites/spr_layout_guide/spr_layout_guide.yy",},},
+    {"id":{"name":"spr_left_panel","path":"sprites/spr_left_panel/spr_left_panel.yy",},},
     {"id":{"name":"spr_panel_close","path":"sprites/spr_panel_close/spr_panel_close.yy",},},
     {"id":{"name":"spr_pawn","path":"sprites/spr_pawn/spr_pawn.yy",},},
     {"id":{"name":"spr_target_bar","path":"sprites/spr_target_bar/spr_target_bar.yy",},},
