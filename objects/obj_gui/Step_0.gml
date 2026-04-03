@@ -91,28 +91,52 @@ var _dice_target_y = (gui_state == "DICE") ? 0 : 1000;
 dice_pop_y = lerp(dice_pop_y, _dice_target_y, animation_speed);
 
 if (gui_state == "DICE") {
-    // While the roll timer is active, keep shuffling values
-    if (dice_roll_timer > 0) {
-        dice_roll_timer--;
-        
-        // Randomize dice faces (0-5)
-        for (var i = 0; i < 3; i++) {
-            dice_values[i] = irandom_range(0, 5);
-        }
-        
-        if (dice_roll_timer == 0) {
-            dice_can_exit = true; // Roll finished, player can click to dismiss
-        }
-    }
-    
-    // Dismiss popup on click if roll is done
-    if (dice_can_exit && mouse_check_button_pressed(mb_left)) {
-        gui_state = "MAIN";
-        dice_can_exit = false;
+    switch (dice_phase) {
+        case "ENTERING":
+            // Wait for popup to nearly reach the target center
+            if (abs(dice_pop_y) < 5) {
+                dice_pop_y = 0;
+                dice_phase = "PAUSE";
+                dice_timer = 20; // 0.3s pause before rolling
+            }
+            break;
+            
+        case "PAUSE":
+            if (dice_timer > 0) {
+                dice_timer--;
+            } else {
+                dice_phase = "ROLLING";
+                dice_timer = 60; // 1s shuffle duration
+            }
+            break;
+            
+        case "ROLLING":
+            if (dice_timer > 0) {
+                dice_timer--;
+                // Randomize dice faces (0-5) while shaking
+                for (var i = 0; i < 3; i++) {
+                    dice_values[i] = irandom_range(0, 5);
+                }
+            } else {
+                dice_phase = "FINISHED";
+                dice_can_exit = true; // Player can now click to dismiss
+            }
+            break;
+            
+        case "FINISHED":
+            // Wait for user to click to return to MAIN
+            if (mouse_check_button_pressed(mb_left)) {
+                gui_state = "MAIN";
+                dice_phase = "IDLE";
+                dice_can_exit = false;
+            }
+            break;
     }
 } else {
-    // Reset timer and exit flag when not in DICE state
-    dice_roll_timer = 0;
+    // Reset state when not in DICE state
+    dice_phase = "IDLE";
+    dice_timer = 0;
     dice_can_exit = false;
 }
+
 

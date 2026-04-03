@@ -230,10 +230,11 @@ var _roll_y = _main_y + stagger_btn_center;
 if (draw_gui_button(_center_x, _roll_y, _main_w, _main_h, spr_button_main, "", c_white, fnt_gui_button_medium)) {
     if (gui_state == "MAIN") {
         gui_state = "DICE";
-        dice_roll_timer = 60; // 1 second at 60fps
-        dice_pop_y = 1000;    // Reset animation start
+        dice_phase = "ENTERING";
+        dice_timer = 0;
+        dice_pop_y = 1000;    
         dice_can_exit = false;
-        randomize();          // Ensure true randomness
+        randomize();          
     }
 }
 
@@ -300,7 +301,7 @@ var _prop_panel_y = _prop_target_y + property_y_offset;
 if (property_y_offset < 790) {
     // --- JUICY OVERLAY BACKGROUND ---
     // This now covers the interactive buttons as well
-    var _overlay_alpha = lerp(0.65, 0, clamp(property_y_offset / 800, 0, 1));
+    var _overlay_alpha = lerp(0.4, 0, clamp(property_y_offset / 800, 0, 1));
     draw_set_color(c_black);
     draw_set_alpha(_overlay_alpha);
     draw_rectangle(0, 0, room_width, room_height, false);
@@ -424,16 +425,17 @@ if (gui_state == "DICE" || dice_pop_y < 990) {
     var _gui_h = display_get_gui_height();
     
     // 1. Dark Overlay (Fades in with the popup position)
-    var _dice_overlay_alpha = lerp(0, 0.6, clamp(1.0 - (dice_pop_y / 1000), 0, 1));
+    var _dice_overlay_alpha = lerp(0, 0.4, clamp(1.0 - (dice_pop_y / 1000), 0, 1));
     draw_set_color(c_black);
     draw_set_alpha(_dice_overlay_alpha);
     draw_rectangle(0, 0, _gui_w, _gui_h, false);
     draw_set_alpha(1.0);
     
     // 2. Calculating Dynamic Dimensions
-    var _dice_scale = 0.7; // Smaller dice as requested
-    var _margin = 20;
-    var _gap = 20;
+    var _dice_scale = 0.55; // Slightly smaller to look even sharper
+    var _margin = 40; // More breathing room
+    var _gap = 30; // More space between dice
+
     
     var _dw = sprite_get_width(spr_dice) * _dice_scale;
     var _dh = sprite_get_height(spr_dice) * _dice_scale;
@@ -445,18 +447,19 @@ if (gui_state == "DICE" || dice_pop_y < 990) {
     var _popup_x = (_gui_w / 2) - (_total_w / 2);
     var _popup_y = (_gui_h / 2) - (_total_h / 2) + dice_pop_y;
     
-    // Draw Dynamic Container
+    // Draw Dynamic Container (9-slice handling)
     draw_sprite_stretched(spr_dice_container, 0, _popup_x, _popup_y, _total_w, _total_h);
     
-    // 4. Dice Rendering (Centered within their slots in the container)
-    var _shake_mag = (dice_roll_timer > 0) ? 6 : 0;
-    var _dice_y = _popup_y + _margin + (_dh / 2);
+    // 4. Dice Rendering (Corrected for Top-Left Origin)
+    var _is_rolling = (dice_phase == "ROLLING");
+    var _shake_mag = _is_rolling ? 6 : 0;
+    var _dice_y_slot = _popup_y + _margin;
     
     for (var i = 0; i < 3; i++) {
-        var _dice_x = _popup_x + _margin + (i * (_dw + _gap)) + (_dw / 2);
+        var _dice_x_slot = _popup_x + _margin + (i * (_dw + _gap));
         
-        var _dx = _dice_x;
-        var _dy = _dice_y;
+        var _dx = _dice_x_slot;
+        var _dy = _dice_y_slot;
         
         // Apply Shake Jitter
         if (_shake_mag > 0) {
@@ -467,14 +470,14 @@ if (gui_state == "DICE" || dice_pop_y < 990) {
         draw_sprite_ext(spr_dice, dice_values[i], _dx, _dy, _dice_scale, _dice_scale, 0, c_white, 1);
     }
     
-    // 5. Instructional Text (Blinking below the container)
+    // 5. Instructional Text (only when roll is done)
     if (dice_can_exit) {
         draw_set_font(fnt_main);
         draw_set_halign(fa_center);
         draw_set_valign(fa_top);
         draw_set_color(c_white);
         draw_set_alpha(abs(sin(current_time/300))); 
-        draw_text(_gui_w / 2, _popup_y + _total_h + 20, "Click anywhere to continue");
+        draw_text(_gui_w / 2, _popup_y + _total_h + 24, "Click anywhere to continue");
         draw_set_alpha(1.0);
     }
 }

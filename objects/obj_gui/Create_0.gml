@@ -42,4 +42,7 @@ dice_values = [0, 0, 0];       // Current face values (0-5)
 dice_roll_timer = 0;           // Timer to stop rolling/shuffling
 dice_pop_y = 1000;             // Vertical offset for popup (starts below screen)
 dice_can_exit = false;         // Flag to allow clicking away after roll ends
+dice_phase = "IDLE";           // Animation phase sequence
+dice_timer = 0;                // Internal countdown for phases
+
 
