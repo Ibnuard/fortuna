@@ -470,30 +470,53 @@ if (gui_state == "DICE" || dice_pop_y < 990) {
             _dy += random_range(-_shake_mag, _shake_mag);
         }
         
-        // --- SELECTION GLOW (Behind the die) ---
+        // --- SELECTION OUTLINE (Behind the die) ---
         if (dice_selected[i] && dice_phase == "FINISHED") {
-            gpu_set_blendmode(bm_add);
-            // Draw a slightly larger, transparent gold highlight
-            var _glow_scale = _dice_scale * 1.15;
-            var _gx = _dx - (_dw * 0.075);
-            var _gy = _dy - (_dh * 0.075);
-            draw_sprite_ext(spr_dice, dice_values[i], _gx, _gy, _glow_scale, _glow_scale, 0, c_gold, 0.4);
-            gpu_set_blendmode(bm_normal);
+            var _out = 4; // Outline thickness
+            gpu_set_fog(true, c_gold, 0, 0); // Force pure gold color
+            draw_sprite_ext(spr_dice, dice_values[i], _dx - _out, _dy, _dice_scale, _dice_scale, 0, c_white, 1);
+            draw_sprite_ext(spr_dice, dice_values[i], _dx + _out, _dy, _dice_scale, _dice_scale, 0, c_white, 1);
+            draw_sprite_ext(spr_dice, dice_values[i], _dx, _dy - _out, _dice_scale, _dice_scale, 0, c_white, 1);
+            draw_sprite_ext(spr_dice, dice_values[i], _dx, _dy + _out, _dice_scale, _dice_scale, 0, c_white, 1);
+            draw_sprite_ext(spr_dice, dice_values[i], _dx - _out, _dy - _out, _dice_scale, _dice_scale, 0, c_white, 1);
+            draw_sprite_ext(spr_dice, dice_values[i], _dx + _out, _dy - _out, _dice_scale, _dice_scale, 0, c_white, 1);
+            draw_sprite_ext(spr_dice, dice_values[i], _dx - _out, _dy + _out, _dice_scale, _dice_scale, 0, c_white, 1);
+            draw_sprite_ext(spr_dice, dice_values[i], _dx + _out, _dy + _out, _dice_scale, _dice_scale, 0, c_white, 1);
+            gpu_set_fog(false, c_white, 0, 0); // Turn off fog
         }
+
         
         // --- DRAW DIE FACE ---
-        var _color = c_white;
-        if (dice_selected[i]) _color = c_gold; 
-        draw_sprite_ext(spr_dice, dice_values[i], _dx, _dy, _dice_scale, _dice_scale, 0, _color, 1);
+        draw_sprite_ext(spr_dice, dice_values[i], _dx, _dy, _dice_scale, _dice_scale, 0, c_white, 1);
         
         // --- NUMERIC INDICATOR (Above Die) ---
-        if (dice_phase == "FINISHED") {
-            draw_set_font(fnt_main);
+        if (dice_phase == "FINISHED" && dice_selected[i]) {
+            draw_set_font(fnt_gui_button_large); // Use larger font for visibility
             draw_set_halign(fa_center);
+            
+            var _num_x = _dx + (_dw / 2);
+            var _num_y = _dy - 70; // Push even higher to be strictly above the die
+            var _num_str = string(dice_values[i] + 1);
+            
+            // 1. Drop shadow (Background drop)
             draw_set_color(c_black); draw_set_alpha(0.5);
-            draw_text(_dx + (_dw/2) + 2, _dy - 35 + 2, string(dice_values[i] + 1));
-            draw_set_color(c_white); draw_set_alpha(1.0);
-            draw_text(_dx + (_dw/2), _dy - 35, string(dice_values[i] + 1));
+            draw_text(_num_x + 5, _num_y + 6, _num_str);
+            draw_set_alpha(1.0);
+            
+            // 2. Thick Black Outline
+            draw_set_color(c_black);
+            draw_text(_num_x - 3, _num_y, _num_str);
+            draw_text(_num_x + 3, _num_y, _num_str);
+            draw_text(_num_x, _num_y - 3, _num_str);
+            draw_text(_num_x, _num_y + 3, _num_str);
+            draw_text(_num_x - 3, _num_y - 3, _num_str);
+            draw_text(_num_x + 3, _num_y - 3, _num_str);
+            draw_text(_num_x - 3, _num_y + 3, _num_str);
+            draw_text(_num_x + 3, _num_y + 3, _num_str);
+            
+            // 3. Main Gold Text (Foreground)
+            draw_set_color(c_gold);
+            draw_text(_num_x, _num_y, _num_str);
         }
         
         // --- INTERACTION (Clicking the Die) ---
@@ -512,34 +535,81 @@ if (gui_state == "DICE" || dice_pop_y < 990) {
         }
     }
     
-    // 5. Instructional Text & Confirm Button (only when roll is done and panel has expanded)
-    if (dice_phase == "FINISHED" && dice_panel_h_extra > 50) {
-        var _ui_alpha = clamp((dice_panel_h_extra - 50) / 50, 0, 1);
+    // 5. Instructional Text & Confirm Button (only when roll is done)
+    if (dice_phase == "FINISHED") {
         var _sel_count = dice_selected[0] + dice_selected[1] + dice_selected[2];
         
         draw_set_font(fnt_main);
         draw_set_halign(fa_center);
         draw_set_valign(fa_top);
-        draw_set_color(c_white);
-        draw_set_alpha(_ui_alpha);
         
         if (_sel_count < 2) {
-            draw_set_alpha(_ui_alpha * abs(sin(current_time/300))); 
-            draw_text(_gui_w / 2, _popup_y + _total_h - 45, "Select 2 Dice to Keep");
-        } else {
-            // SHOW CONFIRM BUTTON (Centered at bottom)
+            draw_set_font(fnt_gui_button_medium); // Slightly larger font
+            var _osc_alpha = abs(sin(current_time/300));
+            var _inst_x = _gui_w / 2;
+            var _inst_y = _popup_y + _total_h + 25; // Adjusted Y for larger font
+            
+            // 1. Drop Shadow
+            draw_set_color(c_black);
+            draw_set_alpha(_osc_alpha * 0.7);
+            draw_text(_inst_x + 3, _inst_y + 4, "Select 2 Dice to Keep");
+            
+            // 2. Main Gold Text
+            draw_set_color(c_gold);
+            draw_set_alpha(_osc_alpha);
+            draw_text(_inst_x, _inst_y, "Select 2 Dice to Keep");
+            
+            draw_set_alpha(1.0);
+        } else if (dice_panel_h_extra > 50) {
+            // CONFIRM BUTTON shows up as panel expands
+            var _ui_alpha = clamp((dice_panel_h_extra - 50) / 70, 0, 1);
+            draw_set_alpha(_ui_alpha);
+            
+            // SHOW CONFIRM BUTTON (Centered at bottom of expanded panel)
             var _conf_w = 260;
-            var _conf_h = 55;
+            var _conf_h = 80; // Further increased height for better text padding
             var _conf_x = (_gui_w / 2) - (_conf_w / 2);
-            var _conf_y = _popup_y + _total_h - 75;
+            var _conf_y = _popup_y + _total_h - 125; // Shifted higher 
             
             if (draw_gui_button(_conf_x, _conf_y, _conf_w, _conf_h, spr_button_main, "Confirm Selection", c_white, fnt_gui_button_medium)) {
                 gui_state = "MAIN";
                 dice_phase = "IDLE";
                 dice_can_exit = false;
             }
+            draw_set_alpha(1.0);
         }
-        draw_set_alpha(1.0);
+
+        // 6. Auxiliary Side Buttons (Action Menu)
+        var _side_w = 160; // Base width
+        var _side_h = 60;  // Taller height so it's less elongated ("lonjong")
+        var _side_gap = 16; // Gap between buttons
+        
+        // --- LEFT SIDE BUTTONS ---
+        var _side_left_x = _popup_x - _side_w - 20; // 20px padding from left side of container
+        var _side_left_y = _popup_y + ((_dh + (2 * _margin)) / 2) - (_side_h / 2); // Center a single button vertically
+        
+        if (draw_gui_button(_side_left_x, _side_left_y, _side_w, _side_h, spr_button_main, "View Map", c_white, fnt_main)) {
+            show_debug_message("Action: View Map");
+        }
+        
+        // --- RIGHT SIDE BUTTONS ---
+        var _side_right_total_h = (2 * _side_h) + _side_gap;
+        var _side_right_x = _popup_x + _total_w + 20; // 20px padding from right side of container
+        var _side_right_y = _popup_y + ((_dh + (2 * _margin)) / 2) - (_side_right_total_h / 2); // Center 2 buttons vertically
+        
+        if (draw_gui_button(_side_right_x, _side_right_y, _side_w, _side_h, spr_button_red, "Re Roll", c_white, fnt_main)) {
+            // TODO: Charge a resource cost before executing roll
+            dice_phase = "ROLLING";
+            dice_timer = irandom_range(40, 60);
+            dice_selected[0] = false;
+            dice_selected[1] = false;
+            dice_selected[2] = false;
+            dice_panel_h_extra = 0; // Reset panel expansion immediately
+        }
+        
+        if (draw_gui_button(_side_right_x, _side_right_y + _side_h + _side_gap, _side_w, _side_h, spr_button_blue, "Use Fate Card", c_white, fnt_main)) {
+            show_debug_message("Action: Use Fate Card");
+        }
     }
 }
 

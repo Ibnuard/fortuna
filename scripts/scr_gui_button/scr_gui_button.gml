@@ -2,6 +2,14 @@
 /// @description Draws a styled button with text at the specified coordinates
 function draw_gui_button(_x, _y, _w, _h, _sprite, _text, _text_color = c_white, _font = fnt_gui_button_large) {
     
+    // DYNAMIC SIZING: Ensure button is at least wide enough for the text
+    draw_set_font(_font);
+    var _req_w = string_width(_text) + 60; // Extra padding
+    if (_req_w > _w) {
+        _x -= (_req_w - _w) / 2; // Keep it centered
+        _w = _req_w;
+    }
+    
     // -- IM-GUI INTRACTION LOGIC --
     var _mx = device_mouse_x_to_gui(0);
     var _my = device_mouse_y_to_gui(0);
@@ -41,8 +49,8 @@ function draw_gui_button(_x, _y, _w, _h, _sprite, _text, _text_color = c_white, 
     var _text_x = _x + (_w / 2);
     
     // Calculate the exact center of the top "face" area 
-    // (nine-slice preserves a 40px 3D bottom border, so we subtract it)
-    var _face_h = _h - 10;
+    // (nine-slice preserves a bottom 3D border, so we subtract to find the true vertical face center)
+    var _face_h = _h - 16;
     var _text_y = _y + (_face_h / 2);
     
     // Drop shadow

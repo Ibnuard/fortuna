@@ -132,8 +132,10 @@ if (gui_state == "DICE") {
             break;
             
         case "FINISHED":
+            var _sel_count = dice_selected[0] + dice_selected[1] + dice_selected[2];
+            var _target_h = (_sel_count == 2) ? 120 : 0;
             // Expand panel height for the Confirm button
-            dice_panel_h_extra = lerp(dice_panel_h_extra, 100, 0.1);
+            dice_panel_h_extra = lerp(dice_panel_h_extra, _target_h, 0.1);
             
             // Animation logic for selection lift
             for (var i = 0; i < 3; i++) {
