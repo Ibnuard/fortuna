@@ -874,7 +874,7 @@ if (stats_popup_alpha > 0) {
     var _row_y_start = _p_y + 130;
     var _row_gap     = 65;
     var _bar_w       = 380;
-    var _bar_h       = 32;
+    var _bar_h       = 44;
     var _bar_x       = _p_x + 130;
     
     for (var i = 0; i < array_length(global.stat_data); i++) {
@@ -896,13 +896,15 @@ if (stats_popup_alpha > 0) {
         }
         
         // 4. Bar Fill (Adjusted to stay inside spr_target_bar borders)
-        var _inner_pad_x = 10;
-        var _inner_pad_y = 6;
+        var _inner_pad_x = 12;
+        var _inner_pad_y = 16;
         var _fill_max_w = _bar_w - (_inner_pad_x * 2);
         var _fw = (_val / 10) * _fill_max_w;
         if (_fw > 0) {
             draw_set_color(_s.color);
-            draw_rectangle(_bar_x + _inner_pad_x, _cy + _inner_pad_y, _bar_x + _inner_pad_x + _fw, _cy + _bar_h - _inner_pad_y, false);
+            // Shifted up by 2px to be perfectly centered on the spr_target_bar track
+            var _yo = -4;
+            draw_rectangle(_bar_x + _inner_pad_x, _cy + _inner_pad_y + _yo, _bar_x + _inner_pad_x + _fw, _cy + _bar_h - _inner_pad_y + _yo, false);
         }
         
         // 5. Value Text

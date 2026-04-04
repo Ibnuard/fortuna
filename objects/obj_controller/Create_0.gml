@@ -15,7 +15,7 @@ stats = {
     agility:          5, // index 2
     charisma:         5, // index 3
     risk_tolerance:   5, // index 4
-    communication:    5  // index 5
+    negotiation:      5  // index 5
 };
 
 // ─── UTILS ───
