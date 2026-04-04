@@ -15,13 +15,12 @@ var draw_order = [-4, 4, -3, 3, -2, 2, -1, 1, 0];
 for (var oi = 0; oi < array_length(draw_order); oi++) {
     var i      = draw_order[oi];
     var _x     = board_center_x + i * step_size + anim_offset;
-    
     var dist_norm = clamp(abs(_x - board_center_x) / (step_size * mid), 0, 1);
     
     var base_shd_x = 6;
     var base_shd_y = 15;
     
-    var shd_draw_y = tile_y + base_shd_y;
+    var shd_draw_y = tile_y + base_shd_y; 
     
     var local_t = clamp((intro_anim_t - ((abs(i)) * 0.08)) / 0.6, 0, 1);
     var t_ease = 1 - power(1 - local_t, 3);
@@ -46,7 +45,7 @@ for (var oi = 0; oi < array_length(draw_order); oi++) {
     var _x     = board_center_x + i * step_size + anim_offset;
     
     var dist_norm = clamp(abs(_x - board_center_x) / (step_size * mid), 0, 1);
-    var lift      = lerp(lift_max, 0, dist_norm);
+    var lift      = lift_max * (1 - power(dist_norm, 2)); // Parabolic curve untuk efek cekung yang lebih 'juicy'
     var _y        = tile_y - lift;
 
     var local_t = clamp((intro_anim_t - ((abs(i)) * 0.08)) / 0.6, 0, 1);
