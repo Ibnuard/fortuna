@@ -17,6 +17,13 @@ for (var oi = 0; oi < array_length(draw_order); oi++) {
     var _x     = board_center_x + i * step_size + anim_offset;
     var dist_norm = clamp(abs(_x - board_center_x) / (step_size * mid), 0, 1);
     
+    // Scale sangat subtle (3-5%)
+    var _w_sc = lerp(1, 0.96, dist_norm); 
+    var _h_sc = lerp(1, 0.97, dist_norm);
+    
+    var current_w = tile_w * _w_sc;
+    var current_h = tile_h * _h_sc;
+    
     var base_shd_x = 6;
     var base_shd_y = 15;
     
@@ -26,7 +33,7 @@ for (var oi = 0; oi < array_length(draw_order); oi++) {
     var t_ease = 1 - power(1 - local_t, 3);
     shd_draw_y += lerp(-1200, 0, t_ease);
     
-    var half_w = tile_w / 2;
+    var half_w = current_w / 2;
     var draw_x = _x - half_w;
     var shd_draw_x = draw_x + base_shd_x + lerp(8, 0, dist_norm);
     
@@ -34,7 +41,7 @@ for (var oi = 0; oi < array_length(draw_order); oi++) {
     draw_sprite_stretched_ext(
         tiles[loop_index(player_index + i)].sprite, 0,
         shd_draw_x, shd_draw_y,
-        tile_w, tile_h,
+        current_w, current_h,
         c_black, 1
     );
 }
@@ -45,6 +52,12 @@ for (var oi = 0; oi < array_length(draw_order); oi++) {
     var _x     = board_center_x + i * step_size + anim_offset;
     
     var dist_norm = clamp(abs(_x - board_center_x) / (step_size * mid), 0, 1);
+    
+    var _w_sc = lerp(1, 0.96, dist_norm);
+    var _h_sc = lerp(1, 0.97, dist_norm);
+    var current_w = tile_w * _w_sc;
+    var current_h = tile_h * _h_sc;
+    
     var lift      = lift_max * (1 - power(dist_norm, 2)); // Parabolic curve untuk efek cekung yang lebih 'juicy'
     var _y        = tile_y - lift;
 
@@ -52,14 +65,14 @@ for (var oi = 0; oi < array_length(draw_order); oi++) {
     var t_ease = 1 - power(1 - local_t, 3);
     _y += lerp(-1200, 0, t_ease);
 
-    var half_w = tile_w / 2;
+    var half_w = current_w / 2;
     var draw_x = _x - half_w;
     
     draw_set_alpha(lerp(1.0, 0.60, dist_norm));
     draw_sprite_stretched_ext(
         tiles[loop_index(player_index + i)].sprite, 0,
         draw_x, _y,
-        tile_w, tile_h,
+        current_w, current_h,
         c_white, 1
     );
     
@@ -69,14 +82,17 @@ for (var oi = 0; oi < array_length(draw_order); oi++) {
     
     // Konpensasi origin Top-Left agar tetap Center secara visual
     var _icon_sc  = sc * 0.75; // Sesuai update manual user
-    var _icon_sw  = sprite_get_width(spr_tile_icons) * _icon_sc;
-    var _icon_sh  = sprite_get_height(spr_tile_icons) * _icon_sc;
+    var _icon_sc_x = _icon_sc * _w_sc;
+    var _icon_sc_y = _icon_sc * _h_sc;
+    
+    var _icon_sw  = sprite_get_width(spr_tile_icons) * _icon_sc_x;
+    var _icon_sh  = sprite_get_height(spr_tile_icons) * _icon_sc_y;
     
     var _icon_x   = _x - (_icon_sw / 2); // Menggunakan _x (center) langsung
-    var _icon_y   = _y + (12 * sc); // Disesuaikan untuk tinggi tile baru
+    var _icon_y   = _y + (12 * sc * _h_sc); // Disesuaikan untuk tinggi tile baru
     
     // Draw icon with same alpha and lift as the tile
-    draw_sprite_ext(spr_tile_icons, _icon_idx, _icon_x, _icon_y, _icon_sc, _icon_sc, 0, c_white, lerp(1.0, 0.60, dist_norm));
+    draw_sprite_ext(spr_tile_icons, _icon_idx, _icon_x, _icon_y, _icon_sc_x, _icon_sc_y, 0, c_white, lerp(1.0, 0.60, dist_norm));
     
     // ── DRAW TILE TEXT (LABEL & INFO) ──
     draw_set_font(fnt_main);
@@ -84,22 +100,23 @@ for (var oi = 0; oi < array_length(draw_order); oi++) {
     var _alpha = lerp(1.0, 0.60, dist_norm);
     
     // 1. Nama Tile (Center Body)
-    var _label_y = _y + (tile_h / 2) + (12 * sc); // Diturunkan agar lebih ke tengah bodi tile
+    var _label_y = _y + (current_h / 2) + (12 * sc * _h_sc); // Diturunkan agar lebih ke tengah bodi tile
     var _label_str = string_upper(_tile.name);
-    var _label_scale = 0.95 * sc;
-    var _label_sep   = 32; // Dalam unit font asli (akan di-scale otomatis oleh fungsi draw)
-    var _label_w     = (tile_w - (20 * sc)) / _label_scale; // Kalkulasi limit lebar vs skala font
+    var _label_scale_x = 0.95 * sc * _w_sc;
+    var _label_scale_y = 0.95 * sc * _h_sc;
+    var _label_sep   = 32 * _h_sc; // Dalam unit font asli (akan di-scale otomatis oleh fungsi draw)
+    var _label_w     = (current_w - (20 * sc)) / _label_scale_x; // Kalkulasi limit lebar vs skala font
     
     // Shadow pass
     draw_set_color(c_black); draw_set_alpha(_alpha * 0.4);
-    draw_text_ext_transformed(_x + 2, _label_y + 2, _label_str, _label_sep, _label_w, _label_scale, _label_scale, 0);
+    draw_text_ext_transformed(_x + 2, _label_y + 2, _label_str, _label_sep, _label_w, _label_scale_x, _label_scale_y, 0);
     
     // Main pass
     draw_set_color(c_white); draw_set_alpha(_alpha);
-    draw_text_ext_transformed(_x, _label_y, _label_str, _label_sep, _label_w, _label_scale, _label_scale, 0);
+    draw_text_ext_transformed(_x, _label_y, _label_str, _label_sep, _label_w, _label_scale_x, _label_scale_y, 0);
     
     // 2. Info / Harga (Bottom Body)
-    var _info_y   = _y + tile_h - (22 * sc); // Lebih ditarik ke arah bottom
+    var _info_y   = _y + current_h - (22 * sc * _h_sc); // Lebih ditarik ke arah bottom
     var _info_str = "";
     
     switch(_tile.type) {
@@ -111,16 +128,17 @@ for (var oi = 0; oi < array_length(draw_order); oi++) {
         case TileType.Property: _info_str = "$" + string(_tile.price); break;
     }
     
-    var _info_scale = 0.82 * sc; 
+    var _info_scale_x = 0.82 * sc * _w_sc;
+    var _info_scale_y = 0.82 * sc * _h_sc;
     var _info_color = c_white; // Reverted back to white for all tiles
     
     // Shadow pass
     draw_set_color(c_black); draw_set_alpha(_alpha * 0.5);
-    draw_text_transformed(_x + 2, _info_y + 2, _info_str, _info_scale, _info_scale, 0);
+    draw_text_transformed(_x + 2, _info_y + 2, _info_str, _info_scale_x, _info_scale_y, 0);
     
     // Main pass
     draw_set_color(_info_color); draw_set_alpha(_alpha);
-    draw_text_transformed(_x, _info_y, _info_str, _info_scale, _info_scale, 0);
+    draw_text_transformed(_x, _info_y, _info_str, _info_scale_x, _info_scale_y, 0);
     
     draw_set_alpha(1.0); draw_set_valign(fa_top);
 }
