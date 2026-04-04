@@ -23,6 +23,7 @@ function GuiModuleConfirm(_ctrl) constructor {
     confirm_panel_y_bonus = 0;
     confirm_launch_delay = 0;
     confirm_merge_frame  = 0;
+    confirm_shake_mag    = 0; 
 
     dice_total = 0;
 
@@ -167,8 +168,18 @@ function GuiModuleConfirm(_ctrl) constructor {
                 break;
             case 4: 
                 confirm_merge_frame++;
-                if (confirm_merge_frame >= 35) {
-                    confirm_merge_frame = 35;
+                
+                // Shake Decay
+                confirm_shake_mag = lerp(confirm_shake_mag, 0, 0.1);
+                
+                // --- MEGA BANG IMPACT (Frame 12) ---
+                if (confirm_merge_frame == 12) {
+                    confirm_shake_mag = 14; // Guncangan kuat
+                    ctrl.mod_dice.dice_flash_alpha = 0.65; // Global screen flash
+                }
+                
+                if (confirm_merge_frame >= 85) { // Longer settle time
+                    confirm_merge_frame = 85;
                     confirm_phase = 5;
                     confirm_fly_frame = 0;
                 }
@@ -270,6 +281,12 @@ function GuiModuleConfirm(_ctrl) constructor {
                 var _center_x = (confirm_fly_start_x[0] + confirm_fly_start_x[1]) / 2 + (_dw_inner / 2);
                 var _center_y = confirm_fly_start_y[0] + _bob - 60; // Pop centrally above
                 
+                // Apply Screenshake to coordinates
+                if (confirm_shake_mag > 0.1) {
+                    _center_x += random_range(-confirm_shake_mag, confirm_shake_mag);
+                    _center_y += random_range(-confirm_shake_mag, confirm_shake_mag);
+                }
+
                 if (confirm_merge_frame < 12) {
                     // Sliding inwards
                     var _mt = confirm_merge_frame / 12.0;
@@ -282,21 +299,38 @@ function GuiModuleConfirm(_ctrl) constructor {
                         _draw_gold_text(string(confirm_fly_values[f] + 1), _curr_x, _curr_y, 1.0, 1.0);
                     }
                 } else {
-                    // Pop total
+                    // --- GIANT RESULT POP (Fixed Scale) ---
                     var _sc = 1.0;
-                    if (confirm_merge_frame < 18) {
-                        var _tt = (confirm_merge_frame - 12) / 6.0;
-                        _sc = lerp(0.8, 1.6, sin(_tt * pi * 0.5)); // fast ease out boom
-                    } else if (confirm_merge_frame < 22) {
-                        var _tt = (confirm_merge_frame - 18) / 4.0;
-                        _sc = lerp(1.6, 1.3, _tt); 
+                    var _glow_alpha = 0;
+                    if (confirm_merge_frame < 20) {
+                        var _tt = (confirm_merge_frame - 12) / 8.0;
+                        _sc = lerp(0.8, 1.8, sin(_tt * pi * 0.5)); // Peak 1.8x (was 2.6x)
+                        _glow_alpha = sin(_tt * pi) * 0.9;
+                    } else if (confirm_merge_frame < 26) {
+                        var _tt = (confirm_merge_frame - 20) / 6.0;
+                        _sc = lerp(1.8, 1.4, _tt); // Settles at 1.4x (was 1.7x)
+                        _glow_alpha = lerp(0.9, 0.45, _tt);
                     } else {
-                        _sc = 1.3 + (sin(current_time / 100) * 0.05); // slightly breathing
+                        _sc = 1.4 + (sin(current_time / 100) * 0.05); // Breathing
+                        _glow_alpha = 0.45;
                     }
                     
                     var _alpha = 1.0;
-                    if (confirm_merge_frame > 30) {
-                        _alpha = lerp(1.0, 0.0, (confirm_merge_frame - 30) / 5.0);
+                    if (confirm_merge_frame > 75) { // Fade out later
+                        _alpha = lerp(1.0, 0.0, (confirm_merge_frame - 75) / 10.0);
+                        _glow_alpha *= _alpha;
+                    }
+                    
+                    // -- INTENSE LIGHTING EFFECT --
+                    if (_glow_alpha > 0) {
+                        gpu_set_blendmode(bm_add);
+                        draw_set_font(fnt_gui_button_large);
+                        draw_set_halign(fa_center); draw_set_valign(fa_middle);
+                        for (var g = 1; g <= 5; g++) { // More layers for intense lighting
+                            var _gsc = _sc * (1.1 + g * 0.18);
+                            draw_text_transformed_color(_center_x, _center_y, string(dice_total), _gsc, _gsc, 0, C_MAIN_GOLD, C_MAIN_GOLD, C_PURE_GOLD, C_PURE_GOLD, _glow_alpha * (1.0 / g));
+                        }
+                        gpu_set_blendmode(bm_normal);
                     }
                     
                     _draw_gold_text(string(dice_total), _center_x, _center_y, _alpha, _sc);

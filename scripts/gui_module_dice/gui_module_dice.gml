@@ -9,6 +9,12 @@ function GuiModuleDice(_ctrl) constructor {
     dice_flash_alpha = 0;
     dice_selected    = [false, false, false];
     dice_select_y    = [0, 0, 0];
+    
+    // -- Local Reveal FX --
+    dice_pop_scale   = [1.0, 1.0, 1.0]; 
+    dice_local_glow  = [0, 0, 0]; 
+    dice_shake_mag   = 0;
+    
     dice_panel_h_extra = 0;
     c_gold = C_PURE_GOLD;
 
@@ -42,7 +48,14 @@ function GuiModuleDice(_ctrl) constructor {
                     } else {
                         dice_phase    = "FINISHED";
                         dice_can_exit = true;
-                        dice_flash_alpha = 0.8;
+                        
+                        // -- Local Impact Trigger --
+                        dice_shake_mag = 6; 
+                        dice_flash_alpha = 0; // Hapus flash satu layar penuh
+                        for (var i = 0; i < 3; i++) {
+                            dice_pop_scale[i] = 1.35; 
+                            dice_local_glow[i] = 1.0;
+                        }
                     }
                     break;
                 case "FINISHED":
@@ -61,6 +74,13 @@ function GuiModuleDice(_ctrl) constructor {
             dice_timer    = 0;
             dice_can_exit = false;
         }
+
+        // Lerp Local FX
+        for (var i = 0; i < 3; i++) {
+            dice_pop_scale[i] = lerp(dice_pop_scale[i], 1.0, 0.15);
+            dice_local_glow[i] = lerp(dice_local_glow[i], 0, 0.1);
+        }
+        dice_shake_mag = lerp(dice_shake_mag, 0, 0.15);
 
         if (dice_flash_alpha > 0) {
             dice_flash_alpha = lerp(dice_flash_alpha, 0, 0.15);
@@ -83,10 +103,10 @@ function GuiModuleDice(_ctrl) constructor {
             var _margin = 40; 
             var _gap = 30; 
             
-            var _dw = sprite_get_width(spr_dice) * _dice_scale;
-            var _dh = sprite_get_height(spr_dice) * _dice_scale;
-            var _total_w = (3 * _dw) + (2 * _gap) + (2 * _margin);
-            var _total_h = _dh + (2 * _margin) + dice_panel_h_extra; 
+            var _dw_base = sprite_get_width(spr_dice) * _dice_scale;
+            var _dh_base = sprite_get_height(spr_dice) * _dice_scale;
+            var _total_w = (3 * _dw_base) + (2 * _gap) + (2 * _margin);
+            var _total_h = _dh_base + (2 * _margin) + dice_panel_h_extra; 
             
             var _popup_x = (_gui_w / 2) - (_total_w / 2);
             var _popup_y = (_gui_h / 2) - (_total_h / 2) + dice_pop_y;
@@ -94,44 +114,67 @@ function GuiModuleDice(_ctrl) constructor {
             draw_sprite_stretched(spr_dice_container, 0, _popup_x, _popup_y, _total_w, _total_h);
             
             var _is_rolling = (dice_phase == "ROLLING");
-            var _shake_mag = _is_rolling ? 6 : 0;
+            var _shake_raw = (_is_rolling ? 6 : 0) + dice_shake_mag;
             var _dice_y_slot = _popup_y + _margin;
             var _sel_count = dice_selected[0] + dice_selected[1] + dice_selected[2];
             
             for (var i = 0; i < 3; i++) {
-                var _dice_x_slot = _popup_x + _margin + (i * (_dw + _gap));
-                var _dx = _dice_x_slot;
-                var _dy = _dice_y_slot + dice_select_y[i];
+                var _dice_x_slot = _popup_x + _margin + (i * (_dw_base + _gap));
                 
-                if (_shake_mag > 0) {
-                    _dx += random_range(-_shake_mag, _shake_mag);
-                    _dy += random_range(-_shake_mag, _shake_mag);
-                }
+                var _ds = _dice_scale * dice_pop_scale[i];
+                var _dw_curr = sprite_get_width(spr_dice) * _ds;
+                var _dh_curr = sprite_get_height(spr_dice) * _ds;
                 
-                if (dice_selected[i] && dice_phase == "FINISHED") {
-                    var _out = 4;
-                    gpu_set_fog(true, c_gold, 0, 0); 
-                    draw_sprite_ext(spr_dice, dice_values[i], _dx - _out, _dy, _dice_scale, _dice_scale, 0, c_white, 1);
-                    draw_sprite_ext(spr_dice, dice_values[i], _dx + _out, _dy, _dice_scale, _dice_scale, 0, c_white, 1);
-                    draw_sprite_ext(spr_dice, dice_values[i], _dx, _dy - _out, _dice_scale, _dice_scale, 0, c_white, 1);
-                    draw_sprite_ext(spr_dice, dice_values[i], _dx, _dy + _out, _dice_scale, _dice_scale, 0, c_white, 1);
-                    draw_sprite_ext(spr_dice, dice_values[i], _dx - _out, _dy - _out, _dice_scale, _dice_scale, 0, c_white, 1);
-                    draw_sprite_ext(spr_dice, dice_values[i], _dx + _out, _dy - _out, _dice_scale, _dice_scale, 0, c_white, 1);
-                    draw_sprite_ext(spr_dice, dice_values[i], _dx - _out, _dy + _out, _dice_scale, _dice_scale, 0, c_white, 1);
-                    draw_sprite_ext(spr_dice, dice_values[i], _dx + _out, _dy + _out, _dice_scale, _dice_scale, 0, c_white, 1);
-                    gpu_set_fog(false, c_white, 0, 0); 
+                // Centering inside slot (Static reference)
+                var _dx = _dice_x_slot + (_dw_base / 2) - (_dw_curr / 2);
+                var _dy = _dice_y_slot + dice_select_y[i] + (_dh_base / 2) - (_dh_curr / 2);
+                
+                if (_shake_raw > 0) {
+                    _dx += random_range(-_shake_raw, _shake_raw);
+                    _dy += random_range(-_shake_raw, _shake_raw);
                 }
                 
                 var _die_alpha = 1.0;
                 if (dice_phase == "FINISHED" && _sel_count == 2 && !dice_selected[i]) {
-                    _die_alpha = 0.7; 
+                    _die_alpha = 0.6; 
                 }
-                draw_sprite_ext(spr_dice, dice_values[i], _dx, _dy, _dice_scale, _dice_scale, 0, c_white, _die_alpha);
+                // -- Golden Selection Outline (Back Layer) --
+                if (dice_selected[i] && dice_phase == "FINISHED" && ctrl.mod_confirm.confirm_phase == 0) {
+                    var _out = 4;
+                    gpu_set_fog(true, C_PURE_GOLD, 0, 0); 
+                    draw_sprite_ext(spr_dice, dice_values[i], _dx - _out, _dy, _ds, _ds, 0, c_white, 0.7);
+                    draw_sprite_ext(spr_dice, dice_values[i], _dx + _out, _dy, _ds, _ds, 0, c_white, 0.7);
+                    draw_sprite_ext(spr_dice, dice_values[i], _dx, _dy - _out, _ds, _ds, 0, c_white, 0.7);
+                    draw_sprite_ext(spr_dice, dice_values[i], _dx, _dy + _out, _ds, _ds, 0, c_white, 0.7);
+                    gpu_set_fog(false, c_white, 0, 0); 
+                }
+
+                var _die_alpha = 1.0;
+                if (dice_phase == "FINISHED" && _sel_count == 2 && !dice_selected[i]) {
+                    _die_alpha = 0.6; 
+                }
+                draw_sprite_ext(spr_dice, dice_values[i], _dx, _dy, _ds, _ds, 0, c_white, _die_alpha);
+
+                // -- Local Flash Glow (Front Layer) --
+                if (dice_local_glow[i] > 0.01) {
+                    var _fsc = _ds * 1.12; 
+                    var _fdw = sprite_get_width(spr_dice) * _fsc;
+                    var _fdh = sprite_get_height(spr_dice) * _fsc;
+                    var _fdx = _dx + (_dw_curr / 2) - (_fdw / 2);
+                    var _fdy = _dy + (_dh_curr / 2) - (_fdh / 2);
+                    
+                    gpu_set_blendmode(bm_add);
+                    gpu_set_fog(true, c_white, 0, 0);
+                    draw_sprite_ext(spr_dice, dice_values[i], _fdx, _fdy, _fsc, _fsc, 0, c_white, dice_local_glow[i] * 0.85);
+                    gpu_set_fog(false, c_white, 0, 0);
+                    gpu_set_blendmode(bm_normal);
+                }
+
                 
                 if (dice_phase == "FINISHED" && dice_selected[i]) {
                     draw_set_font(fnt_gui_button_large); 
                     draw_set_halign(fa_center);
-                    var _num_x = _dx + (_dw / 2);
+                    var _num_x = _dx + (_dw_curr / 2);
                     var _num_y = _dy - 70; 
                     var _num_str = string(dice_values[i] + 1);
                     
@@ -156,7 +199,7 @@ function GuiModuleDice(_ctrl) constructor {
                 if (dice_phase == "FINISHED") {
                     var _mx = device_mouse_x_to_gui(0);
                     var _my = device_mouse_y_to_gui(0);
-                    if (point_in_rectangle(_mx, _my, _dx, _dy, _dx + _dw, _dy + _dh)) {
+                    if (point_in_rectangle(_mx, _my, _dx, _dy, _dx + _dw_curr, _dy + _dh_curr)) {
                         if (mouse_check_button_pressed(mb_left)) {
                             if (dice_selected[i]) {
                                 dice_selected[i] = false;
@@ -200,7 +243,7 @@ function GuiModuleDice(_ctrl) constructor {
                     var _is_ready = (_ui_alpha > 0.95);
                     
                     if (draw_gui_button(_conf_x, _conf_y, _conf_w, _conf_h, spr_button_main, "Confirm Selection", c_white, fnt_gui_button_medium, _is_ready)) {
-                        ctrl.mod_confirm.start_animation(dice_selected, dice_values, _popup_x, _dice_y_slot, _dw, _gap, _margin);
+                        ctrl.mod_confirm.start_animation(dice_selected, dice_values, _popup_x, _dice_y_slot, _dw_base, _gap, _margin);
                         
                         dice_can_exit = false;
                         dice_phase = "IDLE";
@@ -212,7 +255,7 @@ function GuiModuleDice(_ctrl) constructor {
                 var _side_h = 60;  
                 var _side_gap = 16; 
                 var _side_left_x = _popup_x - _side_w - 20; 
-                var _side_left_y = _popup_y + ((_dh + (2 * _margin)) / 2) - (_side_h / 2); 
+                var _side_left_y = _popup_y + ((_dh_base + (2 * _margin)) / 2) - (_side_h / 2); 
                 
                 if (draw_gui_button(_side_left_x, _side_left_y, _side_w, _side_h, spr_button_main, "View Map", c_white, fnt_main, true)) {
                     show_debug_message("Action: View Map");
@@ -220,7 +263,7 @@ function GuiModuleDice(_ctrl) constructor {
                 
                 var _side_right_total_h = (2 * _side_h) + _side_gap;
                 var _side_right_x = _popup_x + _total_w + 20; 
-                var _side_right_y = _popup_y + ((_dh + (2 * _margin)) / 2) - (_side_right_total_h / 2); 
+                var _side_right_y = _popup_y + ((_dh_base + (2 * _margin)) / 2) - (_side_right_total_h / 2); 
                 
                 if (draw_gui_button(_side_right_x, _side_right_y, _side_w, _side_h, spr_button_red, "Re Roll", c_white, fnt_main, true)) {
                     dice_phase = "ROLLING";
