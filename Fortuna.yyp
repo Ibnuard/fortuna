@@ -33,6 +33,7 @@
     {"id":{"name":"fnt_main","path":"fonts/fnt_main/fnt_main.yy",},},
     {"id":{"name":"obj_board","path":"objects/obj_board/obj_board.yy",},},
     {"id":{"name":"obj_debugger","path":"objects/obj_debugger/obj_debugger.yy",},},
+    {"id":{"name":"obj_dice_particle","path":"objects/obj_dice_particle/obj_dice_particle.yy",},},
     {"id":{"name":"obj_gui","path":"objects/obj_gui/obj_gui.yy",},},
     {"id":{"name":"obj_pawn","path":"objects/obj_pawn/obj_pawn.yy",},},
     {"id":{"name":"Room1","path":"rooms/Room1/Room1.yy",},},

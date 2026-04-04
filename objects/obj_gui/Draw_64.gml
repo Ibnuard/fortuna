@@ -222,54 +222,77 @@ var _center_x = room_width / 2 - (_main_w / 2);
 var _left_x   = _center_x - _gap - _side_w;
 var _right_x  = _center_x + _main_w + _gap;
 
-if (draw_gui_button(_left_x, _main_y + stagger_btn_left, _side_w, _side_h, spr_button_red, "Inventory", c_white, fnt_gui_button_medium)) {
-    gui_state = "PROPERTY";
-}
-
-var _roll_y = _main_y + stagger_btn_center;
-if (draw_gui_button(_center_x, _roll_y, _main_w, _main_h, spr_button_main, "", c_white, fnt_gui_button_medium)) {
-    if (gui_state == "MAIN") {
-        gui_state = "DICE";
-        dice_phase = "ENTERING";
-        dice_timer = 0;
-        dice_pop_y = 1000;    
-        dice_can_exit = false;
-        randomize();          
+if (gui_state == "MOVING") {
+    // --- MOVEMENT PROGRESS BOX ---
+    var _box_w = 400;
+    var _box_h = 100;
+    var _box_x = room_width / 2 - (_box_w / 2);
+    var _box_y = _mid_y - (_box_h / 2);
+    
+    draw_sprite_stretched(spr_dice_container, 0, _box_x, _box_y, _box_w, _box_h);
+    
+    if (instance_exists(obj_board)) {
+        draw_set_font(fnt_gui_button_large);
+        draw_set_halign(fa_center); draw_set_valign(fa_middle);
+        var _step_str = "Remaining: " + string(obj_board.steps_remaining);
+        
+        // Shadow
+        draw_set_color(c_black); draw_set_alpha(0.4);
+        draw_text(_box_x + _box_w/2 + 4, _box_y + _box_h/2 + 5, _step_str);
+        // Main
+        draw_set_color(c_white); draw_set_alpha(1.0);
+        draw_text(_box_x + _box_w/2, _box_y + _box_h/2, _step_str);
     }
+} else {
+    if (draw_gui_button(_left_x, _main_y + stagger_btn_left, _side_w, _side_h, spr_button_red, "Inventory", c_white, fnt_gui_button_medium)) {
+        gui_state = "PROPERTY";
+    }
+
+    var _roll_y = _main_y + stagger_btn_center;
+    if (draw_gui_button(_center_x, _roll_y, _main_w, _main_h, spr_button_main, "", c_white, fnt_gui_button_medium)) {
+        if (gui_state == "MAIN") {
+            gui_state = "DICE";
+            dice_phase = "ENTERING";
+            dice_timer = 0;
+            dice_pop_y = 1000;    
+            dice_can_exit = false;
+            randomize();          
+        }
+    }
+
+    // Waving Text for Roll Button
+    var _wave_str = "Roll The Dice!";
+    var _wave_len = string_length(_wave_str);
+    draw_set_font(fnt_gui_button_medium);
+    var _mx = device_mouse_x_to_gui(0);
+    var _my = device_mouse_y_to_gui(0);
+    var _roll_hover = point_in_rectangle(_mx, _my, _center_x, _roll_y, _center_x + _main_w, _roll_y + _main_h);
+    var _roll_press = _roll_hover && mouse_check_button(mb_left);
+    var _juice_y = 0;
+    if (_roll_hover && !_roll_press) _juice_y = -6;
+    if (_roll_press) _juice_y = 2;
+    var _total_w = string_width(_wave_str);
+    var _start_x = _center_x + (_main_w / 2) - (_total_w / 2);
+    var _face_h = _main_h - 10 + ((_roll_press) ? -2 : 0);
+    var _base_y = _roll_y + _juice_y + (_face_h / 2);
+
+    var _cx = _start_x;
+    for (var i = 0; i < _wave_len; i++) {
+        var _ch = string_char_at(_wave_str, i + 1);
+        var _ch_w = string_width(_ch);
+        var _wave_y = sin((current_time / 1000 * 4.0) + (i * 0.4)) * 3.0;
+        draw_set_halign(fa_left); draw_set_valign(fa_middle);
+        draw_set_color(c_black); draw_set_alpha(0.3);
+        draw_text(_cx + 3, _base_y + _wave_y + 4, _ch);
+        draw_set_color(c_white); draw_set_alpha(1.0);
+        draw_text(_cx, _base_y + _wave_y, _ch);
+        _cx += _ch_w;
+    }
+    draw_set_halign(fa_left); draw_set_valign(fa_top);
+
+    draw_gui_button(_right_x, _main_y + stagger_btn_right, _side_w, _side_h, spr_button_blue, "Shop", c_white, fnt_gui_button_medium);
 }
 
-
-// Waving Text for Roll Button
-var _wave_str = "Roll The Dice!";
-var _wave_len = string_length(_wave_str);
-draw_set_font(fnt_gui_button_medium);
-var _mx = device_mouse_x_to_gui(0);
-var _my = device_mouse_y_to_gui(0);
-var _roll_hover = point_in_rectangle(_mx, _my, _center_x, _roll_y, _center_x + _main_w, _roll_y + _main_h);
-var _roll_press = _roll_hover && mouse_check_button(mb_left);
-var _juice_y = 0;
-if (_roll_hover && !_roll_press) _juice_y = -6;
-if (_roll_press) _juice_y = 2;
-var _total_w = string_width(_wave_str);
-var _start_x = _center_x + (_main_w / 2) - (_total_w / 2);
-var _face_h = _main_h - 10 + ((_roll_press) ? -2 : 0);
-var _base_y = _roll_y + _juice_y + (_face_h / 2);
-
-var _cx = _start_x;
-for (var i = 0; i < _wave_len; i++) {
-    var _ch = string_char_at(_wave_str, i + 1);
-    var _ch_w = string_width(_ch);
-    var _wave_y = sin((current_time / 1000 * 4.0) + (i * 0.4)) * 3.0;
-    draw_set_halign(fa_left); draw_set_valign(fa_middle);
-    draw_set_color(c_black); draw_set_alpha(0.3);
-    draw_text(_cx + 3, _base_y + _wave_y + 4, _ch);
-    draw_set_color(c_white); draw_set_alpha(1.0);
-    draw_text(_cx, _base_y + _wave_y, _ch);
-    _cx += _ch_w;
-}
-draw_set_halign(fa_left); draw_set_valign(fa_top);
-
-draw_gui_button(_right_x, _main_y + stagger_btn_right, _side_w, _side_h, spr_button_blue, "Shop", c_white, fnt_gui_button_medium);
 
 
 // ─── PROPERTY OVERLAY PANEL (Drawn LAST so it can dim everything else) ───
@@ -420,7 +443,8 @@ if (property_y_offset < 790) {
 }
 
 // ─── DICE ROLL POPUP RENDERING ───
-if (gui_state == "DICE" || dice_pop_y < 990) {
+// Skip this block once the confirm animation takes over (confirm_phase handles drawing)
+if ((gui_state == "DICE" || dice_pop_y < 990) && confirm_phase == 0) {
     var _gui_w = display_get_gui_width();
     var _gui_h = display_get_gui_height();
     
@@ -578,10 +602,72 @@ if (gui_state == "DICE" || dice_pop_y < 990) {
             var _is_ready = (_ui_alpha > 0.95);
             
             if (draw_gui_button(_conf_x, _conf_y, _conf_w, _conf_h, spr_button_main, "Confirm Selection", c_white, fnt_gui_button_medium, _is_ready)) {
-                gui_state = "MAIN";
-                dice_phase = "IDLE";
+                var _fly_ptr = 0;
+                dice_total = 0;
+                confirm_unsel_idx = -1;
+                
+                // Hover target Y: just above the panel container
+                var _hover_target_y = _popup_y - 75;
+                
+                for (var k = 0; k < 3; k++) {
+                    if (dice_selected[k]) {
+                        var _die_x = _popup_x + _margin + (k * (_dw + _gap));
+                        var _die_y = _dice_y_slot + dice_select_y[k];
+                        confirm_fly_values[_fly_ptr]  = dice_values[k];
+                        // Record where the die IS right now (start of float-up)
+                        confirm_dice_init_x[_fly_ptr] = _die_x;
+                        confirm_dice_init_y[_fly_ptr] = _die_y;
+                        // Record where it will HOVER TO (same X, above panel)
+                        confirm_fly_start_x[_fly_ptr] = _die_x;
+                        confirm_fly_start_y[_fly_ptr] = _hover_target_y;
+                        dice_total += (dice_values[k] + 1);
+                        _fly_ptr++;
+                    } else {
+                        confirm_unsel_idx = k;
+                    }
+                }
+                
+                // Kick off phase 1
+                confirm_phase       = 1;
+                confirm_hover_frame = 0;
+                confirm_panel_frame = 0;
+                confirm_panel_y_bonus = 0;
+                confirm_panel_alpha   = 1.0;
                 dice_can_exit = false;
+                dice_phase = "IDLE";
+                
+                // ─── EXPLODING SPRITE: push chunks into dice_particles array ───
+                if (confirm_unsel_idx != -1) {
+                    var _ex_gui_x = _popup_x + _margin + (confirm_unsel_idx * (_dw + _gap));
+                    var _ex_gui_y = _dice_y_slot;
+                    var _ex_spr   = spr_dice;
+                    var _ex_sub   = dice_values[confirm_unsel_idx];
+                    var _ex_ww    = sprite_get_width(_ex_spr);
+                    var _ex_hh    = sprite_get_height(_ex_spr);
+                    var _chunk    = 8;
+                    for (var _pi = 0; _pi < _ex_ww; _pi += _chunk) {
+                        for (var _pj = 0; _pj < _ex_hh; _pj += _chunk) {
+                            var _life = irandom_range(25, 45);
+                            array_push(dice_particles, {
+                                spr     : _ex_spr,
+                                sub_img : _ex_sub,
+                                chunk_xx: _pi,
+                                chunk_yy: _pj,
+                                chunk_sz: _chunk,
+                                gui_x   : _ex_gui_x + (_pi * _dice_scale),
+                                gui_y   : _ex_gui_y + (_pj * _dice_scale),
+                                vel_x   : random_range(-5, 5),
+                                vel_y   : random_range(-7, -1),
+                                gravity : 0.25,
+                                life    : _life,
+                                life_max: _life,
+                            });
+                        }
+                    }
+                }
             }
+
+
             draw_set_alpha(1.0);
         }
 
@@ -620,6 +706,93 @@ if (gui_state == "DICE" || dice_pop_y < 990) {
 }
 
 
+// ─── CONFIRM ANIMATION OVERLAY (draws on top of everything else) ───
+if (confirm_phase >= 1) {
+    var _ca_margin  = 40;
+    var _ca_gap     = 30;
+    var _ca_scale   = 0.55;
+    var _ca_dw      = sprite_get_width(spr_dice) * _ca_scale;
+    var _ca_dh      = sprite_get_height(spr_dice) * _ca_scale;
+    var _ca_total_w = (3 * _ca_dw) + (2 * _ca_gap) + (2 * _ca_margin);
+    var _ca_total_h = _ca_dh + (2 * _ca_margin);
+    var _ca_popup_x = (_gui_w / 2) - (_ca_total_w / 2);
+    var _ca_base_py = (_gui_h / 2) - (_ca_total_h / 2); // center Y without any bonus
+
+    // ─── PHASE 1: Dice float UP to hover, panel stays (12 frames) ───
+    if (confirm_phase == 1) {
+        // Panel: still fully visible at center
+        draw_sprite_stretched(spr_dice_container, 0, _ca_popup_x, _ca_base_py, _ca_total_w, _ca_total_h);
+        
+        // Dice: lerp from init position to hover position (eased)
+        var _t1 = clamp(confirm_hover_frame / 12, 0, 1);
+        var _t1e = 1.0 - power(1.0 - _t1, 3.0); // ease-out cubic
+        for (var f = 0; f < 2; f++) {
+            var _dx = lerp(confirm_dice_init_x[f], confirm_fly_start_x[f], _t1e);
+            var _dy = lerp(confirm_dice_init_y[f], confirm_fly_start_y[f], _t1e);
+            // Gold outline
+            gpu_set_fog(true, c_gold, 0, 0);
+            draw_sprite_ext(spr_dice, confirm_fly_values[f], _dx - 3, _dy, _ca_scale, _ca_scale, 0, c_white, 0.5);
+            draw_sprite_ext(spr_dice, confirm_fly_values[f], _dx + 3, _dy, _ca_scale, _ca_scale, 0, c_white, 0.5);
+            draw_sprite_ext(spr_dice, confirm_fly_values[f], _dx, _dy - 3, _ca_scale, _ca_scale, 0, c_white, 0.5);
+            draw_sprite_ext(spr_dice, confirm_fly_values[f], _dx, _dy + 3, _ca_scale, _ca_scale, 0, c_white, 0.5);
+            gpu_set_fog(false, c_white, 0, 0);
+            draw_sprite_ext(spr_dice, confirm_fly_values[f], _dx, _dy, _ca_scale, _ca_scale, 0, c_white, 1.0);
+        }
+    }
+    
+    // ─── PHASE 2: Panel slides down, dice hover in place with gentle float ───
+    if (confirm_phase == 2) {
+        // Panel: slides down + fades out
+        var _panel_y = _ca_base_py + confirm_panel_y_bonus;
+        draw_set_alpha(confirm_panel_alpha);
+        draw_sprite_stretched(spr_dice_container, 0, _ca_popup_x, _panel_y, _ca_total_w, _ca_total_h);
+        draw_set_alpha(1.0);
+        
+        // Dice: at hover position, gentle bob + gold glow
+        var _float = sin(current_time / 350) * 4;
+        for (var f = 0; f < 2; f++) {
+            var _hx = confirm_fly_start_x[f];
+            var _hy = confirm_fly_start_y[f] + _float;
+            // Gold outline
+            gpu_set_fog(true, c_gold, 0, 0);
+            draw_sprite_ext(spr_dice, confirm_fly_values[f], _hx - 3, _hy, _ca_scale, _ca_scale, 0, c_white, 0.5);
+            draw_sprite_ext(spr_dice, confirm_fly_values[f], _hx + 3, _hy, _ca_scale, _ca_scale, 0, c_white, 0.5);
+            draw_sprite_ext(spr_dice, confirm_fly_values[f], _hx, _hy - 3, _ca_scale, _ca_scale, 0, c_white, 0.5);
+            draw_sprite_ext(spr_dice, confirm_fly_values[f], _hx, _hy + 3, _ca_scale, _ca_scale, 0, c_white, 0.5);
+            gpu_set_fog(false, c_white, 0, 0);
+            draw_sprite_ext(spr_dice, confirm_fly_values[f], _hx, _hy, _ca_scale, _ca_scale, 0, c_white, 1.0);
+        }
+    }
+    
+    // ─── PHASE 3: Dice fly from hover position toward pawn ───
+    if (confirm_phase == 3 && instance_exists(obj_pawn)) {
+        var _pawn_rx = obj_pawn.x;
+        var _pawn_ry = obj_pawn.y + obj_pawn.y_offset;
+        var _vx = camera_get_view_x(view_camera[0]);
+        var _vy = camera_get_view_y(view_camera[0]);
+        var _pawn_gx = _pawn_rx - _vx;
+        var _pawn_gy = _pawn_ry - _vy;
+        
+        var _ft = clamp(confirm_fly_frame / 20, 0, 1);
+        // Ease-in-out
+        var _t_ease = _ft < 0.5 ? 2 * _ft * _ft : 1.0 - power(-2 * _ft + 2, 2) / 2;
+        var _fly_alpha = lerp(1.0, 0.0, _ft);
+        
+        for (var f = 0; f < 2; f++) {
+            var _fx = lerp(confirm_fly_start_x[f], _pawn_gx, _t_ease);
+            var _fy = lerp(confirm_fly_start_y[f], _pawn_gy, _t_ease);
+            var _frot = _ft * 25; // slight tilt only
+            draw_sprite_ext(spr_dice, confirm_fly_values[f], _fx, _fy, _ca_scale, _ca_scale, _frot, c_white, _fly_alpha);
+        }
+    }
+    
+    draw_set_alpha(1.0);
+    draw_set_halign(fa_left);
+    draw_set_valign(fa_top);
+}
+
+
+
 // ─── FINAL SCANLINE PASS (Drawn over EVERYTHING for that high-intensity CRT mesh) ───
 if (shader_is_compiled(shd_game_fx)) {
     gpu_set_blendmode(bm_normal);
@@ -644,3 +817,17 @@ if (dice_flash_alpha > 0) {
     draw_set_alpha(1.0);
 }
 
+// ─── DICE EXPLOSION PARTICLES (drawn LAST — always on top of everything) ───
+var _pcount = array_length(dice_particles);
+if (_pcount > 0) {
+    draw_set_halign(fa_left);
+    draw_set_valign(fa_top);
+    for (var _i = 0; _i < _pcount; _i++) {
+        var _p = dice_particles[_i];
+        var _alpha = clamp(_p.life / _p.life_max, 0, 1);
+        draw_set_alpha(_alpha);
+        // draw_sprite_part draws at 1:1 scale — we compensate by using chunk_sc to scale the output
+        draw_sprite_part(_p.spr, _p.sub_img, _p.chunk_xx, _p.chunk_yy, _p.chunk_sz, _p.chunk_sz, _p.gui_x, _p.gui_y);
+    }
+    draw_set_alpha(1.0);
+}
