@@ -12,7 +12,7 @@ var tile_scr_w = floor((board_area_w - total_gap) / 9);
 sc = tile_scr_w / 130;
 
 tile_w = floor(130 * sc);
-tile_h = floor(182 * sc);
+tile_h = floor(240 * sc); // Tinggi ditingkatkan agar mengisi ruang board area lebih baik
 tile_count = 9;
 
 board_center_x = board_x + board_area_w / 2;

@@ -7,7 +7,7 @@ function map_get_tiles(_level) {
         add_fate    (spr_tile_fate,   "Fate"),
         add_property(spr_tile_prop,   "Jl. Kenanga",   600,  60,  TileGroup.Cheap),
         add_casino  (spr_tile_casino, "Casino"),
-        add_property(spr_tile_prop,   "Jl. Sudirman",  1200, 120, TileGroup.Mid),
+        add_property(spr_tile_prop,   "Jl. Sudirman Blok M",  1200, 120, TileGroup.Mid),
         add_market  (spr_tile_market, "Market"),
         add_property(spr_tile_prop,   "Jl. Thamrin",   1400, 140, TileGroup.Mid),
         add_jail    (spr_tile_jail,   "Jail"),
