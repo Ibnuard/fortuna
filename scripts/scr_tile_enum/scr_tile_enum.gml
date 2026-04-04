@@ -6,12 +6,3 @@ enum TileType {
 	Casino,
 	Market
 }
-
-
-enum TileGroup {
-	Event,
-	Cheap,
-	Mid,
-	Upper,
-	Elite,
-}

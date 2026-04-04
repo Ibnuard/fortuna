@@ -1,7 +1,6 @@
-// Props
-function add_property(_sprite, _name, _price, _rent, _group){
+function add_property(_sprite, _name, _price, _rent){
 	return new Tile(
-		TileType.Property, _sprite, _name, _price, _rent, _group
+		TileType.Property, _sprite, _name, _price, _rent
 	)
 }
 

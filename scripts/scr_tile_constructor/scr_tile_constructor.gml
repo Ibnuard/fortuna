@@ -4,15 +4,13 @@ function Tile(
     _sprite,        // sprite asset
     _name,          // string label
     _price  = 0,   // harga beli (Property only)
-    _rent   = 0,   // sewa base (Property only)
-    _group  = TileGroup.Event  // warna group (Property only)
+    _rent   = 0    // sewa base (Property only)
 ) constructor {
     type   = _type;
     sprite = _sprite;
     name   = _name;
     price  = _price;
     rent   = _rent;
-    group  = _group;
 
     // Computed — rent naik per level bangunan
     // [base, toko, hotel]
