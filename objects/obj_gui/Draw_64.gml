@@ -571,7 +571,10 @@ if (gui_state == "DICE" || dice_pop_y < 990) {
             var _conf_x = (_gui_w / 2) - (_conf_w / 2);
             var _conf_y = _popup_y + _total_h - 125; // Shifted higher 
             
-            if (draw_gui_button(_conf_x, _conf_y, _conf_w, _conf_h, spr_button_main, "Confirm Selection", c_white, fnt_gui_button_medium)) {
+            // Prevent misclicks by only enabling interaction when fully expanded
+            var _is_ready = (_ui_alpha > 0.95);
+            
+            if (draw_gui_button(_conf_x, _conf_y, _conf_w, _conf_h, spr_button_main, "Confirm Selection", c_white, fnt_gui_button_medium, _is_ready)) {
                 gui_state = "MAIN";
                 dice_phase = "IDLE";
                 dice_can_exit = false;
