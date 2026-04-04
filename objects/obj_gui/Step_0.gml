@@ -200,6 +200,10 @@ if (dice_flash_alpha > 0) {
 if (gui_state == "MOVING" && confirm_phase == 0) {
     if (instance_exists(obj_board)) {
         if (obj_board.steps_remaining <= 0 && !obj_board.anim_active) {
+            // Increment Turn when pawn finishes moving
+            if (instance_exists(obj_controller)) {
+                obj_controller.current_turn++;
+            }
             gui_state = "MAIN";
         }
     }
@@ -218,3 +222,20 @@ for (var _i = array_length(dice_particles) - 1; _i >= 0; _i--) {
         array_delete(dice_particles, _i, 1);
     }
 }
+
+// ─── STATS POPUP TRANSITION ───
+var _stats_target = stats_popup_open ? 1.0 : 0.0;
+var _slide_target = stats_popup_open ? 0.0 : 100.0;
+
+stats_popup_alpha = lerp(stats_popup_alpha, _stats_target, 0.15);
+if (abs(stats_popup_alpha - _stats_target) < 0.005) stats_popup_alpha = _stats_target;
+
+stats_popup_y_slide = lerp(stats_popup_y_slide, _slide_target, 0.15);
+if (abs(stats_popup_y_slide - _slide_target) < 0.1) stats_popup_y_slide = _slide_target;
+
+// ─── INTERACTION BLOCKING ───
+// Main HUD buttons are blocked if:
+// 1. A popup (Stats) is open or fading in
+// 2. Dice selection state is active
+// 3. Confirm animation is flying (dice in the air)
+can_interact_gui = (!stats_popup_open && stats_popup_alpha <= 0 && gui_state != "DICE" && gui_state != "MOVING");

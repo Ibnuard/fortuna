@@ -1,3 +1,8 @@
+// Ensure Gameplay Controller exists
+if (!instance_exists(obj_controller)) {
+    instance_create_layer(0, 0, "Instances", obj_controller);
+}
+
 // Initialize animation variables
 bottom_y_offset = 500; // Starts 500 pixels below its target position
 animation_speed = 0.13; // Smoothness multiplier (closer to 0 is smoother/slower)
@@ -85,3 +90,8 @@ dice_total = 0;
 // ─── DICE EXPLOSION PARTICLES (managed entirely in obj_gui for correct draw order) ───
 dice_particles = [];
 
+// ─── STATS POPUP ───
+stats_popup_open  = false;
+stats_popup_alpha = 0.0;
+stats_popup_y_slide = 100; // Slide offset (starts from bottom)
+can_interact_gui = true;

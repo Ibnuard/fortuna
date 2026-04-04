@@ -37,8 +37,17 @@ var _label_x = _pad_x + _map_btn_w + 30; // 30px gap after Map Info Button
 var _label_w = string_width(_label_str);
 
 // Calculate Number String Constraints
-var _str_cur = "$12.400";
-var _str_tgt = " / $30.000";
+var _str_cur = "$0";
+var _str_tgt = " / $0";
+
+if (instance_exists(obj_controller)) {
+    _str_cur = obj_controller.format_money(obj_controller.player_cash);
+    _str_tgt = " / " + obj_controller.format_money(obj_controller.map_target);
+} else {
+    // Fallback for visual testing
+    _str_cur = "$5.000";
+    _str_tgt = " / $15.000";
+}
 
 draw_set_font(fnt_gui_button_medium); // BOTH are now the same size as requested
 var _cur_w = string_width(_str_cur);
@@ -150,7 +159,10 @@ var _panel_x = room_width / 2 - (_panel_w / 2);
 draw_sprite_stretched(spr_gui_bottom_container, 0, _panel_x, _panel_draw_y, _panel_w, _panel_h);
 
 // ─── TURN BADGE (Staggered) ───
-var _turn_str = "Turn 3 / 12";
+var _turn_str = "Turn 1 / 20";
+if (instance_exists(obj_controller)) {
+    _turn_str = "Turn " + string(obj_controller.current_turn) + " / " + string(obj_controller.map_max_turns);
+}
 var _badge_angle = 0;
 var _badge_w = 200;
 var _badge_h = 80;
@@ -202,17 +214,17 @@ if (shader_is_compiled(shd_game_fx)) {
 // 1. Top Bar Buttons
 var _map_btn_x = _pad_x; 
 var _map_btn_y = top_y_offset + (_topbar_h / 2) - (_map_btn_h / 2) + stagger_option;
-draw_gui_button(_map_btn_x, _map_btn_y, _map_btn_w, _map_btn_h, spr_button_main, "Option", c_white, fnt_main);
+draw_gui_button(_map_btn_x, _map_btn_y, _map_btn_w, _map_btn_h, spr_button_main, "Option", c_white, fnt_main, can_interact_gui);
 
 var _stat_btn_x = room_width - _pad_x - _sm_btn_w;
 var _map_top_x  = _stat_btn_x - _inner_gap - _sm_btn_w;
 var _top_btn_y  = top_y_offset + (_topbar_h / 2) - (_sm_btn_h / 2) + stagger_map_stat;
 
-if (draw_gui_button(_map_top_x, _top_btn_y, _sm_btn_w, _sm_btn_h, spr_button_emerald, "Map", c_white, fnt_main)) {
+if (draw_gui_button(_map_top_x, _top_btn_y, _sm_btn_w, _sm_btn_h, spr_button_emerald, "Map", c_white, fnt_main, can_interact_gui)) {
     // Open Map logic
 }
-if (draw_gui_button(_stat_btn_x, _top_btn_y, _sm_btn_w, _sm_btn_h, spr_button_purple, "Stats", c_white, fnt_main)) {
-    // Open Stat logic
+if (draw_gui_button(_stat_btn_x, _top_btn_y, _sm_btn_w, _sm_btn_h, spr_button_purple, "Stats", c_white, fnt_main, can_interact_gui)) {
+    stats_popup_open = true;
 }
 
 // 2. Bottom Panel Buttons
@@ -244,12 +256,12 @@ if (gui_state == "MOVING") {
         draw_text(_box_x + _box_w/2, _box_y + _box_h/2 - 6, _step_str);
     }
 } else {
-    if (draw_gui_button(_left_x, _main_y + stagger_btn_left, _side_w, _side_h, spr_button_red, "Inventory", c_white, fnt_gui_button_medium)) {
+    if (draw_gui_button(_left_x, _main_y + stagger_btn_left, _side_w, _side_h, spr_button_red, "Inventory", c_white, fnt_gui_button_medium, can_interact_gui)) {
         gui_state = "PROPERTY";
     }
 
     var _roll_y = _main_y + stagger_btn_center;
-    if (draw_gui_button(_center_x, _roll_y, _main_w, _main_h, spr_button_main, "", c_white, fnt_gui_button_medium)) {
+    if (draw_gui_button(_center_x, _roll_y, _main_w, _main_h, spr_button_main, "", c_white, fnt_gui_button_medium, can_interact_gui)) {
         if (gui_state == "MAIN") {
             gui_state = "DICE";
             dice_phase = "ENTERING";
@@ -266,14 +278,14 @@ if (gui_state == "MOVING") {
     draw_set_font(fnt_gui_button_medium);
     var _mx = device_mouse_x_to_gui(0);
     var _my = device_mouse_y_to_gui(0);
-    var _roll_hover = point_in_rectangle(_mx, _my, _center_x, _roll_y, _center_x + _main_w, _roll_y + _main_h);
-    var _roll_press = _roll_hover && mouse_check_button(mb_left);
+    var _roll_hover = can_interact_gui && point_in_rectangle(_mx, _my, _center_x, _roll_y, _center_x + _main_w, _roll_y + _main_h);
+    var _roll_press = can_interact_gui && _roll_hover && mouse_check_button(mb_left);
     var _juice_y = 0;
     if (_roll_hover && !_roll_press) _juice_y = -6;
     if (_roll_press) _juice_y = 2;
     var _total_w = string_width(_wave_str);
     var _start_x = _center_x + (_main_w / 2) - (_total_w / 2);
-    var _face_h = _main_h - 22 + ((_roll_press) ? -2 : 0); 
+    var _face_h = _main_h - 16 + ((_roll_press) ? -2 : 0); 
     var _base_y = _roll_y + _juice_y + (_face_h / 2);
 
     var _cx = _start_x;
@@ -290,7 +302,7 @@ if (gui_state == "MOVING") {
     }
     draw_set_halign(fa_left); draw_set_valign(fa_top);
 
-    draw_gui_button(_right_x, _main_y + stagger_btn_right, _side_w, _side_h, spr_button_blue, "Shop", c_white, fnt_gui_button_medium);
+    draw_gui_button(_right_x, _main_y + stagger_btn_right, _side_w, _side_h, spr_button_blue, "Shop", c_white, fnt_gui_button_medium, can_interact_gui);
 }
 
 
@@ -833,10 +845,86 @@ if (confirm_phase >= 1) {
     draw_set_valign(fa_top);
 }
 
-
-
-
-// ─── FINAL SCANLINE PASS (Drawn over EVERYTHING for that high-intensity CRT mesh) ───
+// ─── STATS POPUP OVERLAY (Pawn characteristics) ───
+if (stats_popup_alpha > 0) {
+    var _gui_w = display_get_gui_width();
+    var _gui_h = display_get_gui_height();
+    
+    // Dim background
+    draw_set_color(c_black);
+    draw_set_alpha(stats_popup_alpha * 0.6);
+    draw_rectangle(0, 0, _gui_w, _gui_h, false);
+    
+    // Panel setup - Slide offset applied here
+    var _p_w = 720;
+    var _p_h = 580;
+    var _p_x = (_gui_w / 2) - (_p_w / 2);
+    var _p_y = (_gui_h / 2) - (_p_h / 2) + stats_popup_y_slide;
+    
+    draw_set_alpha(stats_popup_alpha);
+    draw_sprite_stretched(spr_dice_container, 0, _p_x, _p_y, _p_w, _p_h);
+    
+    // Title
+    draw_set_font(fnt_gui_button_large);
+    draw_set_halign(fa_center); draw_set_valign(fa_top);
+    draw_set_color(c_white);
+    draw_text(_p_x + _p_w/2, _p_y + 35, "Pawn Statistics");
+    
+    // Stats Rows
+    var _row_y_start = _p_y + 130;
+    var _row_gap     = 65;
+    var _bar_w       = 380;
+    var _bar_h       = 32;
+    var _bar_x       = _p_x + 130;
+    
+    for (var i = 0; i < array_length(global.stat_data); i++) {
+        var _s = global.stat_data[i];
+        var _cy = _row_y_start + (i * _row_gap);
+        
+        // 1. Icon
+        draw_sprite_ext(spr_stats, _s.icon, _p_x + 50, _cy - 10, 1, 1, 0, c_white, stats_popup_alpha);
+        
+        // 2. Bar Placeholder (Use spr_target_bar)
+        draw_set_color(c_white); draw_set_alpha(stats_popup_alpha);
+        draw_sprite_stretched(spr_target_bar, 0, _bar_x, _cy, _bar_w, _bar_h);
+        
+        // 3. Current Value
+        var _val = 5;
+        if (instance_exists(obj_controller)) {
+            var _key = string_replace_all(string_lower(_s.name), " ", "_");
+            _val = variable_struct_get(obj_controller.stats, _key);
+        }
+        
+        // 4. Bar Fill (Adjusted to stay inside spr_target_bar borders)
+        var _inner_pad_x = 10;
+        var _inner_pad_y = 6;
+        var _fill_max_w = _bar_w - (_inner_pad_x * 2);
+        var _fw = (_val / 10) * _fill_max_w;
+        if (_fw > 0) {
+            draw_set_color(_s.color);
+            draw_rectangle(_bar_x + _inner_pad_x, _cy + _inner_pad_y, _bar_x + _inner_pad_x + _fw, _cy + _bar_h - _inner_pad_y, false);
+        }
+        
+        // 5. Value Text
+        draw_set_font(fnt_main);
+        draw_set_halign(fa_left); draw_set_valign(fa_middle);
+        draw_set_color(c_white);
+        draw_text(_bar_x + _bar_w + 30, _cy + (_bar_h/2), string(_val) + " / 10");
+    }
+    
+    // Close Button ("X") - Crossed atop the corner
+    var _cx_sz = 64;
+    var _cx_x  = _p_x + _p_w - 5; // Slight overlap to the right
+    var _cx_y  = _p_y + 5;         // Slight overlap to the top
+    
+    if (draw_gui_button(_cx_x - _cx_sz/2, _cx_y - _cx_sz/2, _cx_sz, _cx_sz, spr_panel_close, "", c_white, fnt_main, true)) {
+        stats_popup_open = false;
+    }
+    
+    draw_set_alpha(1.0);
+    draw_set_halign(fa_left);
+    draw_set_valign(fa_top);
+}
 if (shader_is_compiled(shd_game_fx)) {
     gpu_set_blendmode(bm_normal);
     shader_set(shd_game_fx);
