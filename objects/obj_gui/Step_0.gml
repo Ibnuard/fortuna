@@ -127,45 +127,52 @@ if (gui_state == "DICE") {
 switch (confirm_phase) {
     case 0: break; // idle
 
-    case 1: // Selected dice float UP above panel, unselected already exploded (12 frames)
+    case 1: // EXPLOSION HOLD: particles fly, dice stay at init pos (8 frames)
+        confirm_hover_frame++;
+        if (confirm_hover_frame >= 8) {
+            confirm_hover_frame = 0; // reset for float-up use
+            confirm_phase = 2;
+        }
+        break;
+
+    case 2: // FLOAT UP: selected dice rise to center-hover (12 frames)
         confirm_hover_frame++;
         if (confirm_hover_frame >= 12) {
-            confirm_hover_frame = 12;
-            confirm_phase = 2;
+            confirm_hover_frame = 12; // clamp
+            confirm_phase = 3;
             confirm_panel_frame = 0;
         }
         break;
 
-    case 2: // Panel slides down + fades, dice stay floating (15 frames)
+    case 3: // PANEL OUT: panel slides down + fades, dice hover at center (15 frames)
         confirm_panel_frame++;
-        var _t2 = clamp(confirm_panel_frame / 15, 0, 1);
-        confirm_panel_y_bonus = lerp(0, 220, _t2);
-        confirm_panel_alpha   = lerp(1.0, 0.0, _t2);
+        var _t3 = clamp(confirm_panel_frame / 15, 0, 1);
+        confirm_panel_y_bonus = lerp(0, 220, _t3);
+        confirm_panel_alpha   = lerp(1.0, 0.0, _t3);
         if (confirm_panel_frame >= 15) {
-            confirm_phase = 3;
+            confirm_phase = 4;
             confirm_fly_frame = 0;
         }
         break;
 
-    case 3: // Dice fly from hover position toward pawn (20 frames)
+    case 4: // FLY: dice travel to pawn with arc (30 frames)
         confirm_fly_frame++;
-        if (confirm_fly_frame >= 20) {
-            confirm_fly_frame = 20;
-            confirm_phase = 4;
-            confirm_launch_delay = 22; // wait for bottom panel to slide in
-            gui_state = "MOVING";      // triggers bottom panel slide-in
-            dice_pop_y = 1000;         // snap popup fully offscreen
+        if (confirm_fly_frame >= 30) {
+            confirm_fly_frame = 30;
+            confirm_phase = 5;
+            confirm_launch_delay = 22;
+            gui_state  = "MOVING";
+            dice_pop_y = 1000;
         }
         break;
 
-    case 4: // Bottom panel sliding in — wait before releasing pawn
+    case 5: // LAUNCH DELAY: wait for bottom panel before releasing pawn
         confirm_launch_delay--;
         if (confirm_launch_delay <= 0) {
-            // NOW trigger pawn movement
             if (instance_exists(obj_board)) {
                 obj_board.steps_remaining = dice_total;
             }
-            // Cleanup
+            // Cleanup all confirm state
             confirm_phase         = 0;
             confirm_hover_frame   = 0;
             confirm_unsel_frame   = 0;

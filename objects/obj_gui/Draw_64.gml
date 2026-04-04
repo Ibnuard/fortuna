@@ -606,26 +606,30 @@ if ((gui_state == "DICE" || dice_pop_y < 990) && confirm_phase == 0) {
                 dice_total = 0;
                 confirm_unsel_idx = -1;
                 
-                // Hover target Y: just above the panel container
-                var _hover_target_y = _popup_y - 75;
+                // ─── Compute hover targets: 2 dice centered horizontally, above panel ───
+                var _hover_gap    = 20; // gap between the 2 hovering dice
+                var _hover_pair_w = (2 * _dw) + _hover_gap;
+                var _hover_left_x = (_gui_w / 2) - (_hover_pair_w / 2); // X of left die
+                var _hover_y      = _popup_y - 80; // just above panel container top
                 
                 for (var k = 0; k < 3; k++) {
                     if (dice_selected[k]) {
                         var _die_x = _popup_x + _margin + (k * (_dw + _gap));
                         var _die_y = _dice_y_slot + dice_select_y[k];
                         confirm_fly_values[_fly_ptr]  = dice_values[k];
-                        // Record where the die IS right now (start of float-up)
+                        // Where die IS right now (init of float-up)
                         confirm_dice_init_x[_fly_ptr] = _die_x;
                         confirm_dice_init_y[_fly_ptr] = _die_y;
-                        // Record where it will HOVER TO (same X, above panel)
-                        confirm_fly_start_x[_fly_ptr] = _die_x;
-                        confirm_fly_start_y[_fly_ptr] = _hover_target_y;
+                        // Where it hovers TO: centered, above panel
+                        confirm_fly_start_x[_fly_ptr] = _hover_left_x + (_fly_ptr * (_dw + _hover_gap));
+                        confirm_fly_start_y[_fly_ptr] = _hover_y;
                         dice_total += (dice_values[k] + 1);
                         _fly_ptr++;
                     } else {
                         confirm_unsel_idx = k;
                     }
                 }
+
                 
                 // Kick off phase 1
                 confirm_phase       = 1;
@@ -712,84 +716,89 @@ if (confirm_phase >= 1) {
     var _ca_gap     = 30;
     var _ca_scale   = 0.55;
     var _ca_dw      = sprite_get_width(spr_dice) * _ca_scale;
-    var _ca_dh      = sprite_get_height(spr_dice) * _ca_scale;
     var _ca_total_w = (3 * _ca_dw) + (2 * _ca_gap) + (2 * _ca_margin);
-    var _ca_total_h = _ca_dh + (2 * _ca_margin);
+    var _ca_total_h = sprite_get_height(spr_dice) * _ca_scale + (2 * _ca_margin);
     var _ca_popup_x = (_gui_w / 2) - (_ca_total_w / 2);
-    var _ca_base_py = (_gui_h / 2) - (_ca_total_h / 2); // center Y without any bonus
+    var _ca_base_py = (_gui_h / 2) - (_ca_total_h / 2);
 
-    // ─── PHASE 1: Dice float UP to hover, panel stays (12 frames) ───
+    // Helper: draw a die with gold outline
+    var _draw_dice_gold = function(_spr, _sub, _x, _y, _sc, _alpha) {
+        gpu_set_fog(true, c_gold, 0, 0);
+        draw_sprite_ext(_spr, _sub, _x - 3, _y,     _sc, _sc, 0, c_white, _alpha * 0.5);
+        draw_sprite_ext(_spr, _sub, _x + 3, _y,     _sc, _sc, 0, c_white, _alpha * 0.5);
+        draw_sprite_ext(_spr, _sub, _x,     _y - 3, _sc, _sc, 0, c_white, _alpha * 0.5);
+        draw_sprite_ext(_spr, _sub, _x,     _y + 3, _sc, _sc, 0, c_white, _alpha * 0.5);
+        gpu_set_fog(false, c_white, 0, 0);
+        draw_sprite_ext(_spr, _sub, _x, _y, _sc, _sc, 0, c_white, _alpha);
+    };
+
+    // ─── PHASE 1: Explosion hold — dice sit still, particles burst (8 frames) ───
     if (confirm_phase == 1) {
-        // Panel: still fully visible at center
         draw_sprite_stretched(spr_dice_container, 0, _ca_popup_x, _ca_base_py, _ca_total_w, _ca_total_h);
-        
-        // Dice: lerp from init position to hover position (eased)
-        var _t1 = clamp(confirm_hover_frame / 12, 0, 1);
-        var _t1e = 1.0 - power(1.0 - _t1, 3.0); // ease-out cubic
         for (var f = 0; f < 2; f++) {
-            var _dx = lerp(confirm_dice_init_x[f], confirm_fly_start_x[f], _t1e);
-            var _dy = lerp(confirm_dice_init_y[f], confirm_fly_start_y[f], _t1e);
-            // Gold outline
-            gpu_set_fog(true, c_gold, 0, 0);
-            draw_sprite_ext(spr_dice, confirm_fly_values[f], _dx - 3, _dy, _ca_scale, _ca_scale, 0, c_white, 0.5);
-            draw_sprite_ext(spr_dice, confirm_fly_values[f], _dx + 3, _dy, _ca_scale, _ca_scale, 0, c_white, 0.5);
-            draw_sprite_ext(spr_dice, confirm_fly_values[f], _dx, _dy - 3, _ca_scale, _ca_scale, 0, c_white, 0.5);
-            draw_sprite_ext(spr_dice, confirm_fly_values[f], _dx, _dy + 3, _ca_scale, _ca_scale, 0, c_white, 0.5);
-            gpu_set_fog(false, c_white, 0, 0);
-            draw_sprite_ext(spr_dice, confirm_fly_values[f], _dx, _dy, _ca_scale, _ca_scale, 0, c_white, 1.0);
+            _draw_dice_gold(spr_dice, confirm_fly_values[f], confirm_dice_init_x[f], confirm_dice_init_y[f], _ca_scale, 1.0);
         }
     }
-    
-    // ─── PHASE 2: Panel slides down, dice hover in place with gentle float ───
+
+    // ─── PHASE 2: Float-up — dice ease toward center-above-panel (12 frames) ───
     if (confirm_phase == 2) {
-        // Panel: slides down + fades out
+        draw_sprite_stretched(spr_dice_container, 0, _ca_popup_x, _ca_base_py, _ca_total_w, _ca_total_h);
+        var _t2 = clamp(confirm_hover_frame / 12, 0, 1);
+        var _t2e = 1.0 - power(1.0 - _t2, 3.0); // ease-out cubic
+        for (var f = 0; f < 2; f++) {
+            var _dx = lerp(confirm_dice_init_x[f], confirm_fly_start_x[f], _t2e);
+            var _dy = lerp(confirm_dice_init_y[f], confirm_fly_start_y[f], _t2e);
+            _draw_dice_gold(spr_dice, confirm_fly_values[f], _dx, _dy, _ca_scale, 1.0);
+        }
+    }
+
+    // ─── PHASE 3: Panel slides out — dice hover at center with gentle bob ───
+    if (confirm_phase == 3) {
         var _panel_y = _ca_base_py + confirm_panel_y_bonus;
         draw_set_alpha(confirm_panel_alpha);
         draw_sprite_stretched(spr_dice_container, 0, _ca_popup_x, _panel_y, _ca_total_w, _ca_total_h);
         draw_set_alpha(1.0);
-        
-        // Dice: at hover position, gentle bob + gold glow
-        var _float = sin(current_time / 350) * 4;
+        var _bob = sin(current_time / 280) * 5;
         for (var f = 0; f < 2; f++) {
-            var _hx = confirm_fly_start_x[f];
-            var _hy = confirm_fly_start_y[f] + _float;
-            // Gold outline
-            gpu_set_fog(true, c_gold, 0, 0);
-            draw_sprite_ext(spr_dice, confirm_fly_values[f], _hx - 3, _hy, _ca_scale, _ca_scale, 0, c_white, 0.5);
-            draw_sprite_ext(spr_dice, confirm_fly_values[f], _hx + 3, _hy, _ca_scale, _ca_scale, 0, c_white, 0.5);
-            draw_sprite_ext(spr_dice, confirm_fly_values[f], _hx, _hy - 3, _ca_scale, _ca_scale, 0, c_white, 0.5);
-            draw_sprite_ext(spr_dice, confirm_fly_values[f], _hx, _hy + 3, _ca_scale, _ca_scale, 0, c_white, 0.5);
-            gpu_set_fog(false, c_white, 0, 0);
-            draw_sprite_ext(spr_dice, confirm_fly_values[f], _hx, _hy, _ca_scale, _ca_scale, 0, c_white, 1.0);
+            _draw_dice_gold(spr_dice, confirm_fly_values[f], confirm_fly_start_x[f], confirm_fly_start_y[f] + _bob, _ca_scale, 1.0);
         }
     }
-    
-    // ─── PHASE 3: Dice fly from hover position toward pawn ───
-    if (confirm_phase == 3 && instance_exists(obj_pawn)) {
+
+    // ─── PHASE 4: Fly to pawn — arc trajectory, scale pulse, only fades near landing ───
+    if (confirm_phase == 4 && instance_exists(obj_pawn)) {
         var _pawn_rx = obj_pawn.x;
         var _pawn_ry = obj_pawn.y + obj_pawn.y_offset;
-        var _vx = camera_get_view_x(view_camera[0]);
-        var _vy = camera_get_view_y(view_camera[0]);
+        var _vx      = camera_get_view_x(view_camera[0]);
+        var _vy      = camera_get_view_y(view_camera[0]);
         var _pawn_gx = _pawn_rx - _vx;
         var _pawn_gy = _pawn_ry - _vy;
-        
-        var _ft = clamp(confirm_fly_frame / 20, 0, 1);
-        // Ease-in-out
-        var _t_ease = _ft < 0.5 ? 2 * _ft * _ft : 1.0 - power(-2 * _ft + 2, 2) / 2;
-        var _fly_alpha = lerp(1.0, 0.0, _ft);
-        
+
+        var _ft    = clamp(confirm_fly_frame / 30, 0, 1);
+        var _tease = _ft < 0.5 ? 2 * _ft * _ft : 1.0 - power(-2.0 * _ft + 2.0, 2.0) / 2.0;
+
+        // Fade only in last 25% of travel
+        var _fly_alpha = (_ft > 0.75) ? lerp(1.0, 0.0, (_ft - 0.75) / 0.25) : 1.0;
+
+        // Scale: pop up at start, shrink toward landing
+        var _fly_scale = _ca_scale * (1.0 + sin(_ft * pi) * 0.35);
+
         for (var f = 0; f < 2; f++) {
-            var _fx = lerp(confirm_fly_start_x[f], _pawn_gx, _t_ease);
-            var _fy = lerp(confirm_fly_start_y[f], _pawn_gy, _t_ease);
-            var _frot = _ft * 25; // slight tilt only
-            draw_sprite_ext(spr_dice, confirm_fly_values[f], _fx, _fy, _ca_scale, _ca_scale, _frot, c_white, _fly_alpha);
+            var _fx = lerp(confirm_fly_start_x[f], _pawn_gx, _tease);
+            var _fy = lerp(confirm_fly_start_y[f], _pawn_gy, _tease);
+
+            // Subtle arc upward, then down
+            _fy -= sin(_ft * pi) * 60;
+
+            var _frot = _ft * 20; // very slight tilt
+            draw_sprite_ext(spr_dice, confirm_fly_values[f], _fx, _fy, _fly_scale, _fly_scale, _frot, c_white, _fly_alpha);
         }
     }
-    
+
     draw_set_alpha(1.0);
     draw_set_halign(fa_left);
     draw_set_valign(fa_top);
 }
+
 
 
 
