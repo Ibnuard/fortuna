@@ -485,9 +485,12 @@ if (gui_state == "DICE" || dice_pop_y < 990) {
             gpu_set_fog(false, c_white, 0, 0); // Turn off fog
         }
 
-        
         // --- DRAW DIE FACE ---
-        draw_sprite_ext(spr_dice, dice_values[i], _dx, _dy, _dice_scale, _dice_scale, 0, c_white, 1);
+        var _die_alpha = 1.0;
+        if (dice_phase == "FINISHED" && _sel_count == 2 && !dice_selected[i]) {
+            _die_alpha = 0.7; // Dim the unselected die to focus on the selections
+        }
+        draw_sprite_ext(spr_dice, dice_values[i], _dx, _dy, _dice_scale, _dice_scale, 0, c_white, _die_alpha);
         
         // --- NUMERIC INDICATOR (Above Die) ---
         if (dice_phase == "FINISHED" && dice_selected[i]) {
