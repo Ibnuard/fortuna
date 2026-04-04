@@ -1,7 +1,7 @@
 {
   "$GMShader":"",
-  "%Name":"shd_game_fx",
-  "name":"shd_game_fx",
+  "%Name":"shd_vignette",
+  "name":"shd_vignette",
   "parent":{
     "name":"Fortuna",
     "path":"Fortuna.yyp",

@@ -1,0 +1,12 @@
+{
+  "$GMShader":"",
+  "%Name":"shd_scanline",
+  "name":"shd_scanline",
+  "parent":{
+    "name":"Fortuna",
+    "path":"Fortuna.yyp",
+  },
+  "resourceType":"GMShader",
+  "resourceVersion":"2.0",
+  "type":1,
+}
