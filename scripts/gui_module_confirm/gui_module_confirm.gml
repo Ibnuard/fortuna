@@ -21,10 +21,55 @@ function GuiModuleConfirm(_ctrl) constructor {
 
     confirm_panel_frame   = 0;
     confirm_panel_y_bonus = 0;
-    confirm_panel_alpha   = 1.0;
     confirm_launch_delay = 0;
+    confirm_merge_frame  = 0;
 
     dice_total = 0;
+
+    static _draw_gold_text = function(_str, _x, _y, _alpha, _scale=1.0) {
+        draw_set_font(fnt_gui_button_large);
+        draw_set_halign(fa_center); draw_set_valign(fa_middle); // Middle for center popping
+        var _c_gold = C_PURE_GOLD;
+        draw_set_color(c_black); draw_set_alpha(_alpha * 0.5);
+        draw_text_transformed(_x + 5*_scale, _y + 6*_scale, _str, _scale, _scale, 0);
+        draw_set_alpha(_alpha); draw_set_color(c_black);
+        var _sz = 3 * _scale;
+        draw_text_transformed(_x - _sz, _y, _str, _scale, _scale, 0);
+        draw_text_transformed(_x + _sz, _y, _str, _scale, _scale, 0);
+        draw_text_transformed(_x, _y - _sz, _str, _scale, _scale, 0);
+        draw_text_transformed(_x, _y + _sz, _str, _scale, _scale, 0);
+        draw_text_transformed(_x - _sz, _y - _sz, _str, _scale, _scale, 0);
+        draw_text_transformed(_x + _sz, _y - _sz, _str, _scale, _scale, 0);
+        draw_text_transformed(_x - _sz, _y + _sz, _str, _scale, _scale, 0);
+        draw_text_transformed(_x + _sz, _y + _sz, _str, _scale, _scale, 0);
+        draw_set_color(_c_gold);
+        draw_text_transformed(_x, _y, _str, _scale, _scale, 0);
+        draw_set_alpha(1.0); draw_set_color(c_white); draw_set_halign(fa_left); draw_set_valign(fa_top);
+    };
+
+    static _draw_dice_gold = function(_spr, _sub, _x, _y, _sc, _alpha, _show_text=true) {
+        var _dw_inner = sprite_get_width(_spr) * _sc;
+        var _out = 4;
+        var _c_gold = C_PURE_GOLD;
+        gpu_set_fog(true, _c_gold, 0, 0);
+        draw_sprite_ext(_spr, _sub, _x - _out, _y,        _sc, _sc, 0, c_white, _alpha);
+        draw_sprite_ext(_spr, _sub, _x + _out, _y,        _sc, _sc, 0, c_white, _alpha);
+        draw_sprite_ext(_spr, _sub, _x,        _y - _out, _sc, _sc, 0, c_white, _alpha);
+        draw_sprite_ext(_spr, _sub, _x,        _y + _out, _sc, _sc, 0, c_white, _alpha);
+        draw_sprite_ext(_spr, _sub, _x - _out, _y - _out, _sc, _sc, 0, c_white, _alpha);
+        draw_sprite_ext(_spr, _sub, _x + _out, _y - _out, _sc, _sc, 0, c_white, _alpha);
+        draw_sprite_ext(_spr, _sub, _x - _out, _y + _out, _sc, _sc, 0, c_white, _alpha);
+        draw_sprite_ext(_spr, _sub, _x + _out, _y + _out, _sc, _sc, 0, c_white, _alpha);
+        gpu_set_fog(false, c_white, 0, 0);
+        draw_sprite_ext(_spr, _sub, _x, _y, _sc, _sc, 0, c_white, _alpha);
+        
+        if (_show_text) {
+            var _num_str = string(_sub + 1);
+            var _num_x   = _x + (_dw_inner / 2);
+            var _num_y   = _y - 40; 
+            _draw_gold_text(_num_str, _num_x, _num_y, _alpha, 1.0);
+        }
+    };
 
     static start_animation = function(_dice_selected, _dice_values, _popup_x, _dice_y_slot, _dw, _gap, _margin) {
         var _fly_ptr = 0;
@@ -60,6 +105,7 @@ function GuiModuleConfirm(_ctrl) constructor {
         confirm_panel_frame = 0;
         confirm_panel_y_bonus = 0;
         confirm_panel_alpha   = 1.0;
+        confirm_merge_frame   = 0;
         
         if (confirm_unsel_idx != -1) {
             var _ex_gui_x = _popup_x + _margin + (confirm_unsel_idx * (_dw + _gap));
@@ -116,20 +162,28 @@ function GuiModuleConfirm(_ctrl) constructor {
                 confirm_panel_alpha   = lerp(1.0, 0.0, _t3);
                 if (confirm_panel_frame >= 15) {
                     confirm_phase = 4;
-                    confirm_fly_frame = 0;
+                    confirm_merge_frame = 0;
                 }
                 break;
             case 4: 
+                confirm_merge_frame++;
+                if (confirm_merge_frame >= 35) {
+                    confirm_merge_frame = 35;
+                    confirm_phase = 5;
+                    confirm_fly_frame = 0;
+                }
+                break;
+            case 5: 
                 confirm_fly_frame++;
                 if (confirm_fly_frame >= 30) {
                     confirm_fly_frame = 30;
-                    confirm_phase = 5;
+                    confirm_phase = 6;
                     confirm_launch_delay = 22;
                     ctrl.gui_state  = "MOVING";
                     ctrl.mod_dice.dice_pop_y = 1000;
                 }
                 break;
-            case 5: 
+            case 6: 
                 confirm_launch_delay--;
                 if (confirm_launch_delay <= 0) {
                     if (instance_exists(obj_board)) {
@@ -146,6 +200,7 @@ function GuiModuleConfirm(_ctrl) constructor {
                     confirm_panel_frame   = 0;
                     confirm_panel_y_bonus = 0;
                     confirm_panel_alpha   = 1.0;
+        confirm_merge_frame   = 0;
                     confirm_launch_delay  = 0;
                 }
                 break;
@@ -176,40 +231,6 @@ function GuiModuleConfirm(_ctrl) constructor {
             var _ca_popup_x = (_gui_w / 2) - (_ca_total_w / 2);
             var _ca_base_py = (_gui_h / 2) - (_ca_total_h / 2);
 
-            var _draw_dice_gold = function(_spr, _sub, _x, _y, _sc, _alpha) {
-                var _dw_inner = sprite_get_width(_spr) * _sc;
-                var _out = 4;
-                var _c_gold = C_PURE_GOLD;
-                gpu_set_fog(true, _c_gold, 0, 0);
-                draw_sprite_ext(_spr, _sub, _x - _out, _y,        _sc, _sc, 0, c_white, _alpha);
-                draw_sprite_ext(_spr, _sub, _x + _out, _y,        _sc, _sc, 0, c_white, _alpha);
-                draw_sprite_ext(_spr, _sub, _x,        _y - _out, _sc, _sc, 0, c_white, _alpha);
-                draw_sprite_ext(_spr, _sub, _x,        _y + _out, _sc, _sc, 0, c_white, _alpha);
-                draw_sprite_ext(_spr, _sub, _x - _out, _y - _out, _sc, _sc, 0, c_white, _alpha);
-                draw_sprite_ext(_spr, _sub, _x + _out, _y - _out, _sc, _sc, 0, c_white, _alpha);
-                draw_sprite_ext(_spr, _sub, _x - _out, _y + _out, _sc, _sc, 0, c_white, _alpha);
-                draw_sprite_ext(_spr, _sub, _x + _out, _y + _out, _sc, _sc, 0, c_white, _alpha);
-                gpu_set_fog(false, c_white, 0, 0);
-                draw_sprite_ext(_spr, _sub, _x, _y, _sc, _sc, 0, c_white, _alpha);
-                
-                var _num_str = string(_sub + 1);
-                var _num_x   = _x + (_dw_inner / 2);
-                var _num_y   = _y - 66;
-                draw_set_font(fnt_gui_button_large);
-                draw_set_halign(fa_center); draw_set_valign(fa_top);
-                draw_set_color(c_black); draw_set_alpha(_alpha * 0.5);
-                draw_text(_num_x + 5, _num_y + 6, _num_str);
-                draw_set_alpha(_alpha);
-                draw_set_color(c_black);
-                draw_text(_num_x - 3, _num_y,     _num_str); draw_text(_num_x + 3, _num_y,     _num_str);
-                draw_text(_num_x,     _num_y - 3, _num_str); draw_text(_num_x,     _num_y + 3, _num_str);
-                draw_text(_num_x - 3, _num_y - 3, _num_str); draw_text(_num_x + 3, _num_y - 3, _num_str);
-                draw_text(_num_x - 3, _num_y + 3, _num_str); draw_text(_num_x + 3, _num_y + 3, _num_str);
-                draw_set_color(_c_gold);
-                draw_text(_num_x, _num_y, _num_str);
-                draw_set_alpha(1.0); draw_set_color(c_white); draw_set_halign(fa_left);
-            };
-
             if (confirm_phase == 1) {
                 draw_sprite_stretched(spr_dice_container, 0, _ca_popup_x, _ca_base_py, _ca_total_w, _ca_total_h);
                 for (var f = 0; f < 2; f++) {
@@ -233,10 +254,55 @@ function GuiModuleConfirm(_ctrl) constructor {
                 draw_set_alpha(1.0);
                 var _bob = sin(current_time / 280) * 5;
                 for (var f = 0; f < 2; f++) {
-                    _draw_dice_gold(spr_dice, confirm_fly_values[f], confirm_fly_start_x[f], confirm_fly_start_y[f] + _bob, _ca_scale, 1.0);
+                    _draw_dice_gold(spr_dice, confirm_fly_values[f], confirm_fly_start_x[f], confirm_fly_start_y[f] + _bob, _ca_scale, 1.0, true);
                 }
             }
-            if (confirm_phase == 4 && instance_exists(obj_pawn)) {
+            if (confirm_phase == 4) {
+                var _bob = sin(current_time / 280) * 5;
+                var _dw_inner = sprite_get_width(spr_dice) * _ca_scale;
+                
+                // Draw naked dice bobbing
+                for (var f = 0; f < 2; f++) {
+                    _draw_dice_gold(spr_dice, confirm_fly_values[f], confirm_fly_start_x[f], confirm_fly_start_y[f] + _bob, _ca_scale, 1.0, false);
+                }
+                
+                // Merge Text Animation
+                var _center_x = (confirm_fly_start_x[0] + confirm_fly_start_x[1]) / 2 + (_dw_inner / 2);
+                var _center_y = confirm_fly_start_y[0] + _bob - 60; // Pop centrally above
+                
+                if (confirm_merge_frame < 12) {
+                    // Sliding inwards
+                    var _mt = confirm_merge_frame / 12.0;
+                    var _mt_ease = _mt * _mt; // ease in
+                    for (var f = 0; f < 2; f++) {
+                        var _start_x = confirm_fly_start_x[f] + (_dw_inner / 2);
+                        var _start_y = confirm_fly_start_y[f] + _bob - 40;
+                        var _curr_x = lerp(_start_x, _center_x, _mt_ease);
+                        var _curr_y = lerp(_start_y, _center_y, _mt_ease);
+                        _draw_gold_text(string(confirm_fly_values[f] + 1), _curr_x, _curr_y, 1.0, 1.0);
+                    }
+                } else {
+                    // Pop total
+                    var _sc = 1.0;
+                    if (confirm_merge_frame < 18) {
+                        var _tt = (confirm_merge_frame - 12) / 6.0;
+                        _sc = lerp(0.8, 1.6, sin(_tt * pi * 0.5)); // fast ease out boom
+                    } else if (confirm_merge_frame < 22) {
+                        var _tt = (confirm_merge_frame - 18) / 4.0;
+                        _sc = lerp(1.6, 1.3, _tt); 
+                    } else {
+                        _sc = 1.3 + (sin(current_time / 100) * 0.05); // slightly breathing
+                    }
+                    
+                    var _alpha = 1.0;
+                    if (confirm_merge_frame > 30) {
+                        _alpha = lerp(1.0, 0.0, (confirm_merge_frame - 30) / 5.0);
+                    }
+                    
+                    _draw_gold_text(string(dice_total), _center_x, _center_y, _alpha, _sc);
+                }
+            }
+            if (confirm_phase == 5 && instance_exists(obj_pawn)) {
                 var _pawn_rx = obj_pawn.x;
                 var _pawn_ry = obj_pawn.y + obj_pawn.y_offset;
                 var _vx      = camera_get_view_x(view_camera[0]);
