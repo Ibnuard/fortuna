@@ -1,12 +1,12 @@
 // Board Rendering
 
-board_x  = 40; // Symmetric padding from screen edges
-board_y  = 200;
-board_h  = 680;
+board_x = BOARD_PAD_X; // Symmetric padding from screen edges
+board_y = BOARD_PAD_Y;
+board_h = BOARD_AREA_H;
 
 var board_area_w = room_width - (board_x * 2); // Full width minus symmetric padding
 
-tile_gap = 12;
+tile_gap = BOARD_TILE_GAP;
 var total_gap  = tile_gap * 8; // 8 gaps between 9 tiles
 var tile_scr_w = floor((board_area_w - total_gap) / 9);
 sc = tile_scr_w / 130;
@@ -24,20 +24,20 @@ steps_remaining = 0;
 
 anim_active = false;
 anim_t      = 0.0;
-anim_speed  = 1 / 12;
+anim_speed = BOARD_SPEED;
 anim_offset = 0.0;
 
 intro_active = true;
 intro_anim_t = 0.0;
 
-lift_max    = 18;
+lift_max = BOARD_LIFT_MAX;
 
 // Cari obj_pawn yang sudah ada di room
 pawn = instance_find(obj_pawn, 0);
 if (instance_exists(pawn)) {
     pawn.pawn_sprite = spr_pawn;
-    pawn.hop_height  = 28;
-    pawn.hop_speed   = 1 / 12;
+    pawn.hop_height = PAWN_HOP_H;
+    pawn.hop_speed = PAWN_HOP_SPD;
 }
 
 // Ganti warna background room secara otomatis (menggantikan sprite BG yg dihapus)

@@ -29,13 +29,13 @@ function GuiModuleBottom(_ctrl) constructor {
     }
 
     static draw_panel = function() {
-        var _main_w = 320; 
-        var _side_w = 240; 
-        var _gap    = 24; 
-        var _total_btn_w = (_side_w * 2) + _main_w + (_gap * 2);
+         
+         
+        var _gap = GUI_BTN_GAP; 
+        var _total_btn_w = (GUI_BTN_SIDE_W * 2) + GUI_BTN_MAIN_W + (_gap * 2);
         var _padding_x = 48;
         var _panel_w = _total_btn_w + (_padding_x * 2); 
-        var _panel_h = 240;
+        var _panel_h = GUI_PANEL_H;
         var _target_y = 855; 
         var _panel_draw_y = _target_y + bottom_y_offset;
         var _panel_x = room_width / 2 - (_panel_w / 2);
@@ -65,20 +65,20 @@ function GuiModuleBottom(_ctrl) constructor {
     }
 
     static draw_buttons = function() {
-        var _main_w = 320; 
-        var _main_h = 90;
-        var _side_w = 240; 
-        var _side_h = 90;
-        var _gap    = 24; 
-        var _panel_h = 240;
+         
+        
+         
+        
+        var _gap = GUI_BTN_GAP; 
+        var _panel_h = GUI_PANEL_H;
         var _target_y = 855; 
         var _panel_draw_y = _target_y + bottom_y_offset;
 
         var _mid_y = _panel_draw_y + (_panel_h / 2) - 10; 
-        var _main_y = _mid_y - (_main_h / 2);
-        var _center_x = room_width / 2 - (_main_w / 2);
-        var _left_x   = _center_x - _gap - _side_w;
-        var _right_x  = _center_x + _main_w + _gap;
+        var _main_y = _mid_y - (GUI_BTN_MAIN_H / 2);
+        var _center_x = room_width / 2 - (GUI_BTN_MAIN_W / 2);
+        var _left_x   = _center_x - _gap - GUI_BTN_SIDE_W;
+        var _right_x  = _center_x + GUI_BTN_MAIN_W + _gap;
 
         if (ctrl.gui_state == "MOVING") {
             var _box_w = 400;
@@ -98,12 +98,12 @@ function GuiModuleBottom(_ctrl) constructor {
                 draw_text(_box_x + _box_w/2, _box_y + _box_h/2 - 6, _step_str);
             }
         } else {
-            if (draw_gui_button(_left_x, _main_y + stagger_btn_left, _side_w, _side_h, spr_button_red, "Inventory", c_white, fnt_gui_button_medium, ctrl.can_interact_gui)) {
+            if (draw_gui_button(_left_x, _main_y + stagger_btn_left, GUI_BTN_SIDE_W, GUI_BTN_SIDE_H, spr_button_red, "Inventory", c_white, fnt_gui_button_medium, ctrl.can_interact_gui)) {
                 ctrl.gui_state = "PROPERTY";
             }
 
             var _roll_y = _main_y + stagger_btn_center;
-            if (draw_gui_button(_center_x, _roll_y, _main_w, _main_h, spr_button_main, "", c_white, fnt_gui_button_medium, ctrl.can_interact_gui)) {
+            if (draw_gui_button(_center_x, _roll_y, GUI_BTN_MAIN_W, GUI_BTN_MAIN_H, spr_button_main, "", c_white, fnt_gui_button_medium, ctrl.can_interact_gui)) {
                 if (ctrl.gui_state == "MAIN") {
                     ctrl.gui_state = "DICE";
                     ctrl.mod_dice.dice_phase = "ENTERING";
@@ -119,14 +119,14 @@ function GuiModuleBottom(_ctrl) constructor {
             draw_set_font(fnt_gui_button_medium);
             var _mx = device_mouse_x_to_gui(0);
             var _my = device_mouse_y_to_gui(0);
-            var _roll_hover = ctrl.can_interact_gui && point_in_rectangle(_mx, _my, _center_x, _roll_y, _center_x + _main_w, _roll_y + _main_h);
+            var _roll_hover = ctrl.can_interact_gui && point_in_rectangle(_mx, _my, _center_x, _roll_y, _center_x + GUI_BTN_MAIN_W, _roll_y + GUI_BTN_MAIN_H);
             var _roll_press = ctrl.can_interact_gui && _roll_hover && mouse_check_button(mb_left);
             var _juice_y = 0;
             if (_roll_hover && !_roll_press) _juice_y = -6;
             if (_roll_press) _juice_y = 2;
             var _total_w = string_width(_wave_str);
-            var _start_x = _center_x + (_main_w / 2) - (_total_w / 2);
-            var _face_h = _main_h - 16 + ((_roll_press) ? -2 : 0); 
+            var _start_x = _center_x + (GUI_BTN_MAIN_W / 2) - (_total_w / 2);
+            var _face_h = GUI_BTN_MAIN_H - 16 + ((_roll_press) ? -2 : 0); 
             var _base_y = _roll_y + _juice_y + (_face_h / 2);
 
             var _cx = _start_x;
@@ -143,7 +143,7 @@ function GuiModuleBottom(_ctrl) constructor {
             }
             draw_set_halign(fa_left); draw_set_valign(fa_top);
 
-            draw_gui_button(_right_x, _main_y + stagger_btn_right, _side_w, _side_h, spr_button_blue, "Shop", c_white, fnt_gui_button_medium, ctrl.can_interact_gui);
+            draw_gui_button(_right_x, _main_y + stagger_btn_right, GUI_BTN_SIDE_W, GUI_BTN_SIDE_H, spr_button_blue, "Shop", c_white, fnt_gui_button_medium, ctrl.can_interact_gui);
         }
     }
 }

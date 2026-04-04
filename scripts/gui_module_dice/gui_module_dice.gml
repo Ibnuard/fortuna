@@ -10,7 +10,7 @@ function GuiModuleDice(_ctrl) constructor {
     dice_selected    = [false, false, false];
     dice_select_y    = [0, 0, 0];
     dice_panel_h_extra = 0;
-    c_gold = make_color_rgb(255, 215, 0);
+    c_gold = C_PURE_GOLD;
 
     static step = function() {
         var _dice_target_y = (ctrl.gui_state == "DICE") ? 0 : 1000;
@@ -79,7 +79,7 @@ function GuiModuleDice(_ctrl) constructor {
             draw_rectangle(0, 0, _gui_w, _gui_h, false);
             draw_set_alpha(1.0);
             
-            var _dice_scale = 0.55; 
+            var _dice_scale = GUI_DICE_SCALE; 
             var _margin = 40; 
             var _gap = 30; 
             

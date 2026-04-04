@@ -169,7 +169,7 @@ function GuiModuleConfirm(_ctrl) constructor {
             var _gui_h = display_get_gui_height();
             var _ca_margin  = 40;
             var _ca_gap     = 30;
-            var _ca_scale   = 0.55;
+            var _ca_scale   = GUI_DICE_SCALE;
             var _ca_dw      = sprite_get_width(spr_dice) * _ca_scale;
             var _ca_total_w = (3 * _ca_dw) + (2 * _ca_gap) + (2 * _ca_margin);
             var _ca_total_h = sprite_get_height(spr_dice) * _ca_scale + (2 * _ca_margin);
@@ -179,7 +179,7 @@ function GuiModuleConfirm(_ctrl) constructor {
             var _draw_dice_gold = function(_spr, _sub, _x, _y, _sc, _alpha) {
                 var _dw_inner = sprite_get_width(_spr) * _sc;
                 var _out = 4;
-                var _c_gold = make_color_rgb(255, 215, 0);
+                var _c_gold = C_PURE_GOLD;
                 gpu_set_fog(true, _c_gold, 0, 0);
                 draw_sprite_ext(_spr, _sub, _x - _out, _y,        _sc, _sc, 0, c_white, _alpha);
                 draw_sprite_ext(_spr, _sub, _x + _out, _y,        _sc, _sc, 0, c_white, _alpha);

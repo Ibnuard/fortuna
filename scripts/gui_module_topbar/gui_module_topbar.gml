@@ -30,29 +30,22 @@ function GuiModuleTopbar(_ctrl) constructor {
     }
 
     static draw = function() {
-        var _topbar_h = 180;
         if (!surface_exists(surf_topbar)) {
-            surf_topbar = surface_create(room_width, _topbar_h);
+            surf_topbar = surface_create(room_width, GUI_TOPBAR_H);
         }
         
         surface_set_target(surf_topbar);
         draw_clear_alpha(c_black, 0);
-        draw_sprite_stretched(spr_gui_top_bar, 0, 0, 5, room_width, _topbar_h); 
+        draw_sprite_stretched(spr_gui_top_bar, 0, 0, 5, room_width, GUI_TOPBAR_H); 
         
-        var _pad_x = 40; 
-        var _center_y = _topbar_h / 2; 
+        var _center_y = GUI_TOPBAR_H / 2; 
         var _visual_mid_y = _center_y - 3; 
-        
-        draw_set_font(fnt_main); 
-        var _map_btn_w = 190; 
-        var _map_btn_h = 64;  
-        var _sm_btn_w = 110;
-        var _sm_btn_h = 56;
         var _inner_gap = 12;
         
+        draw_set_font(fnt_main); 
         var _label_str = "Target";
         draw_set_font(fnt_gui_button_medium); 
-        var _label_x = _pad_x + _map_btn_w + 30; 
+        var _label_x = GUI_PAD_X + GUI_BTN_MAP_W + 30; 
         var _label_w = string_width(_label_str);
         
         var _str_cur = "$0";
@@ -69,16 +62,16 @@ function GuiModuleTopbar(_ctrl) constructor {
         var _cur_w = string_width(_str_cur);
         var _tgt_w_text = string_width(_str_tgt);
         var _total_num_w = _cur_w + _tgt_w_text;
-        var _num_x_start = room_width - _pad_x - (_sm_btn_w * 2) - (_inner_gap * 2) - _total_num_w - 20; 
+        var _num_x_start = room_width - GUI_PAD_X - (GUI_BTN_SM_W * 2) - (_inner_gap * 2) - _total_num_w - 20; 
         
         var _tgt_x = _label_x + _label_w + 20; 
         var _tgt_w = (_num_x_start - 20) - _tgt_x; 
-        var _tgt_h = _map_btn_h; 
+        var _tgt_h = GUI_BTN_MAP_H; 
         var _tgt_y = _center_y - (_tgt_h / 2); 
         
         draw_set_font(fnt_gui_button_medium); 
         draw_set_halign(fa_left); draw_set_valign(fa_middle);
-        draw_set_color(make_color_rgb(40, 40, 40)); 
+        draw_set_color(C_DARKGRAY); 
         draw_text(_label_x + 3, _visual_mid_y + 4, _label_str); 
         draw_set_color(c_white); 
         draw_text(_label_x, _visual_mid_y, _label_str);
@@ -88,7 +81,7 @@ function GuiModuleTopbar(_ctrl) constructor {
         var _inner_y2 = _tgt_y + _tgt_h - 18; 
         var _fill_pad = 4;
         var _fill_w = (_tgt_w - 24) * _fill_pct; 
-        draw_set_color(make_color_rgb(6, 214, 160)); 
+        draw_set_color(C_EMERALD); 
         draw_rectangle(_tgt_x + 12, _inner_y1 + _fill_pad, _tgt_x + 12 + _fill_w, _inner_y2 - _fill_pad, false);
         draw_set_color(c_white);
         draw_sprite_stretched(spr_target_bar, 0, _tgt_x, _tgt_y, _tgt_w, _tgt_h);
@@ -98,7 +91,7 @@ function GuiModuleTopbar(_ctrl) constructor {
         draw_set_color(c_black); draw_set_alpha(0.3);
         draw_text(_num_x_start + 3, _visual_mid_y + 4, _str_cur); 
         draw_set_alpha(1.0);
-        draw_set_color(make_color_rgb(248, 194, 58)); 
+        draw_set_color(C_MAIN_GOLD); 
         draw_text(_num_x_start, _visual_mid_y, _str_cur);
         
         draw_set_font(fnt_gui_button_medium); 
@@ -122,27 +115,27 @@ function GuiModuleTopbar(_ctrl) constructor {
             var _arc = sin(_ratio * pi);
             var _y_offset = _arc * _curve_intensity; 
             draw_vertex_texture(_x, top_y_offset + 0 + _y_offset, _ratio, 0); 
-            draw_vertex_texture(_x, top_y_offset + _topbar_h + _y_offset, _ratio, 1); 
+            draw_vertex_texture(_x, top_y_offset + GUI_TOPBAR_H + _y_offset, _ratio, 1); 
         }
         draw_primitive_end();
     }
     
     static draw_buttons = function() {
-        var _topbar_h = 180;
-        var _pad_x = 40; 
-        var _map_btn_w = 190; 
-        var _map_btn_h = 64;  
-        var _sm_btn_w = 110;
-        var _sm_btn_h = 56;
+        
+        var _pad_x = GUI_PAD_X; 
+        var _map_btn_w = GUI_BTN_MAP_W; 
+        var _map_btn_h = GUI_BTN_MAP_H;  
+        var _sm_btn_w = GUI_BTN_SM_W;
+        var _sm_btn_h = GUI_BTN_SM_H;
         var _inner_gap = 12;
 
         var _map_btn_x = _pad_x; 
-        var _map_btn_y = top_y_offset + (_topbar_h / 2) - (_map_btn_h / 2) + stagger_option;
+        var _map_btn_y = top_y_offset + (GUI_TOPBAR_H / 2) - (_map_btn_h / 2) + stagger_option;
         draw_gui_button(_map_btn_x, _map_btn_y, _map_btn_w, _map_btn_h, spr_button_main, "Option", c_white, fnt_main, ctrl.can_interact_gui);
 
         var _stat_btn_x = room_width - _pad_x - _sm_btn_w;
         var _map_top_x  = _stat_btn_x - _inner_gap - _sm_btn_w;
-        var _top_btn_y  = top_y_offset + (_topbar_h / 2) - (_sm_btn_h / 2) + stagger_map_stat;
+        var _top_btn_y  = top_y_offset + (GUI_TOPBAR_H / 2) - (_sm_btn_h / 2) + stagger_map_stat;
 
         if (draw_gui_button(_map_top_x, _top_btn_y, _sm_btn_w, _sm_btn_h, spr_button_emerald, "Map", c_white, fnt_main, ctrl.can_interact_gui)) {
             // Open Map logic

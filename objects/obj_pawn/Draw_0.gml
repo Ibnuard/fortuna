@@ -25,7 +25,7 @@ if (sprite_exists(pawn_sprite)) {
     // Placeholder kotak
     draw_set_color(c_white);
     draw_rectangle(draw_x, draw_y, draw_x + pw, draw_y + ph, false);
-    draw_set_color(make_color_rgb(180, 180, 180));
+    draw_set_color(C_PAWN_SHADOW);
     draw_rectangle(draw_x, draw_y, draw_x + pw, draw_y + ph, true);
 }
 

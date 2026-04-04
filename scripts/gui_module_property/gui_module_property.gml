@@ -57,7 +57,7 @@ function GuiModuleProperty(_ctrl) constructor {
         var _prop_filled = 5;
 
         var _card_spr = spr_card_placeholder;
-        var _card_scale = 0.74; 
+        var _card_scale = GUI_CARD_SCALE; 
         var _card_w = sprite_get_width(_card_spr) * _card_scale;
         var _card_h = sprite_get_height(_card_spr) * _card_scale;
         var _card_gap = 16;
