@@ -50,7 +50,7 @@ function draw_gui_button(_x, _y, _w, _h, _sprite, _text, _text_color = c_white, 
     
     // Calculate the exact center of the top "face" area 
     // (nine-slice preserves a bottom 3D border, so we subtract to find the true vertical face center)
-    var _face_h = _h - 16;
+    var _face_h = _h - 24;
     var _text_y = _y + (_face_h / 2);
     
     // Drop shadow

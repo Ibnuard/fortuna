@@ -238,10 +238,10 @@ if (gui_state == "MOVING") {
         
         // Shadow
         draw_set_color(c_black); draw_set_alpha(0.4);
-        draw_text(_box_x + _box_w/2 + 4, _box_y + _box_h/2 + 5, _step_str);
+        draw_text(_box_x + _box_w/2 + 4, _box_y + _box_h/2 - 6 + 5, _step_str); 
         // Main
         draw_set_color(c_white); draw_set_alpha(1.0);
-        draw_text(_box_x + _box_w/2, _box_y + _box_h/2, _step_str);
+        draw_text(_box_x + _box_w/2, _box_y + _box_h/2 - 6, _step_str);
     }
 } else {
     if (draw_gui_button(_left_x, _main_y + stagger_btn_left, _side_w, _side_h, spr_button_red, "Inventory", c_white, fnt_gui_button_medium)) {
@@ -273,7 +273,7 @@ if (gui_state == "MOVING") {
     if (_roll_press) _juice_y = 2;
     var _total_w = string_width(_wave_str);
     var _start_x = _center_x + (_main_w / 2) - (_total_w / 2);
-    var _face_h = _main_h - 10 + ((_roll_press) ? -2 : 0);
+    var _face_h = _main_h - 22 + ((_roll_press) ? -2 : 0); 
     var _base_y = _roll_y + _juice_y + (_face_h / 2);
 
     var _cx = _start_x;
@@ -721,16 +721,50 @@ if (confirm_phase >= 1) {
     var _ca_popup_x = (_gui_w / 2) - (_ca_total_w / 2);
     var _ca_base_py = (_gui_h / 2) - (_ca_total_h / 2);
 
-    // Helper: draw a die with gold outline
+    // Helper: draw a die with full gold outline (4px, 8-directional) + number label above
     var _draw_dice_gold = function(_spr, _sub, _x, _y, _sc, _alpha) {
+        // NOTE: _ca_dw_inner computed here — GML closures can't capture outer locals
+        var _dw_inner = sprite_get_width(_spr) * _sc;
+        // Gold outline — 8-directional, 4px thick
+        var _out = 4;
         gpu_set_fog(true, c_gold, 0, 0);
-        draw_sprite_ext(_spr, _sub, _x - 3, _y,     _sc, _sc, 0, c_white, _alpha * 0.5);
-        draw_sprite_ext(_spr, _sub, _x + 3, _y,     _sc, _sc, 0, c_white, _alpha * 0.5);
-        draw_sprite_ext(_spr, _sub, _x,     _y - 3, _sc, _sc, 0, c_white, _alpha * 0.5);
-        draw_sprite_ext(_spr, _sub, _x,     _y + 3, _sc, _sc, 0, c_white, _alpha * 0.5);
+        draw_sprite_ext(_spr, _sub, _x - _out, _y,        _sc, _sc, 0, c_white, _alpha);
+        draw_sprite_ext(_spr, _sub, _x + _out, _y,        _sc, _sc, 0, c_white, _alpha);
+        draw_sprite_ext(_spr, _sub, _x,        _y - _out, _sc, _sc, 0, c_white, _alpha);
+        draw_sprite_ext(_spr, _sub, _x,        _y + _out, _sc, _sc, 0, c_white, _alpha);
+        draw_sprite_ext(_spr, _sub, _x - _out, _y - _out, _sc, _sc, 0, c_white, _alpha);
+        draw_sprite_ext(_spr, _sub, _x + _out, _y - _out, _sc, _sc, 0, c_white, _alpha);
+        draw_sprite_ext(_spr, _sub, _x - _out, _y + _out, _sc, _sc, 0, c_white, _alpha);
+        draw_sprite_ext(_spr, _sub, _x + _out, _y + _out, _sc, _sc, 0, c_white, _alpha);
         gpu_set_fog(false, c_white, 0, 0);
+        // Die face
         draw_sprite_ext(_spr, _sub, _x, _y, _sc, _sc, 0, c_white, _alpha);
+        
+        // Number label above the die
+        var _num_str = string(_sub + 1);
+        var _num_x   = _x + (_dw_inner / 2);
+        var _num_y   = _y - 66;
+        draw_set_font(fnt_gui_button_large);
+        draw_set_halign(fa_center);
+        draw_set_valign(fa_top);
+        // Drop shadow
+        draw_set_color(c_black); draw_set_alpha(_alpha * 0.5);
+        draw_text(_num_x + 5, _num_y + 6, _num_str);
+        draw_set_alpha(_alpha);
+        // Black outline
+        draw_set_color(c_black);
+        draw_text(_num_x - 3, _num_y,     _num_str); draw_text(_num_x + 3, _num_y,     _num_str);
+        draw_text(_num_x,     _num_y - 3, _num_str); draw_text(_num_x,     _num_y + 3, _num_str);
+        draw_text(_num_x - 3, _num_y - 3, _num_str); draw_text(_num_x + 3, _num_y - 3, _num_str);
+        draw_text(_num_x - 3, _num_y + 3, _num_str); draw_text(_num_x + 3, _num_y + 3, _num_str);
+        // Gold text
+        draw_set_color(c_gold);
+        draw_text(_num_x, _num_y, _num_str);
+        draw_set_alpha(1.0);
+        draw_set_color(c_white);
+        draw_set_halign(fa_left);
     };
+
 
     // ─── PHASE 1: Explosion hold — dice sit still, particles burst (8 frames) ───
     if (confirm_phase == 1) {
