@@ -1,15 +1,15 @@
 /// @description Draw Modular GUI Components
 // The z-ordering (drawing order) is strictly preserved from the original monolithic file.
-// CRITICAL: Shader vignette is BEHIND buttons, but Shader scanlines is ON TOP of everything.
+// CRITICAL: Shader vignette is BEHIND all GUI elements, but Shader scanlines is ON TOP of everything.
 
-// 1. TOP BAR
+// 1. SHADER: VIGNETTE ONLY (Behind GUI Panels & Buttons)
+mod_fx.draw_vignette();
+
+// 2. TOP BAR (Background, text, target bar)
 mod_topbar.draw();
 
-// 2. BOTTOM CONTAINER BORDERS / SHAPES
+// 3. BOTTOM CONTAINER BORDERS / SHAPES
 mod_bottom.draw_panel();
-
-// 3. SHADER: VIGNETTE ONLY (Behind Buttons)
-mod_fx.draw_vignette();
 
 // 4. INTERACTIVE BUTTONS (Top and Bottom)
 mod_topbar.draw_buttons();
