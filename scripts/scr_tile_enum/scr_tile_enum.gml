@@ -9,7 +9,7 @@ enum TileType {
 
 
 enum TileGroup {
-	Evemt,
+	Event,
 	Cheap,
 	Mid,
 	Upper,

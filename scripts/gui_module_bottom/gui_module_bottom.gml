@@ -42,9 +42,11 @@ function GuiModuleBottom(_ctrl) constructor {
 
         draw_sprite_stretched(spr_gui_bottom_container, 0, _panel_x, _panel_draw_y, _panel_w, _panel_h);
 
-        var _turn_str = "Turn 1 / 20";
+        var _turn_num = "1";
+        var _turn_max = "20";
         if (instance_exists(obj_controller)) {
-            _turn_str = "Turn " + string(obj_controller.current_turn) + " / " + string(obj_controller.map_max_turns);
+            _turn_num = string(obj_controller.current_turn);
+            _turn_max = string(obj_controller.map_max_turns);
         }
         var _badge_angle = 0;
         var _badge_w = 200;
@@ -57,10 +59,42 @@ function GuiModuleBottom(_ctrl) constructor {
 
         draw_set_font(fnt_main);
         draw_set_halign(fa_center); draw_set_valign(fa_middle);
+        
+        var _lbl = "Turn ";
+        var _sep = " / ";
+        var _scale = 1.6;
+        
+        var _tw_lbl = string_width(_lbl) * _scale;
+        var _tw_num = string_width(_turn_num) * _scale;
+        var _tw_sep = string_width(_sep) * _scale;
+        var _tw_max = string_width(_turn_max) * _scale;
+        var _total_tw = _tw_lbl + _tw_num + _tw_sep + _tw_max;
+        
+        var _draw_x = _badge_x - (_total_tw / 2);
+        var _draw_y = _badge_y + 8;
+        
+        draw_set_halign(fa_left);
+        
+        // Shadow pass
+        var _so = 2;
         draw_set_color(c_black); draw_set_alpha(0.3);
-        draw_text_transformed(_badge_x + 2, _badge_y + 12, _turn_str, 1.6, 1.6, _badge_angle);
-        draw_set_color(c_white); draw_set_alpha(1.0);
-        draw_text_transformed(_badge_x, _badge_y + 8, _turn_str, 1.6, 1.6, _badge_angle);
+        draw_text_transformed(_draw_x + _so, _draw_y + 4, _lbl, _scale, _scale, 0);
+        draw_text_transformed(_draw_x + _tw_lbl + _so, _draw_y + 4, _turn_num, _scale, _scale, 0);
+        draw_text_transformed(_draw_x + _tw_lbl + _tw_num + _so, _draw_y + 4, _sep + _turn_max, _scale, _scale, 0);
+        
+        // Main pass
+        draw_set_alpha(1.0);
+        draw_set_color(c_white);
+        draw_text_transformed(_draw_x, _draw_y, _lbl, _scale, _scale, 0);
+        _draw_x += _tw_lbl;
+        
+        draw_set_color(C_MAIN_GOLD);
+        draw_text_transformed(_draw_x, _draw_y, _turn_num, _scale, _scale, 0);
+        _draw_x += _tw_num;
+        
+        draw_set_color(c_white);
+        draw_text_transformed(_draw_x, _draw_y, _sep + _turn_max, _scale, _scale, 0);
+        
         draw_set_halign(fa_left); draw_set_valign(fa_top);
     }
 
@@ -91,11 +125,31 @@ function GuiModuleBottom(_ctrl) constructor {
             if (instance_exists(obj_board)) {
                 draw_set_font(fnt_gui_button_large);
                 draw_set_halign(fa_center); draw_set_valign(fa_middle);
-                var _step_str = "Remaining: " + string(obj_board.steps_remaining);
+                
+                var _val_str = string(obj_board.steps_remaining);
+                var _lbl_str = "Remaining: ";
+                
+                var _tw_lbl = string_width(_lbl_str);
+                var _tw_val = string_width(_val_str);
+                var _total_w = _tw_lbl + _tw_val;
+                
+                var _draw_x = _box_x + (_box_w / 2) - (_total_w / 2);
+                var _draw_y = _box_y + (_box_h / 2) - 6;
+                
+                draw_set_halign(fa_left);
+                
+                // Shadow
                 draw_set_color(c_black); draw_set_alpha(0.4);
-                draw_text(_box_x + _box_w/2 + 4, _box_y + _box_h/2 - 6 + 5, _step_str); 
-                draw_set_color(c_white); draw_set_alpha(1.0);
-                draw_text(_box_x + _box_w/2, _box_y + _box_h/2 - 6, _step_str);
+                draw_text(_draw_x + 4, _draw_y + 5, _lbl_str);
+                draw_text(_draw_x + _tw_lbl + 4, _draw_y + 5, _val_str);
+                
+                // Main
+                draw_set_alpha(1.0);
+                draw_set_color(c_white);
+                draw_text(_draw_x, _draw_y, _lbl_str);
+                
+                draw_set_color(C_MAIN_GOLD);
+                draw_text(_draw_x + _tw_lbl, _draw_y, _val_str);
             }
         } else {
             if (draw_gui_button(_left_x, _main_y + stagger_btn_left, GUI_BTN_SIDE_W, GUI_BTN_SIDE_H, spr_button_red, "Inventory", c_white, fnt_gui_button_medium, ctrl.can_interact_gui)) {
