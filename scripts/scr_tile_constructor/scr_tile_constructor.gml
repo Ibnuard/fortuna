@@ -5,7 +5,7 @@ function Tile(
     _name,          // string label
     _price  = 0,   // harga beli (Property only)
     _rent   = 0,   // sewa base (Property only)
-    _group  = TileGroup.Evemt  // warna group (Property only)
+    _group  = TileGroup.Event  // warna group (Property only)
 ) constructor {
     type   = _type;
     sprite = _sprite;

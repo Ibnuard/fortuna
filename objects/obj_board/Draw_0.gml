@@ -63,6 +63,21 @@ for (var oi = 0; oi < array_length(draw_order); oi++) {
         draw_x, _y,
         sc, sc, c_white, 1
     );
+    
+    // ── DRAW TILE ICON ──
+    var _tile = tiles[loop_index(player_index + i)];
+    var _icon_idx = _tile.type; // 1-to-1 mapping confirmed
+    
+    // Konpensasi origin Top-Left agar tetap Center secara visual
+    var _icon_sc  = sc * 0.55; // Lebih kecil lagi agar seimbang
+    var _icon_sw  = sprite_get_width(spr_tile_icons) * _icon_sc;
+    var _icon_sh  = sprite_get_height(spr_tile_icons) * _icon_sc;
+    
+    var _icon_x   = draw_x + (tile_w / 2) - (_icon_sw / 2);
+    var _icon_y   = _y + (8 * sc); // Turunkan agar berada di tengah vertikal header
+    
+    // Draw icon with same alpha and lift as the tile
+    draw_sprite_ext(spr_tile_icons, _icon_idx, _icon_x, _icon_y, _icon_sc, _icon_sc, 0, c_white, lerp(1.0, 0.60, dist_norm));
 }
 
 // ── PASS 2: border putih pada tile tengah ──
