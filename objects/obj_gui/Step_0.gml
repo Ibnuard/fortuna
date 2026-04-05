@@ -7,6 +7,7 @@ mod_property.step();
 mod_confirm.step();
 mod_dice.step();
 mod_skills.step();
+mod_stats.step();
 mod_map.step();
 
 // ─── INTERACTION BLOCKING ───

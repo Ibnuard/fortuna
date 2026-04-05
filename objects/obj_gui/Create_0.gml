@@ -31,4 +31,5 @@ mod_property = new GuiModuleProperty(id);
 mod_confirm  = new GuiModuleConfirm(id);
 mod_dice     = new GuiModuleDice(id);
 mod_skills    = new GuiModuleSkills(id);
+mod_stats     = new GuiModuleStats(id);
 mod_map      = new GuiModuleMap(id);

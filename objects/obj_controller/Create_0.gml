@@ -17,6 +17,16 @@ stats = {
     negotiation:      5  // index 4
 };
 
+pawn_stats = {
+    properties_owned: 0,
+    houses_owned:     0,
+    hotels_owned:     0,
+    passive_income:   0,
+    tax_rate:         5,
+    tax_per_turn:     0,
+    net_income:       0
+};
+
 // ─── UTILS ───
 // Function to format currency
 function format_money(_amount) {

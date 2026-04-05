@@ -66,3 +66,14 @@ global.stat_data = [
     { name: "Risk Tolerance",   color: #E8365D, icon: 4, desc: "Higher rewards when taking dangerous paths or high-stakes bets." },
     { name: "Negotiation",      color: #40C8E0, icon: 5, desc: "Reduces rent you pay to others, and increases rent you collect." }
 ];
+
+// Statistics configuration for spr_stats
+global.pawn_stats_data = [
+    { name: "Total Property Owned", icon: 0, type: "number" },
+    { name: "Total House",          icon: 1, type: "number" },
+    { name: "Total Hotel",          icon: 2, type: "number" },
+    { name: "Passive Income",       icon: 3, type: "currency" },
+    { name: "Tax Rate",             icon: 4, type: "percent" },
+    { name: "Tax / Turn",           icon: 5, type: "currency" },
+    { name: "Net Income",           icon: 6, type: "currency" }
+];

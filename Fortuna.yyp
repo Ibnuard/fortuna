@@ -45,6 +45,7 @@
     {"id":{"name":"gui_module_map","path":"scripts/gui_module_map/gui_module_map.yy",},},
     {"id":{"name":"gui_module_property","path":"scripts/gui_module_property/gui_module_property.yy",},},
     {"id":{"name":"gui_module_skills","path":"scripts/gui_module_skills/gui_module_skills.yy",},},
+    {"id":{"name":"gui_module_stats","path":"scripts/gui_module_stats/gui_module_stats.yy",},},
     {"id":{"name":"gui_module_topbar","path":"scripts/gui_module_topbar/gui_module_topbar.yy",},},
     {"id":{"name":"scr_anim_easing","path":"scripts/scr_anim_easing/scr_anim_easing.yy",},},
     {"id":{"name":"scr_constants","path":"scripts/scr_constants/scr_constants.yy",},},
