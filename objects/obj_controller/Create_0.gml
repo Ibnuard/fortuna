@@ -8,7 +8,7 @@ current_turn  = 1;
 // ─── PLAYER DATA ───
 player_cash   = 5000;
 
-// Pawn Stats (Dummy Pawn) - Ordered to match spr_stats indices
+// Pawn Skills (Dummy Pawn) - Ordered to match spr_skills indices
 stats = {
     money_management: 5, // index 0
     luck:             5, // index 1

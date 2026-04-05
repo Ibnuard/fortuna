@@ -56,7 +56,7 @@
 // ==========================================
 // ─── STAT CONFIGURATION ───
 // ==========================================
-// These match the image_index of spr_stats and provide styling data
+// Pawn Skills (Dummy Pawn) - Ordered to match spr_skills indices
 // 0: Money Management, 1: Luck, 2: Charisma, 3: Risk Tolerance, 4: Negotiation
 
 global.stat_data = [

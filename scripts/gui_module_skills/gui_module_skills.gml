@@ -89,7 +89,7 @@ function GuiModuleSkills(_ctrl) constructor {
                 }
                 
                 var _icon_alpha = _is_hover ? ctrl.skills_popup_alpha : (ctrl.skills_popup_alpha * 0.85);
-                draw_sprite_ext(spr_stats, _s.icon, _icon_x, _cy + (_bar_h / 2), 1, 1, 0, c_white, _icon_alpha);
+                draw_sprite_ext(spr_skills, _s.icon, _icon_x, _cy + (_bar_h / 2), 1, 1, 0, c_white, _icon_alpha);
                 
                 draw_set_color(c_white);
                 draw_set_alpha(ctrl.skills_popup_alpha);
