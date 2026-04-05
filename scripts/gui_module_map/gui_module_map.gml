@@ -91,7 +91,7 @@ function GuiModuleMap(_ctrl) constructor {
         var _p_y = (_gui_h / 2) - (_p_h / 2) + ctrl.map_popup_y_slide;
         
         draw_set_alpha(ctrl.map_popup_alpha);
-        draw_sprite_stretched(spr_dice_container, 0, _p_x, _p_y, _p_w, _p_h);
+        draw_sprite_stretched(spr_container, 0, _p_x, _p_y, _p_w, _p_h);
         
         // Close Button
         var _cx_sz = 64;

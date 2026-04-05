@@ -48,7 +48,7 @@ function GuiModuleSkills(_ctrl) constructor {
             var _p_y = (_gui_h / 2) - (_p_h / 2) + ctrl.skills_popup_y_slide;
             
             draw_set_alpha(ctrl.skills_popup_alpha);
-            draw_sprite_stretched(spr_dice_container, 0, _p_x, _p_y, _p_w, _p_h);
+            draw_sprite_stretched(spr_container, 0, _p_x, _p_y, _p_w, _p_h);
             
             draw_set_font(fnt_gui_button_large);
             draw_set_halign(fa_center); draw_set_valign(fa_top);

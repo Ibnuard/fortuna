@@ -34,7 +34,7 @@ function GuiModuleStats(_ctrl) constructor {
             
             // Main Panel
             draw_set_alpha(ctrl.stats_popup_alpha);
-            draw_sprite_stretched(spr_dice_container, 0, _p_x, _p_y, _p_w, _p_h);
+            draw_sprite_stretched(spr_container, 0, _p_x, _p_y, _p_w, _p_h);
             
             // Header
             draw_set_font(fnt_gui_button_large);
