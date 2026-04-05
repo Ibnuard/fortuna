@@ -9,6 +9,10 @@ skills_popup_open  = false;
 skills_popup_alpha = 0.0;
 skills_popup_y_slide = 100;
 
+stats_popup_open  = false;
+stats_popup_alpha = 0.0;
+stats_popup_y_slide = 100;
+
 map_popup_open  = false;
 map_popup_alpha = 0.0;
 map_popup_y_slide = 100;

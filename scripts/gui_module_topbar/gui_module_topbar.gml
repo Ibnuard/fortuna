@@ -62,7 +62,7 @@ function GuiModuleTopbar(_ctrl) constructor {
         var _cur_w = string_width(_str_cur);
         var _tgt_w_text = string_width(_str_tgt);
         var _total_num_w = _cur_w + _tgt_w_text;
-        var _num_x_start = room_width - GUI_PAD_X - (GUI_BTN_SM_W * 2) - (_inner_gap * 2) - _total_num_w - 20; 
+        var _num_x_start = room_width - GUI_PAD_X - (GUI_BTN_SM_W * 3) - (_inner_gap * 2) - _total_num_w - 40; 
         
         var _tgt_x = _label_x + _label_w + 20; 
         var _tgt_w = (_num_x_start - 20) - _tgt_x; 
@@ -133,15 +133,19 @@ function GuiModuleTopbar(_ctrl) constructor {
         var _map_btn_y = top_y_offset + (GUI_TOPBAR_H / 2) - (_map_btn_h / 2) + stagger_option;
         draw_gui_button(_map_btn_x, _map_btn_y, _map_btn_w, _map_btn_h, spr_button_main, "Option", c_white, fnt_main, ctrl.can_interact_gui);
 
-        var _stat_btn_x = room_width - _pad_x - _sm_btn_w;
-        var _map_top_x  = _stat_btn_x - _inner_gap - _sm_btn_w;
+        var _stats_btn_x = room_width - _pad_x - _sm_btn_w;
+        var _skills_btn_x = _stats_btn_x - _inner_gap - _sm_btn_w;
+        var _map_top_x  = _skills_btn_x - _inner_gap - _sm_btn_w;
         var _top_btn_y  = top_y_offset + (GUI_TOPBAR_H / 2) - (_sm_btn_h / 2) + stagger_map_stat;
 
         if (draw_gui_button(_map_top_x, _top_btn_y, _sm_btn_w, _sm_btn_h, spr_button_emerald, "Map", c_white, fnt_main, ctrl.can_interact_gui)) {
             ctrl.map_popup_open = true;
         }
-        if (draw_gui_button(_stat_btn_x, _top_btn_y, _sm_btn_w, _sm_btn_h, spr_button_purple, "Skills", c_white, fnt_main, ctrl.can_interact_gui)) {
+        if (draw_gui_button(_skills_btn_x, _top_btn_y, _sm_btn_w, _sm_btn_h, spr_button_purple, "Skills", c_white, fnt_main, ctrl.can_interact_gui)) {
             ctrl.skills_popup_open = true;
+        }
+        if (draw_gui_button(_stats_btn_x, _top_btn_y, _sm_btn_w, _sm_btn_h, spr_button_orange, "Stats", c_white, fnt_main, ctrl.can_interact_gui)) {
+            ctrl.stats_popup_open = true;
         }
     }
     
