@@ -72,8 +72,8 @@ global.pawn_stats_data = [
     { name: "Total Property Owned", icon: 0, type: "number" },
     { name: "Total House",          icon: 1, type: "number" },
     { name: "Total Hotel",          icon: 2, type: "number" },
-    { name: "Passive Income",       icon: 3, type: "currency" },
+    { name: "Income / Turn",       icon: 3, type: "currency" },
     { name: "Tax Rate",             icon: 4, type: "percent" },
     { name: "Tax / Turn",           icon: 5, type: "currency" },
-    { name: "Net Income",           icon: 6, type: "currency" }
+    { name: "Net / Turn",           icon: 6, type: "currency" }
 ];

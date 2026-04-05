@@ -63,10 +63,10 @@ function GuiModuleStats(_ctrl) constructor {
                         case "Total Property Owned": _key = "properties_owned"; break;
                         case "Total House":          _key = "houses_owned"; break;
                         case "Total Hotel":          _key = "hotels_owned"; break;
-                        case "Passive Income":       _key = "passive_income"; break;
+                        case "Income / Turn":       _key = "passive_income"; break;
                         case "Tax Rate":             _key = "tax_rate"; break;
                         case "Tax / Turn":           _key = "tax_per_turn"; break;
-                        case "Net Income":           _key = "net_income"; break;
+                        case "Net / Turn":           _key = "net_income"; break;
                     }
                     
                     if (_key != "") {
@@ -82,8 +82,10 @@ function GuiModuleStats(_ctrl) constructor {
                     }
                 }
                 
-                var _icon_scale = 0.7;
-                var _v_mid      = _cy + (_row_gap / 2) - 10;
+                var _icon_scale    = 0.7;
+                var _v_mid         = _cy + (_row_gap / 2) - 10;
+                var _lbl_txt_scale = 1.15;
+                var _val_txt_scale = 1.45; // Significantly larger for clarity
                 
                 // Draw Icon
                 draw_sprite_ext(spr_stats, _s.icon, _icon_col_x, _v_mid, _icon_scale, _icon_scale, 0, c_white, ctrl.stats_popup_alpha);
@@ -92,13 +94,13 @@ function GuiModuleStats(_ctrl) constructor {
                 draw_set_font(fnt_main);
                 draw_set_halign(fa_left); draw_set_valign(fa_middle);
                 draw_set_color(c_white);
-                draw_text(_label_col_x, _v_mid, _s.name);
-                draw_text(_colon_col_x, _v_mid, ":");
+                draw_text_transformed(_label_col_x, _v_mid, _s.name, _lbl_txt_scale, _lbl_txt_scale, 0);
+                draw_text_transformed(_colon_col_x, _v_mid, ":", _lbl_txt_scale, _lbl_txt_scale, 0);
                 
-                // Draw Value (Right Aligned)
+                // Draw Value (Right Aligned - Larger & Clearer)
                 draw_set_halign(fa_right);
                 draw_set_color(C_MAIN_GOLD);
-                draw_text(_value_col_x, _v_mid, _val_str);
+                draw_text_transformed(_value_col_x, _v_mid, _val_str, _val_txt_scale, _val_txt_scale, 0);
             }
             
             // Close Button
