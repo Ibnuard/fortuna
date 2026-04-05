@@ -5,9 +5,9 @@ if (!instance_exists(obj_controller)) {
 
 gui_state = "MAIN"; // "MAIN" | "DICE" | "MOVING" | "PROPERTY"
 
-stats_popup_open  = false;
-stats_popup_alpha = 0.0;
-stats_popup_y_slide = 100;
+skills_popup_open  = false;
+skills_popup_alpha = 0.0;
+skills_popup_y_slide = 100;
 
 map_popup_open  = false;
 map_popup_alpha = 0.0;
@@ -26,5 +26,5 @@ mod_bottom   = new GuiModuleBottom(id);
 mod_property = new GuiModuleProperty(id);
 mod_confirm  = new GuiModuleConfirm(id);
 mod_dice     = new GuiModuleDice(id);
-mod_stats    = new GuiModuleStats(id);
+mod_skills    = new GuiModuleSkills(id);
 mod_map      = new GuiModuleMap(id);

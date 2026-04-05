@@ -25,7 +25,7 @@ mod_dice.draw();
 mod_confirm.draw();
 
 // 8. POPUPS (Stats & Map)
-mod_stats.draw();
+mod_skills.draw();
 mod_map.draw();
 
 // 9. SHADER: SCANLINES ONLY (On top of everyone except particles)

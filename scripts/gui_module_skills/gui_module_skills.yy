@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"gui_module_stats",
+  "%Name":"gui_module_skills",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"gui_module_stats",
+  "name":"gui_module_skills",
   "parent":{
     "name":"Script",
     "path":"folders/Script.yy",

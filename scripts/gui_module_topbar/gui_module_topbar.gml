@@ -140,8 +140,8 @@ function GuiModuleTopbar(_ctrl) constructor {
         if (draw_gui_button(_map_top_x, _top_btn_y, _sm_btn_w, _sm_btn_h, spr_button_emerald, "Map", c_white, fnt_main, ctrl.can_interact_gui)) {
             ctrl.map_popup_open = true;
         }
-        if (draw_gui_button(_stat_btn_x, _top_btn_y, _sm_btn_w, _sm_btn_h, spr_button_purple, "Stats", c_white, fnt_main, ctrl.can_interact_gui)) {
-            ctrl.stats_popup_open = true;
+        if (draw_gui_button(_stat_btn_x, _top_btn_y, _sm_btn_w, _sm_btn_h, spr_button_purple, "Skills", c_white, fnt_main, ctrl.can_interact_gui)) {
+            ctrl.skills_popup_open = true;
         }
     }
     

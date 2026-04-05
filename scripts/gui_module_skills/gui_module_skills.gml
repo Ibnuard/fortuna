@@ -1,48 +1,48 @@
-function GuiModuleStats(_ctrl) constructor {
+function GuiModuleSkills(_ctrl) constructor {
     ctrl = _ctrl;
     tooltip_alpha = 0;
     active_tooltip = -1;
     
     static step = function() {
-        var _stats_target = ctrl.stats_popup_open ? 1.0 : 0.0;
-        var _slide_target = ctrl.stats_popup_open ? 0.0 : 100.0;
+        var _skills_target = ctrl.skills_popup_open ? 1.0 : 0.0;
+        var _slide_target = ctrl.skills_popup_open ? 0.0 : 100.0;
 
-        ctrl.stats_popup_alpha = lerp(ctrl.stats_popup_alpha, _stats_target, 0.15);
-        if (abs(ctrl.stats_popup_alpha - _stats_target) < 0.005) ctrl.stats_popup_alpha = _stats_target;
+        ctrl.skills_popup_alpha = lerp(ctrl.skills_popup_alpha, _skills_target, 0.15);
+        if (abs(ctrl.skills_popup_alpha - _skills_target) < 0.005) ctrl.skills_popup_alpha = _skills_target;
 
-        ctrl.stats_popup_y_slide = lerp(ctrl.stats_popup_y_slide, _slide_target, 0.15);
-        if (abs(ctrl.stats_popup_y_slide - _slide_target) < 0.1) ctrl.stats_popup_y_slide = _slide_target;
+        ctrl.skills_popup_y_slide = lerp(ctrl.skills_popup_y_slide, _slide_target, 0.15);
+        if (abs(ctrl.skills_popup_y_slide - _slide_target) < 0.1) ctrl.skills_popup_y_slide = _slide_target;
         
         // Reset tooltip when closed
-        if (!ctrl.stats_popup_open) {
+        if (!ctrl.skills_popup_open) {
             active_tooltip = -1; 
             tooltip_alpha = 0;
         }
     }
 
     static draw = function() {
-        if (ctrl.stats_popup_alpha > 0) {
+        if (ctrl.skills_popup_alpha > 0) {
             var _gui_w = display_get_gui_width();
             var _gui_h = display_get_gui_height();
             var _mx    = device_mouse_x_to_gui(0);
             var _my    = device_mouse_y_to_gui(0);
             
             draw_set_color(c_black);
-            draw_set_alpha(ctrl.stats_popup_alpha * 0.6);
+            draw_set_alpha(ctrl.skills_popup_alpha * 0.6);
             draw_rectangle(0, 0, _gui_w, _gui_h, false);
             
             var _p_w = 720;
             var _p_h = 580;
             var _p_x = (_gui_w / 2) - (_p_w / 2);
-            var _p_y = (_gui_h / 2) - (_p_h / 2) + ctrl.stats_popup_y_slide;
+            var _p_y = (_gui_h / 2) - (_p_h / 2) + ctrl.skills_popup_y_slide;
             
-            draw_set_alpha(ctrl.stats_popup_alpha);
+            draw_set_alpha(ctrl.skills_popup_alpha);
             draw_sprite_stretched(spr_dice_container, 0, _p_x, _p_y, _p_w, _p_h);
             
             draw_set_font(fnt_gui_button_large);
             draw_set_halign(fa_center); draw_set_valign(fa_top);
             draw_set_color(c_white);
-            draw_text(_p_x + _p_w/2, _p_y + 35, "Pawn Statistics");
+            draw_text(_p_x + _p_w/2, _p_y + 35, "Pawn Skills");
             
             var _row_y_start = _p_y + 130;
             var _row_gap     = 65;
@@ -72,11 +72,11 @@ function GuiModuleStats(_ctrl) constructor {
                     }
                 }
                 
-                var _icon_alpha = _is_hover ? ctrl.stats_popup_alpha : (ctrl.stats_popup_alpha * 0.85);
+                var _icon_alpha = _is_hover ? ctrl.skills_popup_alpha : (ctrl.skills_popup_alpha * 0.85);
 
                 draw_sprite_ext(spr_stats, _s.icon, _icon_x, _cy - 10, 1, 1, 0, c_white, _icon_alpha);
                 
-                draw_set_color(c_white); draw_set_alpha(ctrl.stats_popup_alpha);
+                draw_set_color(c_white); draw_set_alpha(ctrl.skills_popup_alpha);
                 draw_sprite_stretched(spr_target_bar, 0, _bar_x, _cy, _bar_w, _bar_h);
                 
                 var _val = 5;
@@ -103,9 +103,9 @@ function GuiModuleStats(_ctrl) constructor {
                 // Draw a subtle border if active tooltip is this stat
                 if (active_tooltip == i || _is_hover) {
                     draw_set_color(_s.color);
-                    draw_set_alpha(ctrl.stats_popup_alpha * 0.3);
+                    draw_set_alpha(ctrl.skills_popup_alpha * 0.3);
                     draw_roundrect_ext(_icon_x - 30, _cy - 12, _bar_x + _bar_w + 120, _cy + _bar_h + 10, 20, 20, true);
-                    draw_set_alpha(ctrl.stats_popup_alpha);
+                    draw_set_alpha(ctrl.skills_popup_alpha);
                 }
             }
             
@@ -115,7 +115,7 @@ function GuiModuleStats(_ctrl) constructor {
             var _cx_y  = _p_y + 5;         
             
             if (draw_gui_button(_cx_x - _cx_sz/2, _cx_y - _cx_sz/2, _cx_sz, _cx_sz, spr_panel_close, "", c_white, fnt_main, true)) {
-                ctrl.stats_popup_open = false;
+                ctrl.skills_popup_open = false;
             }
             
             // Tooltip Logic ----------------------------------------------------
@@ -172,7 +172,7 @@ function GuiModuleStats(_ctrl) constructor {
                  if (_ty + _th > _gui_h - 20) _ty = _gui_h - _th - 20;
                  
                  // Dibungkus Alpha Global & Hover
-                 draw_set_alpha(tooltip_alpha * ctrl.stats_popup_alpha);
+                 draw_set_alpha(tooltip_alpha * ctrl.skills_popup_alpha);
                  draw_set_color(C_DARKGRAY);
                  draw_roundrect_ext(_tx, _ty, _tx + _tw, _ty + _th, 16, 16, false);
                  
