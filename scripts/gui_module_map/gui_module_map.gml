@@ -21,9 +21,9 @@ function GuiModuleMap(_ctrl) constructor {
             var _mx = device_mouse_x_to_gui(0);
             var _my = device_mouse_y_to_gui(0);
             
-            var _board_size_px = 440;
-            var _header_h = 160;
-            var _edge_padding = 100;
+            var _board_size_px = 340; 
+            var _header_h = 120;
+            var _edge_padding = 80;
             var _p_w = _board_size_px + (_edge_padding * 2);
             var _p_h = _board_size_px + _header_h + _edge_padding;
             var _p_x = (_gui_w / 2) - (_p_w / 2);
@@ -80,9 +80,9 @@ function GuiModuleMap(_ctrl) constructor {
         draw_rectangle(0, 0, _gui_w, _gui_h, false);
         
         // --- DYNAMIC DIMENSIONS (Increased for Pawn clearance) ---
-        var _board_size_px = 440; 
-        var _header_h = 160; // More vertical space as requested
-        var _edge_padding = 100;
+        var _board_size_px = 340; 
+        var _header_h = 120; 
+        var _edge_padding = 80;
         
         var _p_w = _board_size_px + (_edge_padding * 2);
         var _p_h = _board_size_px + _header_h + _edge_padding;
@@ -115,7 +115,7 @@ function GuiModuleMap(_ctrl) constructor {
         if (_level_num == 3) _map_name = "Map World";
         
         var _title_x = _p_x + _p_w/2;
-        var _title_y = _p_y + 50;
+        var _title_y = _p_y + 25;
         
         draw_set_font(fnt_gui_button_large);
         draw_set_halign(fa_center); draw_set_valign(fa_top);
