@@ -12,10 +12,9 @@ player_cash   = 5000;
 stats = {
     money_management: 5, // index 0
     luck:             5, // index 1
-    agility:          5, // index 2
-    charisma:         5, // index 3
-    risk_tolerance:   5, // index 4
-    negotiation:      5  // index 5
+    charisma:         5, // index 2
+    risk_tolerance:   5, // index 3
+    negotiation:      5  // index 4
 };
 
 // ─── UTILS ───

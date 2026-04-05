@@ -57,12 +57,11 @@
 // ─── STAT CONFIGURATION ───
 // ==========================================
 // These match the image_index of spr_stats and provide styling data
-// 0: Money Management, 1: Luck, 2: Agility, 3: Charisma, 4: Risk Tolerance, 5: Negotiation
+// 0: Money Management, 1: Luck, 2: Charisma, 3: Risk Tolerance, 4: Negotiation
 
 global.stat_data = [
     { name: "Money Management", color: #F5B731, icon: 0, desc: "Improves your ability to handle cash, reducing fines and taxes." },
     { name: "Luck",             color: #E8365D, icon: 1, desc: "Higher chance of favorable outcomes from Fate cards and Casino." },
-    { name: "Agility",          color: #2ECC71, icon: 2, desc: "Increases your chance to dodge pitfalls and move faster." },
     { name: "Charisma",         color: #F39C12, icon: 3, desc: "Lowers the cost of buying properties and upgrades." },
     { name: "Risk Tolerance",   color: #E8365D, icon: 4, desc: "Higher rewards when taking dangerous paths or high-stakes bets." },
     { name: "Negotiation",      color: #40C8E0, icon: 5, desc: "Reduces rent you pay to others, and increases rent you collect." }
