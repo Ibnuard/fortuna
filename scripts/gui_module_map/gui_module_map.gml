@@ -84,87 +84,63 @@ function GuiModuleMap(_ctrl) constructor {
             
             // 2. Draw Active Tiles (Perimeter Logic)
             for (var i = 0; i < _total_tiles; i++) {
-                var _tx_grid = 0;
-                var _ty_grid = 0;
+                var _tx_grid = 0, _ty_grid = 0;
                 
                 // Continuous Perimeter Mapping
-                if (i < _edge_len) {
-                    _tx_grid = _edge_len - i;
-                    _ty_grid = _edge_len;
-                } else if (i < 2 * _edge_len) {
-                    _tx_grid = 0;
-                    _ty_grid = _edge_len - (i - _edge_len);
-                } else if (i < 3 * _edge_len) {
-                    _tx_grid = i - 2 * _edge_len;
-                    _ty_grid = 0;
-                } else {
-                    _tx_grid = _edge_len;
-                    _ty_grid = i - 3 * _edge_len;
-                }
+                if (i < _edge_len) { _tx_grid = _edge_len - i; _ty_grid = _edge_len; }
+                else if (i < 2 * _edge_len) { _tx_grid = 0; _ty_grid = _edge_len - (i - _edge_len); }
+                else if (i < 3 * _edge_len) { _tx_grid = i - 2 * _edge_len; _ty_grid = 0; }
+                else { _tx_grid = _edge_len; _ty_grid = i - 3 * _edge_len; }
                 
                 var _render_x = _bx + (_tx_grid * _tiles_px);
                 var _render_y = _by + (_ty_grid * _tiles_px);
                 
-                // --- TILE ASSETS ---
                 var _tile_data = obj_board.tiles[i];
                 var _tile_sprite = _tile_data.sprite;
+                var _scale_x = (_tiles_px - 8) / sprite_get_width(_tile_sprite);
+                var _scale_y = (_tiles_px - 8) / sprite_get_height(_tile_sprite);
                 
-                var _sw = sprite_get_width(_tile_sprite);
-                var _sh = sprite_get_height(_tile_sprite);
-                var _scale_x = (_tiles_px - 8) / _sw;
-                var _scale_y = (_tiles_px - 8) / _sh;
-                
-                // --- DROP SHADOW (Tile) ---
+                // Shadow
                 draw_set_color(c_black); draw_set_alpha(0.4 * ctrl.map_popup_alpha);
                 draw_rectangle(_render_x + 8, _render_y + 8, _render_x + _tiles_px, _render_y + _tiles_px, false);
                 
-                // --- MAIN TILE ---
+                // Tile
                 draw_set_alpha(ctrl.map_popup_alpha);
                 draw_sprite_ext(_tile_sprite, 0, _render_x + 4, _render_y + 4, _scale_x, _scale_y, 0, c_white, ctrl.map_popup_alpha);
                 
-                // --- Thicker Outline (Player Position Only) ---
+                // Active Tile Highlight (White Border)
                 if (i == obj_board.player_index) {
                     draw_set_color(c_white);
                     for (var _th = 0; _th < 4; _th++) {
                         draw_rectangle(_render_x + 2 + _th, _render_y + 2 + _th, _render_x + _tiles_px - 2 - _th, _render_y + _tiles_px - 2 - _th, true);
                     }
-                    
-                    // --- REFINED PAWN POSITIONING (Fix Centering for Top-Left Origin) ---
-                    var _psp = spr_pawn;
-                    var _psc = (_tiles_px * 0.55) / sprite_get_height(_psp); 
-                    
-                    // Actual size after scaling
-                    var _pw = sprite_get_width(_psp) * _psc;
-                    var _ph = sprite_get_height(_psp) * _psc;
-                    
-                    var _px = _render_x + (_tiles_px / 2);
-                    var _py = _render_y + (_tiles_px / 2);
-                    var _p_buffer = _tiles_px * 0.85; 
-                    
-                    // --- IDLE ANIMATION ---
-                    var _idle_y = sin(current_time * 0.005) * (8 * ctrl.map_popup_alpha);
-                    
-                    // Position outside based on edge
-                    if (i < _edge_len) { // Bottom
-                        _py += _p_buffer;
-                    } else if (i < 2 * _edge_len) { // Left
-                        _px -= _p_buffer;
-                    } else if (i < 3 * _edge_len) { // Top
-                        _py -= _p_buffer;
-                    } else { // Right
-                        _px += _p_buffer;
-                    }
-                    
-                    // Draw centered by subtracting half-width/height (since origin is 0,0)
-                    var _final_x = _px - (_pw / 2);
-                    var _final_y = _py - (_ph / 2) + _idle_y; // Apply idle animation
-                    
-                    // Pawn Shadow (stays on ground, no idle_y)
-                    draw_sprite_ext(_psp, 0, _final_x + 3, _final_y - _idle_y + 3, _psc, _psc, 0, c_black, 0.3 * ctrl.map_popup_alpha);
-                    // Pawn Main
-                    draw_sprite_ext(_psp, 0, _final_x, _final_y, _psc, _psc, 0, c_white, ctrl.map_popup_alpha);
                 }
             }
+            
+            // 3. Draw Pawn (Separate Pass for Depth)
+            var i = obj_board.player_index;
+            var _tx_grid = 0, _ty_grid = 0;
+            if (i < _edge_len) { _tx_grid = _edge_len - i; _ty_grid = _edge_len; }
+            else if (i < 2 * _edge_len) { _tx_grid = 0; _ty_grid = _edge_len - (i - _edge_len); }
+            else if (i < 3 * _edge_len) { _tx_grid = i - 2 * _edge_len; _ty_grid = 0; }
+            else { _tx_grid = _edge_len; _ty_grid = i - 3 * _edge_len; }
+            
+            var _px = _bx + (_tx_grid * _tiles_px) + (_tiles_px / 2);
+            var _py = _by + (_ty_grid * _tiles_px) + (_tiles_px / 2);
+            
+            var _psp = spr_pawn;
+            var _psc = (_tiles_px * 0.6) / sprite_get_height(_psp); // Smaller as requested
+            var _pw = sprite_get_width(_psp) * _psc;
+            var _ph = sprite_get_height(_psp) * _psc;
+            
+            var _idle_y = sin(current_time * 0.005) * (8 * ctrl.map_popup_alpha);
+            var _final_x = _px - (_pw / 2);
+            var _final_y = _py - _ph + _idle_y;
+            
+            // Shadow
+            draw_sprite_ext(_psp, 0, _final_x + 3, _final_y - _idle_y + 3, _psc, _psc, 0, c_black, 0.3 * ctrl.map_popup_alpha);
+            // Main
+            draw_sprite_ext(_psp, 0, _final_x, _final_y, _psc, _psc, 0, c_white, ctrl.map_popup_alpha);
         }
         
         draw_set_alpha(1.0);
