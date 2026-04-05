@@ -18,6 +18,7 @@ map_popup_alpha = 0.0;
 map_popup_y_slide = 100;
 
 can_interact_gui = true;
+active_tile_index = -1;
 animation_speed = 0.13; // Smoothness multiplier (closer to 0 is smoother/slower)
 
 // ─── INITIALIZATION OF MODULES (Controller-Struct Pattern) ───

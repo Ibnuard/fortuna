@@ -40,7 +40,13 @@ if (anim_active) {
         
         if (steps_remaining <= 0) {
             steps_remaining = 0;
-            show_debug_message("LAND DI TILE: " + string(player_index));
+            
+            // Trigger GUI Interaction
+            var _landed_tile = tiles[player_index];
+            if (_landed_tile.type == TileType.Property) {
+                obj_gui.active_tile_index = player_index;
+                obj_gui.gui_state         = "PROPERTY";
+            }
         }
     }
 }

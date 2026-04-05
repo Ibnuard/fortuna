@@ -51,141 +51,167 @@ function GuiModuleProperty(_ctrl) constructor {
     }
 
     static draw = function() {
-        var _fate_max = 6;
-        var _prop_max = 12;
-        var _fate_filled = 2;
-        var _prop_filled = 5;
+        if (property_y_offset > 795) return;
+        
+        var _gui_w = display_get_gui_width();
+        var _gui_h = display_get_gui_height();
+        var _mx    = device_mouse_x_to_gui(0);
+        var _my    = device_mouse_y_to_gui(0);
+        
+        // --- Overlay Background ---
+        var _overlay_alpha = lerp(0.5, 0, clamp(property_y_offset / 800, 0, 1));
+        draw_set_color(c_black);
+        draw_set_alpha(_overlay_alpha);
+        draw_rectangle(0, 0, _gui_w, _gui_h, false);
+        
+        // --- Panel Dimensions (Compact Look - Slightly taller for spacing) ---
+        var _p_w = 620;
+        var _p_h = 630;
+        var _p_x = (_gui_w / 2) - (_p_w / 2);
+        var _p_y = (_gui_h / 2) - (_p_h / 2) + property_y_offset;
+        
+        draw_set_alpha(1.0);
+        draw_sprite_stretched(spr_container, 0, _p_x, _p_y, _p_w, _p_h);
+        
+        // --- Title (Top) ---
+        draw_set_font(fnt_gui_button_large);
+        draw_set_halign(fa_center); draw_set_valign(fa_top);
+        draw_set_color(c_white);
+        draw_text(_p_x + _p_w/2, _p_y + 25, "Property");
+        
+        // --- Close Button ---
+        var _cx_sz = 64;
+        if (draw_gui_button(_p_x + _p_w - 5 - (_cx_sz/2), _p_y + 5 - (_cx_sz/2), _cx_sz, _cx_sz, spr_panel_close, "", c_white, fnt_main, true)) {
+            ctrl.gui_state = "MAIN";
+            ctrl.active_tile_index = -1;
+        }
 
-        var _card_spr = spr_card_placeholder;
-        var _card_scale = GUI_CARD_SCALE; 
-        var _card_w = sprite_get_width(_card_spr) * _card_scale;
-        var _card_h = sprite_get_height(_card_spr) * _card_scale;
-        var _card_gap = 16;
-        var _columns = clamp(max(_fate_max, _prop_max), 5, 6);
-        var _total_cards_w = (_card_w * _columns) + (_card_gap * max(0, _columns - 1));
-
-        var _prop_panel_w = _total_cards_w + 100; 
-        var _prop_panel_h = room_height * 0.7; 
-        var _prop_panel_x = room_width / 2 - (_prop_panel_w / 2);
-        var _submerged_amt = 150; 
-        var _prop_target_y = room_height - _prop_panel_h + _submerged_amt; 
-        var _prop_panel_y = _prop_target_y + property_y_offset;
-
-        if (property_y_offset < 790) {
-            var _overlay_alpha = lerp(0.4, 0, clamp(property_y_offset / 800, 0, 1));
-            draw_set_color(c_black);
-            draw_set_alpha(_overlay_alpha);
-            draw_rectangle(0, 0, room_width, room_height, false);
+        // --- Tile Interaction Content ---
+        if (instance_exists(obj_board) && ctrl.active_tile_index != -1) {
+            var _tiles = obj_board.tiles;
+            var _tile = _tiles[ctrl.active_tile_index];
+            
+            // 1. Render Tile Card (ENLARGED & REPOSITIONED)
+            var _card_scale = 1.5; // Gedein tile
+            var _card_w     = 130 * _card_scale;
+            var _card_h     = 182 * _card_scale;
+            var _card_x     = _p_x + (_p_w / 2) - (_card_w / 2);
+            var _card_y     = _p_y + 125; // 20% area gap
+            
+            // Base Card
+            draw_sprite_ext(_tile.sprite, 0, _card_x, _card_y, _card_scale, _card_scale, 0, c_white, 1);
+            
+            // Icon on Card
+            var _icon_sc = _card_scale * 0.75;
+            var _icon_w  = sprite_get_width(spr_tile_icons) * _icon_sc;
+            draw_sprite_ext(spr_tile_icons, _tile.type, _card_x + (_card_w/2) - (_icon_w/2), _card_y + (4 * _card_scale), _icon_sc, _icon_sc, 0, c_white, 1);
+            
+            // Name on Card
+            draw_set_font(fnt_main);
+            draw_set_halign(fa_center); draw_set_valign(fa_middle);
+            var _lbl_sc = 1.0 * _card_scale;
             draw_set_color(c_white);
+            draw_text_transformed(_card_x + _card_w/2, _card_y + (_card_h/2) + 12, string_upper(_tile.name), _lbl_sc, _lbl_sc, 0);
+            
+            // Price on Card Bottom
+            draw_set_valign(fa_middle);
+            var _price_str = obj_controller.format_money(_tile.price);
+            var _price_sc  = 0.9 * _card_scale;
+            draw_text_transformed(_card_x + _card_w/2, _card_y + _card_h - (22 * _card_scale), _price_str, _price_sc, _price_sc, 0);
+            
+            // 2. Info Text (Benefits)
+            var _info_y = _card_y + _card_h + 45; // 20% area gap
+            var _rent_val = _tile.rent;
+            var _phase_idx = clamp(_tile.building_level, 0, 2);
+            _rent_val = _tile.rent_table[_phase_idx];
+            
+            var _val_str = obj_controller.format_money(_rent_val);
+            var _psv_str = obj_controller.format_money(floor(_rent_val * 0.5));
+            
+            draw_set_halign(fa_center);
+            draw_set_font(fnt_main);
+            
+            // Income Row
+            var _income_str = "Income on Landing +" + _val_str;
+            draw_set_color(c_white); draw_set_alpha(1.0);
+            draw_text_transformed(_p_x + _p_w/2, _info_y, _income_str, 1.25, 1.25, 0);
+            
+            // Passive Income Row (Full Alpha as requested)
+            var _passive_str = "Income per Run +" + _psv_str;
+            draw_set_alpha(1.0); 
+            draw_text_transformed(_p_x + _p_w/2, _info_y + 35, _passive_str, 1.05, 1.05, 0);
             draw_set_alpha(1.0);
             
-            draw_sprite_stretched(spr_gui_bottom_container, 0, _prop_panel_x, _prop_panel_y, _prop_panel_w, _prop_panel_h);
+            // 3. Buttons (30% area margin from bottom)
+            var _btn_w = 150;
+            var _btn_h = 60;
+            var _btn_gap = 20;
+            var _btns_x_start = _p_x + (_p_w / 2) - ((_btn_w * 3 + _btn_gap * 2) / 2);
+            var _btn_y = _p_y + _p_h - 100;
             
-            var _close_scale = 0.65;
-            var _close_w = sprite_get_width(spr_panel_close) * _close_scale;
-            var _close_h = sprite_get_height(spr_panel_close) * _close_scale;
-            var _close_x = _prop_panel_x + _prop_panel_w - (_close_w * 0.7);
-            var _close_y = _prop_panel_y - (_close_h * 0.3);
+            var _is_owned = (_tile.owner != -1);
             
-            var _mx = device_mouse_x_to_gui(0);
-            var _my = device_mouse_y_to_gui(0);
-            var _close_hover = point_in_rectangle(_mx, _my, _close_x, _close_y, _close_x + _close_w, _close_y + _close_h);
-            var _close_pressed = _close_hover && mouse_check_button(mb_left);
-            
-            if (_close_hover) {
-                if (mouse_check_button_pressed(mb_left)) is_dragging_panel = false;
-                if (mouse_check_button_released(mb_left)) ctrl.gui_state = "MAIN";
-            }
-            
-            var _draw_scale = _close_scale;
-            var _draw_x = _close_x;
-            var _draw_y = _close_y;
-            if (_close_pressed) {
-                _draw_scale = _close_scale * 0.9;
-                var _shrink_w = _close_w - (sprite_get_width(spr_panel_close) * _draw_scale);
-                var _shrink_h = _close_h - (sprite_get_height(spr_panel_close) * _draw_scale);
-                _draw_x += _shrink_w / 2;
-                _draw_y += _shrink_h / 2;
-            }
-            
-            draw_sprite_ext(spr_panel_close, 0, _draw_x, _draw_y, _draw_scale, _draw_scale, 0, c_white, 1);
-            if (_close_hover && !_close_pressed) {
-                gpu_set_blendmode(bm_add);
-                draw_sprite_ext(spr_panel_close, 0, _draw_x, _draw_y, _draw_scale, _draw_scale, 0, c_white, 0.25);
-                gpu_set_blendmode(bm_normal);
-            }
-            
-            var _inner_w = _total_cards_w;
-            var _inner_h = _prop_panel_h - _submerged_amt - 100; 
-            var _inner_x = _prop_panel_x + 50; 
-            var _inner_y = _prop_panel_y + 50; 
-            
-            if (_inner_w > 0 && _inner_h > 0) {
-                if (!surface_exists(surf_panel)) {
-                    surf_panel = surface_create(_inner_w, _inner_h);
-                } else if (surface_get_width(surf_panel) != _inner_w || surface_get_height(surf_panel) != _inner_h) {
-                    surface_free(surf_panel);
-                    surf_panel = surface_create(_inner_w, _inner_h);
+            if (!_is_owned) {
+                // --- UNOWNED: BUY (Orange) | SKIP (Red) | NEGO (Blue) ---
+                // Button 1: BUY
+                var _can_buy = (obj_controller.player_cash >= _tile.price);
+                if (draw_gui_button(_btns_x_start, _btn_y, _btn_w, _btn_h, spr_button_orange, "Buy", c_white, fnt_main, _can_buy)) {
+                    obj_controller.player_cash -= _tile.price;
+                    _tile.owner = 0; 
+                    ctrl.gui_state = "MAIN";
+                    ctrl.active_tile_index = -1;
                 }
                 
-                surface_set_target(surf_panel);
-                draw_clear_alpha(c_black, 0);
+                // Button 2: SKIP (Price Penalty)
+                if (draw_gui_button(_btns_x_start + _btn_w + _btn_gap, _btn_y, _btn_w, _btn_h, spr_button_red, "Skip", c_white, fnt_main, true)) {
+                    _tile.price = floor(_tile.price * 1.25); // 25% price hike
+                    ctrl.gui_state = "MAIN";
+                    ctrl.active_tile_index = -1;
+                }
+
+                // Button 3: NEGO (Locked by Skills)
+                var _can_nego = (obj_controller.stats.charisma >= 5 && obj_controller.stats.negotiation >= 5);
+                var _nego_price = floor(_tile.price * 0.65); // 35% discount
+                if (draw_gui_button(_btns_x_start + (_btn_w + _btn_gap) * 2, _btn_y, _btn_w, _btn_h, spr_button_blue, "Nego", c_white, fnt_main, _can_nego && obj_controller.player_cash >= _nego_price)) {
+                    obj_controller.player_cash -= _nego_price;
+                    _tile.owner = 0;
+                    ctrl.gui_state = "MAIN";
+                    ctrl.active_tile_index = -1;
+                }
+            } else {
+                // --- OWNED: UPGRADE (Orange) | SELL (Red) | SKIP (Blue) ---
+                // Button 1: UPGRADE
+                var _can_up = (_tile.building_level < 2);
+                var _up_cost = floor(_tile.price * 0.75);
+                var _up_label = (_tile.building_level == 0) ? "House" : "Hotel";
+                if (_tile.building_level == 2) _up_label = "MAX";
                 
-                var _draw_cursor_y = -panel_scroll_y; 
-                draw_set_font(fnt_main);
-                draw_set_halign(fa_center);
-                draw_set_valign(fa_middle);
-                var _text_x = _inner_w / 2;
-                var _origin_x = sprite_get_xoffset(_card_spr) * _card_scale;
-                var _origin_y = sprite_get_yoffset(_card_spr) * _card_scale;
-                
-                _draw_cursor_y += 15; 
-                var _fate_str = "Fate Cards (" + string(_fate_filled) + "/" + string(_fate_max) + ")";
-                draw_set_color(c_black); draw_set_alpha(0.3); draw_text(_text_x + 2, _draw_cursor_y + 3, _fate_str);
-                draw_set_color(c_white); draw_set_alpha(1.0); draw_text(_text_x, _draw_cursor_y, _fate_str);
-                _draw_cursor_y += 25 + _origin_y; 
-                
-                for (var i = 0; i < _fate_max; i++) {
-                    var _col = i mod _columns;
-                    var _row = i div _columns;
-                    var _cx = (_col * (_card_w + _card_gap)) + _origin_x;
-                    var _cy = _draw_cursor_y + (_row * (_card_h + _card_gap));
-                    draw_sprite_ext(_card_spr, 0, _cx, _cy, _card_scale, _card_scale, 0, c_white, 1);
+                if (draw_gui_button(_btns_x_start, _btn_y, _btn_w, _btn_h, spr_button_orange, _up_label, c_white, fnt_main, _can_up && obj_controller.player_cash >= _up_cost)) {
+                    obj_controller.player_cash -= _up_cost;
+                    _tile.building_level++;
+                    ctrl.gui_state = "MAIN";
+                    ctrl.active_tile_index = -1;
                 }
                 
-                var _fate_rows = ceil(_fate_max / _columns);
-                _draw_cursor_y += (_fate_rows * (_card_h + _card_gap)) - _origin_y;
-                
-                _draw_cursor_y += 20; 
-                var _prop_str = "Properties (" + string(_prop_filled) + "/" + string(_prop_max) + ")";
-                draw_set_color(c_black); draw_set_alpha(0.3); draw_text(_text_x + 2, _draw_cursor_y + 3, _prop_str);
-                draw_set_color(c_white); draw_set_alpha(1.0); draw_text(_text_x, _draw_cursor_y, _prop_str);
-                _draw_cursor_y += 25 + _origin_y; 
-                
-                for (var i = 0; i < _prop_max; i++) {
-                    var _col = i mod _columns;
-                    var _row = i div _columns;
-                    var _cx = (_col * (_card_w + _card_gap)) + _origin_x;
-                    var _cy = _draw_cursor_y + (_row * (_card_h + _card_gap));
-                    draw_sprite_ext(_card_spr, 0, _cx, _cy, _card_scale, _card_scale, 0, c_white, 1);
+                // Button 2: SELL
+                if (draw_gui_button(_btns_x_start + _btn_w + _btn_gap, _btn_y, _btn_w, _btn_h, spr_button_red, "Sell", c_white, fnt_main, true)) {
+                    obj_controller.player_cash += floor(_tile.price * 0.85); // 85% back
+                    _tile.owner = -1;
+                    _tile.building_level = 0;
+                    ctrl.gui_state = "MAIN";
+                    ctrl.active_tile_index = -1;
                 }
-                
-                var _prop_rows = ceil(_prop_max / _columns);
-                _draw_cursor_y += (_prop_rows * (_card_h + _card_gap)) - _origin_y;
-                _draw_cursor_y += 15; 
-                
-                surface_reset_target();
-                draw_surface(surf_panel, _inner_x, _inner_y);
-                
-                var _total_content_height = (_draw_cursor_y + panel_scroll_y); 
-                if (_total_content_height > _inner_h) {
-                    panel_max_scroll = _total_content_height - _inner_h;
-                } else {
-                    panel_max_scroll = 0;
+
+                // Button 3: SKIP (Get Income)
+                if (draw_gui_button(_btns_x_start + (_btn_w + _btn_gap) * 2, _btn_y, _btn_w, _btn_h, spr_button_blue, "Income", c_white, fnt_main, true)) {
+                    obj_controller.player_cash += floor(_rent_val * 0.4); // 40% income on pass
+                    ctrl.gui_state = "MAIN";
+                    ctrl.active_tile_index = -1;
                 }
-                draw_set_halign(fa_left); draw_set_valign(fa_top);
             }
         }
+        
+        draw_set_halign(fa_left); draw_set_valign(fa_top);
     }
 
     static cleanup = function() {
