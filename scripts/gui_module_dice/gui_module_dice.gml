@@ -258,7 +258,7 @@ function GuiModuleDice(_ctrl) constructor {
                 var _side_left_y = _popup_y + ((_dh_base + (2 * _margin)) / 2) - (_side_h / 2); 
                 
                 if (draw_gui_button(_side_left_x, _side_left_y, _side_w, _side_h, spr_button_main, "View Map", c_white, fnt_main, true)) {
-                    show_debug_message("Action: View Map");
+                    ctrl.map_popup_open = true;
                 }
                 
                 var _side_right_total_h = (2 * _side_h) + _side_gap;

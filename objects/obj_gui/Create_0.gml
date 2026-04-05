@@ -9,6 +9,10 @@ stats_popup_open  = false;
 stats_popup_alpha = 0.0;
 stats_popup_y_slide = 100;
 
+map_popup_open  = false;
+map_popup_alpha = 0.0;
+map_popup_y_slide = 100;
+
 can_interact_gui = true;
 animation_speed = 0.13; // Smoothness multiplier (closer to 0 is smoother/slower)
 
@@ -23,3 +27,4 @@ mod_property = new GuiModuleProperty(id);
 mod_confirm  = new GuiModuleConfirm(id);
 mod_dice     = new GuiModuleDice(id);
 mod_stats    = new GuiModuleStats(id);
+mod_map      = new GuiModuleMap(id);

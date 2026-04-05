@@ -24,8 +24,9 @@ mod_dice.draw();
 // 7. CONFIRM ANIMATION
 mod_confirm.draw();
 
-// 8. STATS POPUP
+// 8. POPUPS (Stats & Map)
 mod_stats.draw();
+mod_map.draw();
 
 // 9. SHADER: SCANLINES ONLY (On top of everyone except particles)
 mod_fx.draw_scanline();
