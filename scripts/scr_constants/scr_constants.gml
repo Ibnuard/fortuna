@@ -19,8 +19,8 @@
 #macro GUI_BTN_SM_H    56
 
 // Bottom Panel Dimensions
-#macro GUI_BTN_MAIN_W  320
-#macro GUI_BTN_MAIN_H  90
+#macro GUI_BTN_MAIN_W  360
+#macro GUI_BTN_MAIN_H  100
 #macro GUI_BTN_SIDE_W  240
 #macro GUI_BTN_SIDE_H  90
 #macro GUI_BTN_GAP     24

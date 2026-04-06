@@ -24,10 +24,10 @@ function GuiModuleBottom(_ctrl) constructor {
         }
         
         var _spd = 0.10;
-        if (ctrl.mod_topbar.intro_timer > 20) { stagger_turn_badge = lerp(stagger_turn_badge, 0, _spd); }
-        if (ctrl.mod_topbar.intro_timer > 30) { stagger_btn_center = lerp(stagger_btn_center, 0, _spd); }
-        if (ctrl.mod_topbar.intro_timer > 35) { stagger_btn_left   = lerp(stagger_btn_left,   0, _spd); }
-        if (ctrl.mod_topbar.intro_timer > 38) { stagger_btn_right  = lerp(stagger_btn_right,  0, _spd); }
+        if (ctrl.mod_topbar.intro_timer > 15) { stagger_turn_badge = lerp(stagger_turn_badge, 0, _spd); }
+        if (ctrl.mod_topbar.intro_timer > 20) { stagger_btn_center = lerp(stagger_btn_center, 0, _spd); }
+        if (ctrl.mod_topbar.intro_timer > 25) { stagger_btn_left   = lerp(stagger_btn_left,   0, _spd); }
+        if (ctrl.mod_topbar.intro_timer > 30) { stagger_btn_right  = lerp(stagger_btn_right,  0, _spd); }
 
         // Update Dynamic Width (Super Fast Lerp)
         var _target_w = (ctrl.gui_state == "MOVING") ? panel_width_mini : panel_width_full;
@@ -68,7 +68,7 @@ function GuiModuleBottom(_ctrl) constructor {
         var _badge_w = 200;
         var _badge_h = 80;
         var _badge_x = _gui_w / 2;
-        var _badge_y = _panel_draw_y - 2 + stagger_turn_badge;
+        var _badge_y = _panel_draw_y - 20 + stagger_turn_badge; // Moved 18px higher
 
         draw_set_alpha(1.0);
         draw_sprite_ext(spr_container, 0, _badge_x, _badge_y + 10, _badge_w/200, _badge_h/100, _badge_angle, c_white, 1);
@@ -178,11 +178,11 @@ function GuiModuleBottom(_ctrl) constructor {
         
         if (ctrl.gui_state == "MAIN" || _f_main > 0) {
             if (_f_main > 0.1) {
-                if (draw_gui_button(_left_x, _main_y + stagger_btn_left, GUI_BTN_SIDE_W, GUI_BTN_SIDE_H, spr_button_red, "Inventory", c_white, fnt_gui_button_medium, ctrl.can_interact_gui)) {
-                    // TBD: Open Inventory instead of Property interaction
+                if (draw_gui_button(_left_x, _main_y + stagger_btn_left, GUI_BTN_SIDE_W, GUI_BTN_SIDE_H, spr_button_red, "Property", c_white, fnt_gui_button_medium, ctrl.can_interact_gui)) {
+                    // TBD: Open Property interaction
                 }
 
-                var _roll_y = _main_y + stagger_btn_center;
+                var _roll_y = _main_y + stagger_btn_center - 5; // Slightly higher to accommodate larger size
                 if (draw_gui_button(_center_x, _roll_y, GUI_BTN_MAIN_W, GUI_BTN_MAIN_H, spr_button_main, "", c_white, fnt_gui_button_medium, ctrl.can_interact_gui)) {
                     if (ctrl.gui_state == "MAIN") {
                         ctrl.gui_state = "DICE";
@@ -222,7 +222,7 @@ function GuiModuleBottom(_ctrl) constructor {
                     _cx += _ch_w;
                 }
                 
-                draw_gui_button(_right_x, _main_y + stagger_btn_right, GUI_BTN_SIDE_W, GUI_BTN_SIDE_H, spr_button_blue, "Shop", c_white, fnt_gui_button_medium, ctrl.can_interact_gui);
+                draw_gui_button(_right_x, _main_y + stagger_btn_right, GUI_BTN_SIDE_W, GUI_BTN_SIDE_H, spr_button_purple, "Fate Card", c_white, fnt_gui_button_medium, ctrl.can_interact_gui);
             }
         }
     }

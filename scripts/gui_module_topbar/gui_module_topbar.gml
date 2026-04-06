@@ -138,8 +138,9 @@ function GuiModuleTopbar(_ctrl) constructor {
             // Options/Pause click logic here
         }
 
-        // Left of Pause: Map Button (Orange)
-        var _map_top_x = _pause_x - _inner_gap - _sm_btn_w;
+        // Left of Pause: Map Button (Orange) with increased gap
+        var _gap_size = 24; // Increased gap between map and pause buttons
+        var _map_top_x = _pause_x - _gap_size - _sm_btn_w;
         if (draw_gui_button(_map_top_x, _top_btn_y, _sm_btn_w, _sm_btn_h, spr_button_orange, "Map", c_white, fnt_main, ctrl.can_interact_gui)) {
             ctrl.map_popup_open = true;
         }
