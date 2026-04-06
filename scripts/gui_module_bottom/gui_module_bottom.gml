@@ -179,7 +179,7 @@ function GuiModuleBottom(_ctrl) constructor {
         if (ctrl.gui_state == "MAIN" || _f_main > 0) {
             if (_f_main > 0.1) {
                 if (draw_gui_button(_left_x, _main_y + stagger_btn_left, GUI_BTN_SIDE_W, GUI_BTN_SIDE_H, spr_button_red, "Inventory", c_white, fnt_gui_button_medium, ctrl.can_interact_gui)) {
-                    ctrl.gui_state = "PROPERTY";
+                    // TBD: Open Inventory instead of Property interaction
                 }
 
                 var _roll_y = _main_y + stagger_btn_center;

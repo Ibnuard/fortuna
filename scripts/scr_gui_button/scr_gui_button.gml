@@ -19,27 +19,28 @@ function draw_gui_button(_x, _y, _w, _h, _sprite, _text, _text_color = c_white, 
     var _pressed = _hover && mouse_check_button(mb_left);
     var _clicked = _hover && mouse_check_button_released(mb_left);
     
-    // JUICE: Float up on hover
+    // JUICE: Float up on hover (SUBTLE: 3px)
     if (_hover && !_pressed) {
-        _y -= 6; // Angkat tombol sedikit ke atas
+        _y -= 3; 
     }
     
     // JUICE: Dip in on press
     if (_pressed) {
         var _squash = 2;
-        _y += _squash; // Turunkan atap tombol
-        _h -= _squash; // Penyet tingginya sehingga 9-slice tertekan
+        _y += _squash; 
+        _h -= _squash; 
+    }
+
+    // -- DRAWING PASSES --
+    
+    // JUICE: Subtler Drop Shadow on hover (Drawn before the button)
+    if (_hover && !_pressed) {
+        var _shd_off = 4; // Subtler offset
+        draw_sprite_stretched_ext(_sprite, 0, _x + _shd_off, _y + _shd_off + 3, _w, _h, c_black, 0.25);
     }
 
     // Draw the button stretched
     draw_sprite_stretched(_sprite, 0, _x, _y, _w, _h);
-    
-    // JUICE: Glow on hover
-    if (_hover && !_pressed) {
-        gpu_set_blendmode(bm_add);
-        draw_sprite_ext(_sprite, 0, _x, _y, _w / sprite_get_width(_sprite), _h / sprite_get_height(_sprite), 0, c_white, 0.15);
-        gpu_set_blendmode(bm_normal);
-    }
     
     // Set text properties
     draw_set_font(_font);
@@ -47,16 +48,12 @@ function draw_gui_button(_x, _y, _w, _h, _sprite, _text, _text_color = c_white, 
     draw_set_valign(fa_middle);
     
     var _text_x = _x + (_w / 2);
-    
-    // Calculate the exact center of the top "face" area 
-    // (nine-slice preserves a bottom 3D border, so we subtract to find the true vertical face center)
     var _face_h = _h - 16;
     var _text_y = _y + (_face_h / 2);
     
-    // Drop shadow
-    draw_set_color(c_black);
-    draw_set_alpha(0.3);
-    draw_text(_text_x + 3, _text_y + 4, _text);
+    // Text shadow
+    draw_set_color(c_black); draw_set_alpha(0.3);
+    draw_text(_text_x + 2, _text_y + 3, _text);
     draw_set_alpha(1.0);
     
     // Main text

@@ -121,31 +121,27 @@ function GuiModuleTopbar(_ctrl) constructor {
     }
     
     static draw_buttons = function() {
+        var _gui_w = display_get_gui_width();
         
-        var _pad_x = GUI_PAD_X; 
-        var _map_btn_w = GUI_BTN_MAP_W; 
-        var _map_btn_h = GUI_BTN_MAP_H;  
-        var _sm_btn_w = GUI_BTN_SM_W;
-        var _sm_btn_h = GUI_BTN_SM_H;
+        var _pad_x     = GUI_PAD_X; 
+        var _sm_btn_w  = GUI_BTN_SM_W;
+        var _sm_btn_h  = GUI_BTN_SM_H;
         var _inner_gap = 12;
 
-        var _map_btn_x = _pad_x; 
-        var _map_btn_y = top_y_offset + (GUI_TOPBAR_H / 2) - (_map_btn_h / 2) + stagger_option;
-        draw_gui_button(_map_btn_x, _map_btn_y, _map_btn_w, _map_btn_h, spr_button_main, "Option", c_white, fnt_main, ctrl.can_interact_gui);
+        // --- NEW LAYOUT: [MAP] [PAUSE] ---
+        // Far Right: Pause Button (Sprite only)
+        var _pause_w     = 56; // Square pause button
+        var _pause_x     = _gui_w - _pad_x - _pause_w;
+        var _top_btn_y   = top_y_offset + (GUI_TOPBAR_H / 2) - (_sm_btn_h / 2) + stagger_map_stat;
+        
+        if (draw_gui_button(_pause_x, _top_btn_y, _pause_w, _sm_btn_h, spr_button_pause, "", c_white, fnt_main, ctrl.can_interact_gui)) {
+            // Options/Pause click logic here
+        }
 
-        var _stats_btn_x = room_width - _pad_x - _sm_btn_w;
-        var _skills_btn_x = _stats_btn_x - _inner_gap - _sm_btn_w;
-        var _map_top_x  = _skills_btn_x - _inner_gap - _sm_btn_w;
-        var _top_btn_y  = top_y_offset + (GUI_TOPBAR_H / 2) - (_sm_btn_h / 2) + stagger_map_stat;
-
-        if (draw_gui_button(_map_top_x, _top_btn_y, _sm_btn_w, _sm_btn_h, spr_button_emerald, "Map", c_white, fnt_main, ctrl.can_interact_gui)) {
+        // Left of Pause: Map Button (Orange)
+        var _map_top_x = _pause_x - _inner_gap - _sm_btn_w;
+        if (draw_gui_button(_map_top_x, _top_btn_y, _sm_btn_w, _sm_btn_h, spr_button_orange, "Map", c_white, fnt_main, ctrl.can_interact_gui)) {
             ctrl.map_popup_open = true;
-        }
-        if (draw_gui_button(_skills_btn_x, _top_btn_y, _sm_btn_w, _sm_btn_h, spr_button_purple, "Skills", c_white, fnt_main, ctrl.can_interact_gui)) {
-            ctrl.skills_popup_open = true;
-        }
-        if (draw_gui_button(_stats_btn_x, _top_btn_y, _sm_btn_w, _sm_btn_h, spr_button_orange, "Stats", c_white, fnt_main, ctrl.can_interact_gui)) {
-            ctrl.stats_popup_open = true;
         }
     }
     
