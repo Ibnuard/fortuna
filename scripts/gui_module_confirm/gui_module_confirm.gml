@@ -243,13 +243,13 @@ function GuiModuleConfirm(_ctrl) constructor {
             var _ca_base_py = (_gui_h / 2) - (_ca_total_h / 2);
 
             if (confirm_phase == 1) {
-                draw_sprite_stretched(spr_dice_container, 0, _ca_popup_x, _ca_base_py, _ca_total_w, _ca_total_h);
+                draw_sprite_stretched(spr_container, 0, _ca_popup_x, _ca_base_py, _ca_total_w, _ca_total_h);
                 for (var f = 0; f < 2; f++) {
                     _draw_dice_gold(spr_dice, confirm_fly_values[f], confirm_dice_init_x[f], confirm_dice_init_y[f], _ca_scale, 1.0);
                 }
             }
             if (confirm_phase == 2) {
-                draw_sprite_stretched(spr_dice_container, 0, _ca_popup_x, _ca_base_py, _ca_total_w, _ca_total_h);
+                draw_sprite_stretched(spr_container, 0, _ca_popup_x, _ca_base_py, _ca_total_w, _ca_total_h);
                 var _t2 = clamp(confirm_hover_frame / 12, 0, 1);
                 var _t2e = 1.0 - power(1.0 - _t2, 3.0); 
                 for (var f = 0; f < 2; f++) {
@@ -261,7 +261,7 @@ function GuiModuleConfirm(_ctrl) constructor {
             if (confirm_phase == 3) {
                 var _panel_y = _ca_base_py + confirm_panel_y_bonus;
                 draw_set_alpha(confirm_panel_alpha);
-                draw_sprite_stretched(spr_dice_container, 0, _ca_popup_x, _panel_y, _ca_total_w, _ca_total_h);
+                draw_sprite_stretched(spr_container, 0, _ca_popup_x, _panel_y, _ca_total_w, _ca_total_h);
                 draw_set_alpha(1.0);
                 var _bob = sin(current_time / 280) * 5;
                 for (var f = 0; f < 2; f++) {

@@ -46,11 +46,15 @@ function GuiModuleBottom(_ctrl) constructor {
     static draw_panel = function() {
          
          
+        var _gui_w = display_get_gui_width();
+        var _gui_h = display_get_gui_height();
+        
         var _panel_w = panel_width_current; 
         var _panel_h = GUI_PANEL_H;
-        var _target_y = 855; 
+        // Calculation: Push below the screen edge so rounded corners are hidden
+        var _target_y = _gui_h - _panel_h + 15; 
         var _panel_draw_y = _target_y + bottom_y_offset;
-        var _panel_x = room_width / 2 - (_panel_w / 2);
+        var _panel_x = _gui_w / 2 - (_panel_w / 2);
 
         draw_sprite_stretched(spr_gui_bottom_container, 0, _panel_x, _panel_draw_y, _panel_w, _panel_h);
 
@@ -63,7 +67,7 @@ function GuiModuleBottom(_ctrl) constructor {
         var _badge_angle = 0;
         var _badge_w = 200;
         var _badge_h = 80;
-        var _badge_x = room_width / 2;
+        var _badge_x = _gui_w / 2;
         var _badge_y = _panel_draw_y - 2 + stagger_turn_badge;
 
         draw_set_alpha(1.0);
@@ -115,14 +119,17 @@ function GuiModuleBottom(_ctrl) constructor {
         
          
         
+        var _gui_w = display_get_gui_width();
+        var _gui_h = display_get_gui_height();
+        
         var _gap = GUI_BTN_GAP; 
         var _panel_h = GUI_PANEL_H;
-        var _target_y = 855; 
+        var _target_y = _gui_h - _panel_h + 15; 
         var _panel_draw_y = _target_y + bottom_y_offset;
 
         var _mid_y = _panel_draw_y + (_panel_h / 2) - 10; 
         var _main_y = _mid_y - (GUI_BTN_MAIN_H / 2);
-        var _center_x = room_width / 2 - (GUI_BTN_MAIN_W / 2);
+        var _center_x = _gui_w / 2 - (GUI_BTN_MAIN_W / 2);
         var _left_x   = _center_x - _gap - GUI_BTN_SIDE_W;
         var _right_x  = _center_x + GUI_BTN_MAIN_W + _gap;
 
@@ -133,11 +140,11 @@ function GuiModuleBottom(_ctrl) constructor {
         if (ctrl.gui_state == "MOVING" || _f_mov > 0) {
             var _box_w = panel_width_current - 60; 
             var _box_h = 100;
-            var _box_x = room_width / 2 - (_box_w / 2);
+            var _box_x = _gui_w / 2 - (_box_w / 2);
             var _box_y = _mid_y - (_box_h / 2);
             
             draw_set_alpha(_f_mov);
-            draw_sprite_stretched(spr_dice_container, 0, _box_x, _box_y, _box_w, _box_h);
+            draw_sprite_stretched(spr_container, 0, _box_x, _box_y, _box_w, _box_h);
             
             if (instance_exists(obj_board) && _f_mov > 0.2) {
                 draw_set_font(fnt_gui_button_large);

@@ -95,12 +95,12 @@ function GuiModuleProperty(_ctrl) constructor {
             var _card_scale = 1.5; 
             var _card_w     = 130 * _card_scale;
             var _card_h     = 182 * _card_scale;
-            var _card_x     = _p_x + (_p_w / 2) - (_card_w / 2);
             
-            // Floating Logic
-            var _float_y    = sin(current_time * 0.003) * 8; // Smooth 8px float
-            var _card_y_base = _p_y + 125;
-            var _card_y     = _card_y_base + _float_y; // 20% area gap
+            // Floating Logic (Idle Animation)
+            var _float_y    = sin(current_time * 0.003) * 8; 
+            var _card_y_base = floor(_p_y + 140); // 20% area gap
+            var _card_x     = floor(_p_x + (_p_w / 2) - (_card_w / 2));
+            var _card_y     = floor(_card_y_base + _float_y);
             
             // Drop Shadow (Drawn first)
             var _shd_off = 12;
@@ -112,40 +112,43 @@ function GuiModuleProperty(_ctrl) constructor {
             // Icon on Card
             var _icon_sc = _card_scale * 0.75;
             var _icon_w  = sprite_get_width(spr_tile_icons) * _icon_sc;
-            draw_sprite_ext(spr_tile_icons, _tile.type, _card_x + (_card_w/2) - (_icon_w/2), _card_y + (4 * _card_scale), _icon_sc, _icon_sc, 0, c_white, 1);
+            draw_sprite_ext(spr_tile_icons, _tile.type, floor(_card_x + (_card_w/2) - (_icon_w/2)), floor(_card_y + (4 * _card_scale)), _icon_sc, _icon_sc, 0, c_white, 1);
             
             // Name on Card
             draw_set_font(fnt_main);
             draw_set_halign(fa_center); draw_set_valign(fa_middle);
             var _lbl_sc = 1.0 * _card_scale;
             draw_set_color(c_white);
-            draw_text_transformed(_card_x + _card_w/2, _card_y + (_card_h/2) + 12, string_upper(_tile.name), _lbl_sc, _lbl_sc, 0);
+            draw_text_transformed(floor(_card_x + _card_w/2), floor(_card_y + (_card_h/2) + 12), string_upper(_tile.name), _lbl_sc, _lbl_sc, 0);
             
             // Price on Card Bottom
             draw_set_valign(fa_middle);
             var _price_str = obj_controller.format_money(_tile.price);
             var _price_sc  = 0.9 * _card_scale;
-            draw_text_transformed(_card_x + _card_w/2, _card_y + _card_h - (22 * _card_scale), _price_str, _price_sc, _price_sc, 0);
+            draw_text_transformed(floor(_card_x + _card_w/2), floor(_card_y + _card_h - (22 * _card_scale)), _price_str, _price_sc, _price_sc, 0);
             
             // 2. Info Text (Benefits - STATIC POSITION)
-            var _info_y = _card_y_base + _card_h + 45; // Gap (~20%)
+            var _info_y = floor(_card_y_base + _card_h + 55); // More gap
+            var _level   = _tile.building_level;
             var _rent_val = _tile.rent;
-            var _phase_idx = clamp(_tile.building_level, 0, 2);
+            var _phase_idx = clamp(_level, 0, 2);
             _rent_val = _tile.rent_table[_phase_idx];
             
             var _val_str = obj_controller.format_money(_rent_val);
             var _psv_str = obj_controller.format_money(floor(_rent_val * 0.5));
+            if (_level > 0) _psv_str += "/run";
             
             draw_set_font(fnt_main);
             
-            // Income on Landing (Gold Value)
+            // Income on Landing (Labels: White, Values: Gold + Large)
             var _inc_lbl = "Income on Landing ";
-            var _inc_lbl_sc = 1.15;
-            var _inc_val_sc = 1.5;
+            var _inc_lbl_sc = 1.1;
+            var _inc_val_sc = 1.65; // Extra Large
+            
             var _inc_lbl_w = string_width(_inc_lbl) * _inc_lbl_sc;
             var _inc_val_w = string_width(_val_str) * _inc_val_sc;
             var _inc_total_w = _inc_lbl_w + _inc_val_w;
-            var _inc_x = (_p_x + _p_w/2) - (_inc_total_w/2);
+            var _inc_x = floor((_p_x + _p_w/2) - (_inc_total_w/2));
             
             draw_set_halign(fa_left); draw_set_valign(fa_middle);
             draw_set_color(c_white);
@@ -153,19 +156,20 @@ function GuiModuleProperty(_ctrl) constructor {
             draw_set_color(C_MAIN_GOLD);
             draw_text_transformed(_inc_x + _inc_lbl_w, _info_y, _val_str, _inc_val_sc, _inc_val_sc, 0);
             
-            // Income per Run (Gold Value)
+            // Income per Run (Labels: White, Values: Gold + Large)
             var _run_lbl = "Income per Run ";
             var _run_lbl_sc = 0.95;
-            var _run_val_sc = 1.35;
+            var _run_val_sc = 1.4; // Large
+            
             var _run_lbl_w = string_width(_run_lbl) * _run_lbl_sc;
             var _run_val_w = string_width(_psv_str) * _run_val_sc;
             var _run_total_w = _run_lbl_w + _run_val_w;
-            var _run_x = (_p_x + _p_w/2) - (_run_total_w/2);
+            var _run_x = floor((_p_x + _p_w/2) - (_run_total_w/2));
             
             draw_set_color(c_white);
-            draw_text_transformed(_run_x, _info_y + 40, _run_lbl, _run_lbl_sc, _run_lbl_sc, 0);
+            draw_text_transformed(_run_x, _info_y + 44, _run_lbl, _run_lbl_sc, _run_lbl_sc, 0);
             draw_set_color(C_MAIN_GOLD);
-            draw_text_transformed(_run_x + _run_lbl_w, _info_y + 40, _psv_str, _run_val_sc, _run_val_sc, 0);
+            draw_text_transformed(_run_x + _run_lbl_w, _info_y + 44, _psv_str, _run_val_sc, _run_val_sc, 0);
             
             // 3. Buttons (30% area margin from bottom)
             var _btn_w = 150;

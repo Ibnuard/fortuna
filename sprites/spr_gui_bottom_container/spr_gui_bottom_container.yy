@@ -24,7 +24,7 @@
   "name":"spr_gui_bottom_container",
   "nineSlice":{
     "$GMNineSliceData":"",
-    "bottom":0,
+    "bottom":30,
     "enabled":true,
     "guideColour":[4294902015,4294902015,4294902015,4294902015,],
     "highlightColour":1728023040,

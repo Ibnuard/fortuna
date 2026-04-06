@@ -111,7 +111,7 @@ function GuiModuleDice(_ctrl) constructor {
             var _popup_x = (_gui_w / 2) - (_total_w / 2);
             var _popup_y = (_gui_h / 2) - (_total_h / 2) + dice_pop_y;
             
-            draw_sprite_stretched(spr_dice_container, 0, _popup_x, _popup_y, _total_w, _total_h);
+            draw_sprite_stretched(spr_container, 0, _popup_x, _popup_y, _total_w, _total_h);
             
             var _is_rolling = (dice_phase == "ROLLING");
             var _shake_raw = (_is_rolling ? 6 : 0) + dice_shake_mag;
