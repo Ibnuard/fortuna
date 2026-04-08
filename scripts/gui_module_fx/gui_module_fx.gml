@@ -21,13 +21,13 @@ function GuiModuleFx(_ctrl) constructor {
         var _gui_h = display_get_gui_height();
         if (shader_is_compiled(shd_vignette)) {
             gpu_set_blendmode(bm_normal); 
-            shader_set(shd_vignette);
-            var _u_res = shader_get_uniform(shd_vignette, "u_resolution");
-            
-            shader_set_uniform_f(_u_res, _gui_w, _gui_h);
-            
-            draw_rectangle_color(0, 0, _gui_w, _gui_h, c_black, c_black, c_black, c_black, false);
-            shader_reset();
+            //shader_set(shd_vignette);
+            //var _u_res = shader_get_uniform(shd_vignette, "u_resolution");
+            //
+            //shader_set_uniform_f(_u_res, _gui_w, _gui_h);
+            //
+            //draw_rectangle_color(0, 0, _gui_w, _gui_h, c_black, c_black, c_black, c_black, false);
+            //shader_reset();
         }
     }
 

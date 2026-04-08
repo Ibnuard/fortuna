@@ -286,8 +286,8 @@ function GuiModuleMap(_ctrl) constructor {
                     // 3. Nama Tile (Inside Card Body)
                     var _label_y = _card_y + (_card_h / 2) + (12 * _isc);
                     var _label_str = string_upper(_data.name);
-                    var _label_scale_x = 0.95 * _isc;
-                    var _label_scale_y = 0.95 * _isc;
+                    var _label_scale_x = 1.0;
+                    var _label_scale_y = 1.0;
                     var _label_sep     = 32 * _isc;
                     var _label_w_limit = (_card_w - (20 * _isc)) / _label_scale_x;
                     
@@ -308,8 +308,8 @@ function GuiModuleMap(_ctrl) constructor {
                         case TileType.Property: _info_str = "$" + string(_data.price); break;
                     }
                     
-                    var _info_scale_x = 0.82 * _isc;
-                    var _info_scale_y = 0.82 * _isc;
+                    var _info_scale_x = 1.0;
+                    var _info_scale_y = 1.0;
                     
                     draw_set_color(c_black); draw_set_alpha(0.5 * _a);
                     draw_text_transformed(_card_x + _card_w/2 + 2, _info_y + 2, _info_str, _info_scale_x, _info_scale_y, 0);

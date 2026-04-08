@@ -78,7 +78,7 @@ function GuiModuleBottom(_ctrl) constructor {
         
         var _lbl = "Turn ";
         var _sep = " / ";
-        var _scale = 1.6;
+        var _scale = 1.0;
         
         var _tw_lbl = string_width(_lbl) * _scale;
         var _tw_num = string_width(_turn_num) * _scale;

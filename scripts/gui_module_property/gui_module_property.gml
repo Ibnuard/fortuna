@@ -117,14 +117,14 @@ function GuiModuleProperty(_ctrl) constructor {
             // Name on Card
             draw_set_font(fnt_main);
             draw_set_halign(fa_center); draw_set_valign(fa_middle);
-            var _lbl_sc = 1.0 * _card_scale;
+            var _lbl_sc = 1.0;
             draw_set_color(c_white);
             draw_text_transformed(floor(_card_x + _card_w/2), floor(_card_y + (_card_h/2) + 12), string_upper(_tile.name), _lbl_sc, _lbl_sc, 0);
             
             // Price on Card Bottom
             draw_set_valign(fa_middle);
             var _price_str = obj_controller.format_money(_tile.price);
-            var _price_sc  = 0.9 * _card_scale;
+            var _price_sc  = 1.0;
             draw_text_transformed(floor(_card_x + _card_w/2), floor(_card_y + _card_h - (22 * _card_scale)), _price_str, _price_sc, _price_sc, 0);
             
             // 2. Info Text (Benefits - STATIC POSITION)
@@ -142,8 +142,8 @@ function GuiModuleProperty(_ctrl) constructor {
             
             // Income on Landing (Labels: White, Values: Gold + Large)
             var _inc_lbl = "Income on Landing ";
-            var _inc_lbl_sc = 1.1;
-            var _inc_val_sc = 1.65; // Extra Large
+            var _inc_lbl_sc = 1.0;
+            var _inc_val_sc = 1.0;
             
             var _inc_lbl_w = string_width(_inc_lbl) * _inc_lbl_sc;
             var _inc_val_w = string_width(_val_str) * _inc_val_sc;
@@ -158,8 +158,8 @@ function GuiModuleProperty(_ctrl) constructor {
             
             // Income per Run (Labels: White, Values: Gold + Large)
             var _run_lbl = "Income per Run ";
-            var _run_lbl_sc = 0.95;
-            var _run_val_sc = 1.4; // Large
+            var _run_lbl_sc = 1.0;
+            var _run_val_sc = 1.0;
             
             var _run_lbl_w = string_width(_run_lbl) * _run_lbl_sc;
             var _run_val_w = string_width(_psv_str) * _run_val_sc;

@@ -84,8 +84,8 @@ function GuiModuleStats(_ctrl) constructor {
                 
                 var _icon_scale    = 0.7;
                 var _v_mid         = _cy + (_row_gap / 2) - 10;
-                var _lbl_txt_scale = 1.15;
-                var _val_txt_scale = 1.45; // Significantly larger for clarity
+                var _lbl_txt_scale = 1.0;
+                var _val_txt_scale = 1.0;
                 
                 // Draw Icon
                 draw_sprite_ext(spr_stats, _s.icon, _icon_col_x, _v_mid, _icon_scale, _icon_scale, 0, c_white, ctrl.stats_popup_alpha);

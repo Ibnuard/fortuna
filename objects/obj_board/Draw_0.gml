@@ -102,8 +102,8 @@ for (var oi = 0; oi < array_length(draw_order); oi++) {
     // 1. Nama Tile (Center Body)
     var _label_y = _y + (current_h / 2) + (12 * sc * _h_sc); // Diturunkan agar lebih ke tengah bodi tile
     var _label_str = string_upper(_tile.name);
-    var _label_scale_x = 0.95 * sc * _w_sc;
-    var _label_scale_y = 0.95 * sc * _h_sc;
+    var _label_scale_x = 1.0;
+    var _label_scale_y = 1.0;
     var _label_sep   = 32 * _h_sc; // Dalam unit font asli (akan di-scale otomatis oleh fungsi draw)
     var _label_w     = (current_w - (20 * sc)) / _label_scale_x; // Kalkulasi limit lebar vs skala font
     
@@ -128,8 +128,8 @@ for (var oi = 0; oi < array_length(draw_order); oi++) {
         case TileType.Property: _info_str = "$" + string(_tile.price); break;
     }
     
-    var _info_scale_x = 0.82 * sc * _w_sc;
-    var _info_scale_y = 0.82 * sc * _h_sc;
+    var _info_scale_x = 1.0;
+    var _info_scale_y = 1.0;
     var _info_color = c_white; // Reverted back to white for all tiles
     
     // Shadow pass

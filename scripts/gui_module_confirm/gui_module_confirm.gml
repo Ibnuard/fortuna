@@ -301,17 +301,19 @@ function GuiModuleConfirm(_ctrl) constructor {
                 } else {
                     // --- GIANT RESULT POP (Balanced Large) ---
                     var _sc = 1.0;
+
                     var _glow_alpha = 0;
                     if (confirm_merge_frame < 20) {
                         var _tt = (confirm_merge_frame - 12) / 8.0;
-                        _sc = lerp(0.8, 2.5, sin(_tt * pi * 0.5)); // Peak 2.2x
+                        _sc = 1.0;
+    
                         _glow_alpha = sin(_tt * pi) * 0.9;
                     } else if (confirm_merge_frame < 26) {
                         var _tt = (confirm_merge_frame - 20) / 6.0;
-                        _sc = lerp(2.5, 1.6, _tt); // Settles at 1.6x
+                        _sc = 1.0;
                         _glow_alpha = lerp(0.9, 0.45, _tt);
                     } else {
-                        _sc = 1.6 + (sin(current_time / 100) * 0.05); // Breathing
+                        _sc = 1.0;
                         _glow_alpha = 0.45;
                     }
                     
