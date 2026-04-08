@@ -190,7 +190,15 @@ function GuiModuleBottom(_ctrl) constructor {
                 }
 
                 var _roll_y = _main_y + stagger_btn_center - 5; // Slightly higher to accommodate larger size
-                if (draw_gui_button(_center_x, _roll_y, GUI_BTN_MAIN_W, GUI_BTN_MAIN_H, spr_button_main, "", c_white, fnt_gui_button_medium, ctrl.can_interact_gui)) {
+                
+                // --- BREATHING ANIMATION (JUICY IDLE) ---
+                var _breath_sc  = sin(current_time / 450) * 0.02; // Very subtle scaling (2%)
+                var _breath_w   = GUI_BTN_MAIN_W * (1 + _breath_sc);
+                var _breath_h   = GUI_BTN_MAIN_H * (1 + _breath_sc * 0.5);
+                var _breath_x   = _center_x - (_breath_w - GUI_BTN_MAIN_W) / 2;
+                var _breath_y   = _roll_y - (_breath_h - GUI_BTN_MAIN_H) / 2;
+
+                if (draw_gui_button(_breath_x, _breath_y, _breath_w, _breath_h, spr_button_main, "", c_white, fnt_gui_button_medium, ctrl.can_interact_gui)) {
                     if (ctrl.gui_state == "MAIN") {
                         ctrl.gui_state = "DICE";
                         ctrl.mod_dice.dice_phase = "ENTERING";
@@ -206,15 +214,15 @@ function GuiModuleBottom(_ctrl) constructor {
                 draw_set_font(fnt_gui_button_medium);
                 var _mx = device_mouse_x_to_gui(0);
                 var _my = device_mouse_y_to_gui(0);
-                var _roll_hover = ctrl.can_interact_gui && point_in_rectangle(_mx, _my, _center_x, _roll_y, _center_x + GUI_BTN_MAIN_W, _roll_y + GUI_BTN_MAIN_H);
+                var _roll_hover = ctrl.can_interact_gui && point_in_rectangle(_mx, _my, _breath_x, _breath_y, _breath_x + _breath_w, _breath_y + _breath_h);
                 var _roll_press = ctrl.can_interact_gui && _roll_hover && mouse_check_button(mb_left);
                 var _juice_y = 0;
                 if (_roll_hover && !_roll_press) _juice_y = -6;
                 if (_roll_press) _juice_y = 2;
                 var _total_w = string_width(_wave_str);
-                var _start_x = _center_x + (GUI_BTN_MAIN_W / 2) - (_total_w / 2);
-                var _face_h = GUI_BTN_MAIN_H - 16 + ((_roll_press) ? -2 : 0); 
-                var _base_y = _roll_y + _juice_y + (_face_h / 2);
+                var _start_x = _breath_x + (_breath_w / 2) - (_total_w / 2);
+                var _face_h = _breath_h - 16 + ((_roll_press) ? -2 : 0); 
+                var _base_y = _breath_y + _juice_y + (_face_h / 2);
 
                 var _cx = _start_x;
                 for (var i = 0; i < _wave_len; i++) {
