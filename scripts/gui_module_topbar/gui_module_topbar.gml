@@ -134,27 +134,24 @@ function GuiModuleTopbar(_ctrl) constructor {
         var _bar_w     = _gui_w - (_marg_x * 2);
         
         // --- High-Fidelity Button Sizes ---
-        // Using 64px height to match sprite design and avoid squashed look
         var _btn_h     = 60; 
-        var _map_w     = 100;
-        var _pause_w   = 60; // Square pause button
+        var _map_w     = 120; // Slightly wider for the new sprite
+        var _pause_w   = 60; 
         
-        // Accurate Vertical Centering Calculation
-        // Must account for the 20px vertical offset used in the surface drawing (_draw_y_in_surf)
         var _surf_v_offset = 20; 
         var _top_btn_y = top_y_offset + _surf_v_offset + (GUI_TOPBAR_H / 2) - (_btn_h / 2) + stagger_map_stat;
         
-        var _pause_x   = _marg_x + _bar_w - 70; // 70px right padding
+        // Increased safety margin from the right edge (from 70 to 100)
+        var _pause_x   = _marg_x + _bar_w - 100; 
         
         // Draw Pause Button
         if (draw_gui_button(_pause_x, _top_btn_y, _pause_w, _btn_h, spr_button_pause, "", c_white, fnt_main, ctrl.can_interact_gui)) {
-            // Options click
         }
 
-        // Draw Map Button
+        // Draw Map Button (using the new spr_btn_top_bar)
         var _gap_size = 18; 
         var _map_top_x = _pause_x - _gap_size - _map_w;
-        if (draw_gui_button(_map_top_x, _top_btn_y, _map_w, _btn_h, spr_button_orange, "Map", c_white, fnt_gui_button_medium, ctrl.can_interact_gui)) {
+        if (draw_gui_button(_map_top_x, _top_btn_y, _map_w, _btn_h, spr_btn_top_bar, "Map", c_white, fnt_gui_button_medium, ctrl.can_interact_gui)) {
             ctrl.map_popup_open = true;
         }
     }
