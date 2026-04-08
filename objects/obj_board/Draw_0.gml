@@ -17,6 +17,9 @@ for (var oi = 0; oi < array_length(draw_order); oi++) {
     var _x     = board_center_x + i * step_size + anim_offset;
     var dist_norm = clamp(abs(_x - board_center_x) / (step_size * mid), 0, 1);
     
+    // Juicy Idle Animation (Floating Wave)
+    var _idle_y = sin((current_time * 0.002) + (i * 0.6)) * 8;
+    
     // Scale sangat subtle (3-5%)
     var _w_sc = lerp(1, 0.96, dist_norm); 
     var _h_sc = lerp(1, 0.97, dist_norm);
@@ -49,6 +52,7 @@ for (var oi = 0; oi < array_length(draw_order); oi++) {
 // ── PASS 1: semua tile ──
 for (var oi = 0; oi < array_length(draw_order); oi++) {
     var i      = draw_order[oi];
+    var _tile = tiles[loop_index(player_index + i)];
     var _x     = board_center_x + i * step_size + anim_offset;
     
     var dist_norm = clamp(abs(_x - board_center_x) / (step_size * mid), 0, 1);
@@ -59,7 +63,10 @@ for (var oi = 0; oi < array_length(draw_order); oi++) {
     var current_h = tile_h * _h_sc;
     
     var lift      = lift_max * (1 - power(dist_norm, 2)); // Parabolic curve untuk efek cekung yang lebih 'juicy'
-    var _y        = tile_y - lift;
+    
+    // Juicy Idle Animation (Floating Wave)
+    var _idle_y = sin((current_time * 0.002) + (i * 0.6)) * 8;
+    var _y        = tile_y - lift + _idle_y;
 
     var local_t = clamp((intro_anim_t - ((abs(i)) * 0.08)) / 0.6, 0, 1);
     var t_ease = 1 - power(1 - local_t, 3);
@@ -68,16 +75,60 @@ for (var oi = 0; oi < array_length(draw_order); oi++) {
     var half_w = current_w / 2;
     var draw_x = _x - half_w;
     
-    draw_set_alpha(lerp(1.0, 0.60, dist_norm));
+    // ── CARD DRAWING PASS ──
+    var _is_glass = (_tile.owner == -1 && _tile.type == TileType.Property);
+    var _base_alpha = _is_glass ? 0.75 : 1.0;
+    
+    draw_set_alpha(_base_alpha * lerp(1.0, 0.60, dist_norm));
     draw_sprite_stretched_ext(
-        tiles[loop_index(player_index + i)].sprite, 0,
+        _tile.sprite, 0,
         draw_x, _y,
         current_w, current_h,
         c_white, 1
     );
+
+    // ── GLASS CARD EFFECTS (Unowned Only) ──
+    if (_is_glass) {
+        // 1. Specular Border (Glass Edge)
+        draw_set_color(c_white);
+        draw_set_alpha(0.3 * _alpha);
+        draw_roundrect_ext(draw_x, _y, draw_x + current_w, _y + current_h, 8*sc, 8*sc, true);
+        
+        // 2. Contained Shimmer (Reflection)
+        var _shimmer_period = 4000;
+        var _shimmer_dur    = 1200;
+        var _time           = current_time % _shimmer_period;
+        
+        if (_time < _shimmer_dur) {
+            var _prog = _time / _shimmer_dur;
+            var _sweep_x = lerp(-100 * sc, current_w + 100 * sc, _prog);
+            var _sweep_w = 30 * sc;
+            
+            gpu_set_blendmode(bm_add);
+            draw_set_alpha(0.15 * _alpha);
+            
+            // Clean diagonal sweep strictly aligned to card face
+            draw_primitive_begin(pr_trianglestrip);
+            var _tilt = 40 * sc;
+            
+            // We draw the sweep but clamp values to stay visually bounded
+            var _x1 = draw_x + _sweep_x;
+            var _x2 = _x1 + _sweep_w;
+            
+            draw_set_color(c_white);
+            draw_vertex(clamp(_x2, draw_x, draw_x + current_w), _y);
+            draw_vertex(clamp(_x1, draw_x, draw_x + current_w), _y);
+            draw_vertex(clamp(_x2 - _tilt, draw_x, draw_x + current_w), _y + current_h);
+            draw_vertex(clamp(_x1 - _tilt, draw_x, draw_x + current_w), _y + current_h);
+            draw_primitive_end();
+            
+            gpu_set_blendmode(bm_normal);
+        }
+    }
+    
+    draw_set_alpha(1.0);
     
     // ── DRAW TILE ICON ──
-    var _tile = tiles[loop_index(player_index + i)];
     var _icon_idx = _tile.type; // 1-to-1 mapping confirmed
     
     // Konpensasi origin Top-Left agar tetap Center secara visual
