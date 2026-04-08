@@ -71,9 +71,7 @@ function GuiModuleBottom(_ctrl) constructor {
         var _badge_y = _panel_draw_y - 20 + stagger_turn_badge; // Moved 18px higher
 
         draw_set_alpha(1.0);
-        draw_sprite_ext(spr_container, 0, _badge_x, _badge_y + 10, _badge_w/200, _badge_h/100, _badge_angle, c_white, 1);
-
-        draw_set_font(fnt_main);
+        draw_set_font(fnt_gui_button_medium);
         draw_set_halign(fa_center); draw_set_valign(fa_middle);
         
         var _lbl = "Turn ";
@@ -86,8 +84,17 @@ function GuiModuleBottom(_ctrl) constructor {
         var _tw_max = string_width(_turn_max) * _scale;
         var _total_tw = _tw_lbl + _tw_num + _tw_sep + _tw_max;
         
+        // --- Dynamic Badge Dimensions ---
+        var _badge_w = _total_tw + 60; // Text width + horizontal padding
+        var _badge_h = string_height("T") + 48; // Dynamic height with extra padding for double border
+        var _badge_x = _gui_w / 2;
+        var _badge_y_base = _panel_draw_y - 20 + stagger_turn_badge + 10; 
+        
+        // Draw stretched sprite (Nine-Slice handling)
+        draw_sprite_stretched(spr_turn_container, 0, _badge_x - _badge_w/2, _badge_y_base - _badge_h/2, _badge_w, _badge_h);
+
         var _draw_x = _badge_x - (_total_tw / 2);
-        var _draw_y = _badge_y + 8;
+        var _draw_y = _badge_y_base - 4; // Visual center adjustment for the font
         
         draw_set_halign(fa_left);
         

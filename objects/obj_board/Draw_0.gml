@@ -165,13 +165,15 @@ for (var oi = 0; oi < array_length(draw_order); oi++) {
     
     var gap       = 1;
     var thickness = 8;
+    var radius    = 12 * sc; // Proportional radius
     
     draw_set_alpha(1);
     for (var b = 0; b < thickness; b++) {
         draw_set_color(c_white);
-        draw_rectangle(
+        draw_roundrect_ext(
             bx - gap - b, by - gap - b,
             bx + tile_w + gap + b, by + tile_h + gap + b,
+            radius, radius,
             true
         );
     }

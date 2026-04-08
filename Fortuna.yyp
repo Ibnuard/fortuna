@@ -86,6 +86,7 @@
     {"id":{"name":"spr_tile_prop","path":"sprites/spr_tile_prop/spr_tile_prop.yy",},},
     {"id":{"name":"spr_tile_start","path":"sprites/spr_tile_start/spr_tile_start.yy",},},
     {"id":{"name":"spr_top_map_placeholder","path":"sprites/spr_top_map_placeholder/spr_top_map_placeholder.yy",},},
+    {"id":{"name":"spr_turn_container","path":"sprites/spr_turn_container/spr_turn_container.yy",},},
   ],
   "resourceType":"GMProject",
   "resourceVersion":"2.0",
