@@ -1,0 +1,12 @@
+{
+  "$GMShader":"",
+  "%Name":"shd_curved_gui",
+  "name":"shd_curved_gui",
+  "parent":{
+    "name":"Fortuna",
+    "path":"Fortuna.yyp",
+  },
+  "resourceType":"GMShader",
+  "resourceVersion":"2.0",
+  "type":1,
+}

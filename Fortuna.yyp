@@ -56,6 +56,7 @@
     {"id":{"name":"scr_tile_enum","path":"scripts/scr_tile_enum/scr_tile_enum.yy",},},
     {"id":{"name":"scr_tile_factory","path":"scripts/scr_tile_factory/scr_tile_factory.yy",},},
     {"id":{"name":"scr_tile_utils","path":"scripts/scr_tile_utils/scr_tile_utils.yy",},},
+    {"id":{"name":"shd_curved_gui","path":"shaders/shd_curved_gui/shd_curved_gui.yy",},},
     {"id":{"name":"shd_scanline","path":"shaders/shd_scanline/shd_scanline.yy",},},
     {"id":{"name":"shd_topo_background","path":"shaders/shd_topo_background/shd_topo_background.yy",},},
     {"id":{"name":"shd_vignette","path":"shaders/shd_vignette/shd_vignette.yy",},},

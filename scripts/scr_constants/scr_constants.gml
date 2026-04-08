@@ -12,7 +12,7 @@
 
 // Topbar Dimensions
 #macro GUI_PAD_X       40
-#macro GUI_TOPBAR_H    180
+#macro GUI_TOPBAR_H    160
 #macro GUI_BTN_MAP_W   190
 #macro GUI_BTN_MAP_H   64
 #macro GUI_BTN_SM_W    110
