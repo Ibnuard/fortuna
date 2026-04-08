@@ -130,24 +130,31 @@ function GuiModuleTopbar(_ctrl) constructor {
     
     static draw_buttons = function() {
         var _gui_w = display_get_gui_width();
-        var _marg_x    = 36; // Back to normal margin
+        var _marg_x    = 36; 
         var _bar_w     = _gui_w - (_marg_x * 2);
         
-        var _sm_btn_w  = 90; 
-        var _sm_btn_h  = 46; 
+        // --- High-Fidelity Button Sizes ---
+        // Using 64px height to match sprite design and avoid squashed look
+        var _btn_h     = 60; 
+        var _map_w     = 100;
+        var _pause_w   = 60; // Square pause button
         
-        var _pause_w     = 46; 
-        var _pause_x     = _marg_x + _bar_w - 70; // Nice padding inside the wide bar
-        var _top_btn_y   = top_y_offset + (GUI_TOPBAR_H / 2) - (_sm_btn_h / 2) + stagger_map_stat;
+        // Accurate Vertical Centering Calculation
+        // Must account for the 20px vertical offset used in the surface drawing (_draw_y_in_surf)
+        var _surf_v_offset = 20; 
+        var _top_btn_y = top_y_offset + _surf_v_offset + (GUI_TOPBAR_H / 2) - (_btn_h / 2) + stagger_map_stat;
         
-        _top_btn_y += 3;
-
-        if (draw_gui_button(_pause_x, _top_btn_y, _pause_w, _sm_btn_h, spr_button_pause, "", c_white, fnt_main, ctrl.can_interact_gui)) {
+        var _pause_x   = _marg_x + _bar_w - 70; // 70px right padding
+        
+        // Draw Pause Button
+        if (draw_gui_button(_pause_x, _top_btn_y, _pause_w, _btn_h, spr_button_pause, "", c_white, fnt_main, ctrl.can_interact_gui)) {
+            // Options click
         }
 
+        // Draw Map Button
         var _gap_size = 18; 
-        var _map_top_x = _pause_x - _gap_size - _sm_btn_w;
-        if (draw_gui_button(_map_top_x, _top_btn_y, _sm_btn_w, _sm_btn_h, spr_button_orange, "Map", c_white, fnt_gui_button_medium, ctrl.can_interact_gui)) {
+        var _map_top_x = _pause_x - _gap_size - _map_w;
+        if (draw_gui_button(_map_top_x, _top_btn_y, _map_w, _btn_h, spr_button_orange, "Map", c_white, fnt_gui_button_medium, ctrl.can_interact_gui)) {
             ctrl.map_popup_open = true;
         }
     }

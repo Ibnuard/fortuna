@@ -48,8 +48,7 @@ function draw_gui_button(_x, _y, _w, _h, _sprite, _text, _text_color = c_white, 
     draw_set_valign(fa_middle);
     
     var _text_x = _x + (_w / 2);
-    var _face_h = _h - 16;
-    var _text_y = _y + (_face_h / 2);
+    var _text_y = _y + (_h / 2); // True vertical center
     
     // Text shadow
     draw_set_color(c_black); draw_set_alpha(0.3);
