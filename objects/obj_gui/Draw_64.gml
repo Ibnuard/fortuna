@@ -1,7 +1,4 @@
 /// @description Draw Modular GUI Components
-// The z-ordering (drawing order) is strictly preserved from the original monolithic file.
-// CRITICAL: Shader vignette is BEHIND all GUI elements, but Shader scanlines is ON TOP of everything.
-
 // 1. SHADER: VIGNETTE ONLY (Behind GUI Panels & Buttons)
 mod_fx.draw_vignette();
 

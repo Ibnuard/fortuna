@@ -1,0 +1,12 @@
+{
+  "$GMShader":"",
+  "%Name":"shd_topo_background",
+  "name":"shd_topo_background",
+  "parent":{
+    "name":"Fortuna",
+    "path":"Fortuna.yyp",
+  },
+  "resourceType":"GMShader",
+  "resourceVersion":"2.0",
+  "type":1,
+}
