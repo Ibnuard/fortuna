@@ -56,6 +56,7 @@ for (var oi = 0; oi < array_length(draw_order); oi++) {
     var _x     = board_center_x + i * step_size + anim_offset;
     
     var dist_norm = clamp(abs(_x - board_center_x) / (step_size * mid), 0, 1);
+    var _alpha = lerp(1.0, 0.60, dist_norm);
     
     var _w_sc = lerp(1, 0.96, dist_norm);
     var _h_sc = lerp(1, 0.97, dist_norm);
@@ -148,9 +149,6 @@ for (var oi = 0; oi < array_length(draw_order); oi++) {
     // ── DRAW TILE TEXT (LABEL & INFO) ──
     draw_set_font(fnt_main);
     draw_set_halign(fa_center); draw_set_valign(fa_middle);
-    var _alpha = lerp(1.0, 0.60, dist_norm);
-    
-    // 1. Nama Tile (Center Body)
     var _label_y = _y + (current_h / 2) + (12 * sc * _h_sc); // Diturunkan agar lebih ke tengah bodi tile
     var _label_str = string_upper(_tile.name);
     var _label_scale_x = 1.0;

@@ -43,7 +43,7 @@
 #macro BOARD_PAD_Y     200
 #macro BOARD_AREA_H    680
 #macro BOARD_TILE_GAP  12
-#macro BOARD_LIFT_MAX  48 // Ditingkatkan agar efek cekung lebih terasa pada tile tinggi
+#macro BOARD_LIFT_MAX  24 // Dikurangi agar barisan kartu terlihat lebih rata
 #macro BOARD_SPEED     (1/12)
 
 // Pawn Values
