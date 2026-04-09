@@ -2,6 +2,7 @@ function GuiModuleBottom(_ctrl) constructor {
     ctrl = _ctrl;
 
     bottom_y_offset = 500;
+    surf_bottom = -1;
     stagger_turn_badge = 80;
     stagger_btn_center = 80;
     stagger_btn_left   = 80;
@@ -44,36 +45,42 @@ function GuiModuleBottom(_ctrl) constructor {
         if (abs(stagger_btn_right) < 0.5) stagger_btn_right = 0;
     }
 
-    static draw_panel = function() {
-         
-         
+    static draw = function() {
         var _gui_w = display_get_gui_width();
         var _gui_h = display_get_gui_height();
         
         var _panel_w = panel_width_current; 
         var _panel_h = GUI_PANEL_H;
-        // Panel anchors to bottom of GUI - slides up/down via bottom_y_offset
-        // bottom_y_offset=0: panel top sits at (gui_h - panel_h + corner_hide)
-        // corner_hide=15 hides the bottom rounded corners just below screen edge
         var _corner_hide = 15;
-        var _target_y = _gui_h - _panel_h + _corner_hide + bottom_y_offset - GUI_BOTTOM_MARGIN; 
-        var _panel_draw_y = _target_y;
+        
+        // Screen position for panel (used for surface placement)
+        var _screen_panel_y = _gui_h - _panel_h + _corner_hide + bottom_y_offset - GUI_BOTTOM_MARGIN;
+        
+        // Surface dimensions — extra space above panel for turn badge
+        var _badge_extra = 100;
+        var _surf_h = _badge_extra + _panel_h + 20;
+        
+        if (!surface_exists(surf_bottom)) {
+            surf_bottom = surface_create(_gui_w, _surf_h);
+        }
+        
+        surface_set_target(surf_bottom);
+        draw_clear_alpha(c_black, 0);
+        
+        // --- Draw in surface-local coordinates ---
+        var _local_panel_y = _badge_extra;
         var _panel_x = _gui_w / 2 - (_panel_w / 2);
-
-        draw_sprite_stretched(spr_gui_bottom_container, 0, _panel_x, _panel_draw_y, _panel_w, _panel_h);
-
+        
+        draw_sprite_stretched(spr_gui_bottom_container, 0, _panel_x, _local_panel_y, _panel_w, _panel_h);
+        
+        // --- Turn Badge ---
         var _turn_num = "1";
         var _turn_max = "20";
         if (instance_exists(obj_controller)) {
             _turn_num = string(obj_controller.current_turn);
             _turn_max = string(obj_controller.map_max_turns);
         }
-        var _badge_angle = 0;
-        var _badge_w = 200;
-        var _badge_h = 80;
-        var _badge_x = _gui_w / 2;
-        var _badge_y = _panel_draw_y - 20 + stagger_turn_badge; // Moved 18px higher
-
+        
         draw_set_alpha(1.0);
         draw_set_font(fnt_gui_button_medium);
         draw_set_halign(fa_center); draw_set_valign(fa_middle);
@@ -89,16 +96,16 @@ function GuiModuleBottom(_ctrl) constructor {
         var _total_tw = _tw_lbl + _tw_num + _tw_sep + _tw_max;
         
         // --- Dynamic Badge Dimensions ---
-        _badge_w = _total_tw + 60; // Text width + horizontal padding
-        _badge_h = string_height("T") + 48; // Dynamic height with extra padding for double border
-        _badge_x = _gui_w / 2;
-        _badge_y_base = _panel_draw_y - 20 + stagger_turn_badge + 10; 
+        var _badge_w = _total_tw + 60;
+        var _badge_h = string_height("T") + 48;
+        var _badge_x = _gui_w / 2;
+        var _badge_y_base = _local_panel_y - 10 + stagger_turn_badge;
         
         // Draw stretched sprite (Nine-Slice handling)
         draw_sprite_stretched(spr_turn_container, 0, _badge_x - _badge_w/2, _badge_y_base - _badge_h/2, _badge_w, _badge_h);
-
+        
         var _draw_x = _badge_x - (_total_tw / 2);
-        var _draw_y = _badge_y_base - 4; // Visual center adjustment for the font
+        var _draw_y = _badge_y_base - 4;
         
         draw_set_halign(fa_left);
         
@@ -123,6 +130,26 @@ function GuiModuleBottom(_ctrl) constructor {
         draw_text_transformed(_draw_x, _draw_y, _sep + _turn_max, _scale, _scale, 0);
         
         draw_set_halign(fa_left); draw_set_valign(fa_top);
+        surface_reset_target();
+        
+        // --- Render surface with CRT curve (bottom bulge) ---
+        var _surf_screen_y = _screen_panel_y - _badge_extra;
+        var _tex = surface_get_texture(surf_bottom);
+        var _segments = 128;
+        var _curve_intensity = 10; // Positive = curves DOWN (bottom of CRT)
+        
+        gpu_set_tex_filter(true);
+        draw_primitive_begin_texture(pr_trianglestrip, _tex);
+        for (var i = 0; i <= _segments; i++) {
+            var _ratio = i / _segments;
+            var _x = _ratio * _gui_w;
+            var _arc = sin(_ratio * pi);
+            var _y_off = _arc * _curve_intensity;
+            draw_vertex_texture_color(_x, _surf_screen_y + _y_off, _ratio, 0, c_white, 1);
+            draw_vertex_texture_color(_x, _surf_screen_y + _surf_h + _y_off, _ratio, 1, c_white, 1);
+        }
+        draw_primitive_end();
+        gpu_set_tex_filter(false);
     }
 
     static draw_buttons = function() {
@@ -245,5 +272,9 @@ function GuiModuleBottom(_ctrl) constructor {
                 draw_gui_button(_right_x, _main_y + stagger_btn_right, GUI_BTN_SIDE_W, GUI_BTN_SIDE_H, spr_button_purple, "Fate Card", c_white, fnt_gui_button_medium, ctrl.can_interact_gui);
             }
         }
+    }
+
+    static cleanup = function() {
+        if (surface_exists(surf_bottom)) surface_free(surf_bottom);
     }
 }

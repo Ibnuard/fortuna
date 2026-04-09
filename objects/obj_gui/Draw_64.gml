@@ -6,7 +6,7 @@ mod_fx.draw_vignette();
 mod_topbar.draw();
 
 // 3. BOTTOM CONTAINER BORDERS / SHAPES
-mod_bottom.draw_panel();
+mod_bottom.draw();
 
 // 4. INTERACTIVE BUTTONS (Top and Bottom)
 mod_topbar.draw_buttons();
