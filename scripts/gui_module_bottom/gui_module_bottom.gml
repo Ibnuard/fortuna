@@ -15,6 +15,7 @@ function GuiModuleBottom(_ctrl) constructor {
     panel_width_current = panel_width_full;
 
     static step = function() {
+        // bottom_y_offset: 0 = fully visible, >0 = hidden below screen
         var _target_bottom_offset = (ctrl.gui_state == "MAIN" || ctrl.gui_state == "MOVING") ? 0 : 300;
         
         if (abs(bottom_y_offset - _target_bottom_offset) > 0.5) {
@@ -51,8 +52,11 @@ function GuiModuleBottom(_ctrl) constructor {
         
         var _panel_w = panel_width_current; 
         var _panel_h = GUI_PANEL_H;
-        // Calculation: Push below the screen edge so rounded corners are hidden
-        var _target_y = _gui_h - _panel_h + 15; 
+        // Panel anchors to bottom of GUI - slides up/down via bottom_y_offset
+        // bottom_y_offset=0: panel top sits at (gui_h - panel_h + corner_hide)
+        // corner_hide=15 hides the bottom rounded corners just below screen edge
+        var _corner_hide = 15;
+        var _target_y = _gui_h - _panel_h + _corner_hide + bottom_y_offset - GUI_BOTTOM_MARGIN; 
         var _panel_draw_y = _target_y;
         var _panel_x = _gui_w / 2 - (_panel_w / 2);
 
@@ -131,7 +135,8 @@ function GuiModuleBottom(_ctrl) constructor {
         
         var _gap = GUI_BTN_GAP; 
         var _panel_h = GUI_PANEL_H;
-        var _target_y = _gui_h - _panel_h + 15; 
+        var _corner_hide = 15;
+        var _target_y = _gui_h - _panel_h + _corner_hide + bottom_y_offset - GUI_BOTTOM_MARGIN; 
         var _panel_draw_y = _target_y;
 
         var _mid_y = _panel_draw_y + (_panel_h / 2) + 20; 
