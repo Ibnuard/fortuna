@@ -149,7 +149,7 @@ function GuiModuleDice(_ctrl) constructor {
                     gpu_set_fog(false, c_white, 0, 0); 
                 }
 
-                var _die_alpha = 1.0;
+                _die_alpha = 1.0;
                 if (dice_phase == "FINISHED" && _sel_count == 2 && !dice_selected[i]) {
                     _die_alpha = 0.6; 
                 }

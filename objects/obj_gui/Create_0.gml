@@ -1,3 +1,6 @@
+// Set consistent GUI resolution (matches Room1 height)
+display_set_gui_size(1920, 1080);
+
 // Ensure Gameplay Controller exists
 if (!instance_exists(obj_controller)) {
     instance_create_layer(0, 0, "Instances", obj_controller);

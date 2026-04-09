@@ -24,7 +24,7 @@
 #macro GUI_BTN_SIDE_W  240
 #macro GUI_BTN_SIDE_H  90
 #macro GUI_BTN_GAP     24
-#macro GUI_PANEL_H     240
+#macro GUI_PANEL_H     210
 
 // UI Component Settings
 #macro GUI_DICE_SCALE  0.55
