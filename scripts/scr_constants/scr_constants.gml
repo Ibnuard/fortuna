@@ -25,7 +25,7 @@
 #macro GUI_BTN_SIDE_H  90
 #macro GUI_BTN_GAP     24
 #macro GUI_PANEL_H     210
-#macro GUI_BOTTOM_MARGIN 48  // Safe area from bottom edge (Windows taskbar ~48px)
+#macro GUI_BOTTOM_MARGIN 10  // Small margin from bottom edge
 
 // UI Component Settings
 #macro GUI_DICE_SCALE  0.55

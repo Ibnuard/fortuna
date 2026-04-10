@@ -1,10 +1,13 @@
-// Board Rendering
+// Board Rendering — Uses GUI coordinates (1920x1080) for cross-platform consistency
+
+var _gui_w = 1920; // Fixed GUI width (matches display_set_gui_size)
+var _gui_h = 1080; // Fixed GUI height
 
 board_x = BOARD_PAD_X; // Symmetric padding from screen edges
 board_y = BOARD_PAD_Y;
 board_h = BOARD_AREA_H;
 
-var board_area_w = room_width - (board_x * 2); // Full width minus symmetric padding
+var board_area_w = _gui_w - (board_x * 2); // Full GUI width minus symmetric padding
 
 tile_gap = BOARD_TILE_GAP;
 var total_gap  = tile_gap * 8; // 8 gaps between 9 tiles

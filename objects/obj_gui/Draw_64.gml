@@ -1,4 +1,7 @@
 /// @description Draw Modular GUI Components
+// Enforce fixed GUI resolution every frame (prevents macOS Retina scaling issues)
+display_set_gui_size(1920, 1080);
+
 // 1. SHADER: VIGNETTE ONLY (Behind GUI Panels & Buttons)
 mod_fx.draw_vignette();
 
