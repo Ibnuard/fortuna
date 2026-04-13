@@ -172,7 +172,7 @@ function GuiModuleDice(_ctrl) constructor {
 
                 
                 if (dice_phase == "FINISHED" && dice_selected[i]) {
-                    draw_set_font(fnt_gui_button_large); 
+                    draw_set_font(fnt_main_54); 
                     draw_set_halign(fa_center);
                     var _num_x = _dx + (_dw_curr / 2);
                     var _num_y = _dy - 70; 
@@ -212,12 +212,12 @@ function GuiModuleDice(_ctrl) constructor {
             }
             
             if (dice_phase == "FINISHED") {
-                draw_set_font(fnt_main);
+                draw_set_font(fnt_main_18);
                 draw_set_halign(fa_center);
                 draw_set_valign(fa_top);
                 
                 if (_sel_count < 2) {
-                    draw_set_font(fnt_gui_button_medium); 
+                    draw_set_font(fnt_main_36); 
                     var _osc_alpha = abs(sin(current_time/300));
                     var _inst_x = _gui_w / 2;
                     var _inst_y = _popup_y + _total_h + 25; 
@@ -242,7 +242,7 @@ function GuiModuleDice(_ctrl) constructor {
                     
                     var _is_ready = (_ui_alpha > 0.95);
                     
-                    if (draw_gui_button(_conf_x, _conf_y, _conf_w, _conf_h, spr_button_main, "Confirm Selection", c_white, fnt_gui_button_medium, _is_ready)) {
+                    if (draw_gui_button(_conf_x, _conf_y, _conf_w, _conf_h, spr_button_main, "Confirm Selection", c_white, fnt_main_36, _is_ready)) {
                         ctrl.mod_confirm.start_animation(dice_selected, dice_values, _popup_x, _dice_y_slot, _dw_base, _gap, _margin);
                         
                         dice_can_exit = false;
@@ -257,7 +257,7 @@ function GuiModuleDice(_ctrl) constructor {
                 var _side_left_x = _popup_x - _side_w - 20; 
                 var _side_left_y = _popup_y + ((_dh_base + (2 * _margin)) / 2) - (_side_h / 2); 
                 
-                if (draw_gui_button(_side_left_x, _side_left_y, _side_w, _side_h, spr_button_main, "View Map", c_white, fnt_main, true)) {
+                if (draw_gui_button(_side_left_x, _side_left_y, _side_w, _side_h, spr_button_main, "View Map", c_white, fnt_main_18, true)) {
                     ctrl.map_popup_open = true;
                 }
                 
@@ -265,7 +265,7 @@ function GuiModuleDice(_ctrl) constructor {
                 var _side_right_x = _popup_x + _total_w + 20; 
                 var _side_right_y = _popup_y + ((_dh_base + (2 * _margin)) / 2) - (_side_right_total_h / 2); 
                 
-                if (draw_gui_button(_side_right_x, _side_right_y, _side_w, _side_h, spr_button_red, "Re Roll", c_white, fnt_main, true)) {
+                if (draw_gui_button(_side_right_x, _side_right_y, _side_w, _side_h, spr_button_red, "Re Roll", c_white, fnt_main_18, true)) {
                     dice_phase = "ROLLING";
                     dice_timer = irandom_range(40, 60);
                     dice_selected[0] = false;
@@ -274,7 +274,7 @@ function GuiModuleDice(_ctrl) constructor {
                     dice_panel_h_extra = 0;
                 }
                 
-                if (draw_gui_button(_side_right_x, _side_right_y + _side_h + _side_gap, _side_w, _side_h, spr_button_blue, "Use Fate Card", c_white, fnt_main, true)) {
+                if (draw_gui_button(_side_right_x, _side_right_y + _side_h + _side_gap, _side_w, _side_h, spr_button_blue, "Use Fate Card", c_white, fnt_main_18, true)) {
                     show_debug_message("Action: Use Fate Card");
                 }
             }

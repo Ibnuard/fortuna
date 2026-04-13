@@ -150,7 +150,7 @@ for (var oi = 0; oi < array_length(draw_order); oi++) {
     draw_sprite_ext(spr_tile_icons, _icon_idx, _icon_x, _icon_y, _icon_sc_x, _icon_sc_y, 0, c_white, lerp(1.0, 0.60, dist_norm));
     
     // ── DRAW TILE TEXT (LABEL & INFO) ──
-    draw_set_font(fnt_main);
+    draw_set_font(fnt_main_18);
     draw_set_halign(fa_center); draw_set_valign(fa_middle);
     var _label_y = _y + (current_h / 2) + (12 * sc * _h_sc); // Diturunkan agar lebih ke tengah bodi tile
     var _label_str = string_upper(_tile.name);

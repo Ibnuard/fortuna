@@ -74,14 +74,14 @@ function GuiModuleProperty(_ctrl) constructor {
         draw_sprite_stretched(spr_container, 0, _p_x, _p_y, _p_w, _p_h);
         
         // --- Title (Top) ---
-        draw_set_font(fnt_gui_button_large);
+        draw_set_font(fnt_main_54);
         draw_set_halign(fa_center); draw_set_valign(fa_top);
         draw_set_color(c_white);
         draw_text(_p_x + _p_w/2, _p_y + 25, "Property");
         
         // --- Close Button ---
         var _cx_sz = 64;
-        if (draw_gui_button(_p_x + _p_w - 5 - (_cx_sz/2), _p_y + 5 - (_cx_sz/2), _cx_sz, _cx_sz, spr_panel_close, "", c_white, fnt_main, true)) {
+        if (draw_gui_button(_p_x + _p_w - 5 - (_cx_sz/2), _p_y + 5 - (_cx_sz/2), _cx_sz, _cx_sz, spr_panel_close, "", c_white, fnt_main_18, true)) {
             ctrl.gui_state = "MAIN";
             ctrl.active_tile_index = -1;
         }
@@ -115,7 +115,7 @@ function GuiModuleProperty(_ctrl) constructor {
             draw_sprite_ext(spr_tile_icons, _tile.type, floor(_card_x + (_card_w/2) - (_icon_w/2)), floor(_card_y + (4 * _card_scale)), _icon_sc, _icon_sc, 0, c_white, 1);
             
             // Name on Card
-            draw_set_font(fnt_main);
+            draw_set_font(fnt_main_18);
             draw_set_halign(fa_center); draw_set_valign(fa_middle);
             var _lbl_sc = 1.0;
             draw_set_color(c_white);
@@ -138,7 +138,7 @@ function GuiModuleProperty(_ctrl) constructor {
             var _psv_str = obj_controller.format_money(floor(_rent_val * 0.5));
             if (_level > 0) _psv_str += "/run";
             
-            draw_set_font(fnt_main);
+            draw_set_font(fnt_main_18);
             
             // Income on Landing (Labels: White, Values: Gold + Large)
             var _inc_lbl = "Income on Landing ";
@@ -184,7 +184,7 @@ function GuiModuleProperty(_ctrl) constructor {
                 // --- UNOWNED: BUY (Orange) | SKIP (Red) | NEGO (Blue) ---
                 // Button 1: BUY
                 var _can_buy = (obj_controller.player_cash >= _tile.price);
-                if (draw_gui_button(_btns_x_start, _btn_y, _btn_w, _btn_h, spr_button_orange, "Buy", c_white, fnt_main, _can_buy)) {
+                if (draw_gui_button(_btns_x_start, _btn_y, _btn_w, _btn_h, spr_button_orange, "Buy", c_white, fnt_main_18, _can_buy)) {
                     obj_controller.player_cash -= _tile.price;
                     _tile.owner = 0; 
                     ctrl.gui_state = "MAIN";
@@ -192,7 +192,7 @@ function GuiModuleProperty(_ctrl) constructor {
                 }
                 
                 // Button 2: SKIP (Price Penalty)
-                if (draw_gui_button(_btns_x_start + _btn_w + _btn_gap, _btn_y, _btn_w, _btn_h, spr_button_red, "Skip", c_white, fnt_main, true)) {
+                if (draw_gui_button(_btns_x_start + _btn_w + _btn_gap, _btn_y, _btn_w, _btn_h, spr_button_red, "Skip", c_white, fnt_main_18, true)) {
                     _tile.price = floor(_tile.price * 1.25); // 25% price hike
                     ctrl.gui_state = "MAIN";
                     ctrl.active_tile_index = -1;
@@ -201,7 +201,7 @@ function GuiModuleProperty(_ctrl) constructor {
                 // Button 3: NEGO (Locked by Skills)
                 var _can_nego = (obj_controller.stats.charisma >= 5 && obj_controller.stats.negotiation >= 5);
                 var _nego_price = floor(_tile.price * 0.65); // 35% discount
-                if (draw_gui_button(_btns_x_start + (_btn_w + _btn_gap) * 2, _btn_y, _btn_w, _btn_h, spr_button_blue, "Nego", c_white, fnt_main, _can_nego && obj_controller.player_cash >= _nego_price)) {
+                if (draw_gui_button(_btns_x_start + (_btn_w + _btn_gap) * 2, _btn_y, _btn_w, _btn_h, spr_button_blue, "Nego", c_white, fnt_main_18, _can_nego && obj_controller.player_cash >= _nego_price)) {
                     obj_controller.player_cash -= _nego_price;
                     _tile.owner = 0;
                     ctrl.gui_state = "MAIN";
@@ -215,7 +215,7 @@ function GuiModuleProperty(_ctrl) constructor {
                 var _up_label = (_tile.building_level == 0) ? "House" : "Hotel";
                 if (_tile.building_level == 2) _up_label = "MAX";
                 
-                if (draw_gui_button(_btns_x_start, _btn_y, _btn_w, _btn_h, spr_button_orange, _up_label, c_white, fnt_main, _can_up && obj_controller.player_cash >= _up_cost)) {
+                if (draw_gui_button(_btns_x_start, _btn_y, _btn_w, _btn_h, spr_button_orange, _up_label, c_white, fnt_main_18, _can_up && obj_controller.player_cash >= _up_cost)) {
                     obj_controller.player_cash -= _up_cost;
                     _tile.building_level++;
                     ctrl.gui_state = "MAIN";
@@ -223,7 +223,7 @@ function GuiModuleProperty(_ctrl) constructor {
                 }
                 
                 // Button 2: SELL
-                if (draw_gui_button(_btns_x_start + _btn_w + _btn_gap, _btn_y, _btn_w, _btn_h, spr_button_red, "Sell", c_white, fnt_main, true)) {
+                if (draw_gui_button(_btns_x_start + _btn_w + _btn_gap, _btn_y, _btn_w, _btn_h, spr_button_red, "Sell", c_white, fnt_main_18, true)) {
                     obj_controller.player_cash += floor(_tile.price * 0.85); // 85% back
                     _tile.owner = -1;
                     _tile.building_level = 0;
@@ -232,7 +232,7 @@ function GuiModuleProperty(_ctrl) constructor {
                 }
 
                 // Button 3: SKIP (Get Income)
-                if (draw_gui_button(_btns_x_start + (_btn_w + _btn_gap) * 2, _btn_y, _btn_w, _btn_h, spr_button_blue, "Income", c_white, fnt_main, true)) {
+                if (draw_gui_button(_btns_x_start + (_btn_w + _btn_gap) * 2, _btn_y, _btn_w, _btn_h, spr_button_blue, "Income", c_white, fnt_main_18, true)) {
                     obj_controller.player_cash += floor(_rent_val * 0.4); // 40% income on pass
                     ctrl.gui_state = "MAIN";
                     ctrl.active_tile_index = -1;

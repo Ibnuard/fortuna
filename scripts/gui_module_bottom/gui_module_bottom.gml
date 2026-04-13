@@ -82,7 +82,7 @@ function GuiModuleBottom(_ctrl) constructor {
         }
         
         draw_set_alpha(1.0);
-        draw_set_font(fnt_gui_button_medium);
+        draw_set_font(fnt_main_36);
         draw_set_halign(fa_center); draw_set_valign(fa_middle);
         
         var _lbl = "Turn ";
@@ -186,7 +186,7 @@ function GuiModuleBottom(_ctrl) constructor {
             draw_sprite_stretched(spr_container, 0, _box_x, _box_y, _box_w, _box_h);
             
             if (instance_exists(obj_board) && _f_mov > 0.2) {
-                draw_set_font(fnt_gui_button_large);
+                draw_set_font(fnt_main_54);
                 draw_set_halign(fa_center); draw_set_valign(fa_middle);
                 
                 var _val_str = string(obj_board.steps_remaining);
@@ -217,7 +217,7 @@ function GuiModuleBottom(_ctrl) constructor {
         
         if (ctrl.gui_state == "MAIN" || _f_main > 0) {
             if (_f_main > 0.1) {
-                if (draw_gui_button(_left_x, _main_y + stagger_btn_left, GUI_BTN_SIDE_W, GUI_BTN_SIDE_H, spr_button_red, "Property", c_white, fnt_gui_button_medium, ctrl.can_interact_gui)) {
+                if (draw_gui_button(_left_x, _main_y + stagger_btn_left, GUI_BTN_SIDE_W, GUI_BTN_SIDE_H, spr_button_red, "Property", c_white, fnt_main_36, ctrl.can_interact_gui)) {
                     // TBD: Open Property interaction
                 }
 
@@ -230,7 +230,7 @@ function GuiModuleBottom(_ctrl) constructor {
                 var _breath_x   = _center_x - (_breath_w - GUI_BTN_MAIN_W) / 2;
                 var _breath_y   = _roll_y - (_breath_h - GUI_BTN_MAIN_H) / 2;
 
-                if (draw_gui_button(_breath_x, _breath_y, _breath_w, _breath_h, spr_button_main, "", c_white, fnt_gui_button_medium, ctrl.can_interact_gui)) {
+                if (draw_gui_button(_breath_x, _breath_y, _breath_w, _breath_h, spr_button_main, "", c_white, fnt_main_36, ctrl.can_interact_gui)) {
                     if (ctrl.gui_state == "MAIN") {
                         ctrl.gui_state = "DICE";
                         ctrl.mod_dice.dice_phase = "ENTERING";
@@ -243,7 +243,7 @@ function GuiModuleBottom(_ctrl) constructor {
                 
                 var _wave_str = "Roll The Dice!";
                 var _wave_len = string_length(_wave_str);
-                draw_set_font(fnt_gui_button_medium);
+                draw_set_font(fnt_main_36);
                 var _mx = device_mouse_x_to_gui(0);
                 var _my = device_mouse_y_to_gui(0);
                 var _roll_hover = ctrl.can_interact_gui && point_in_rectangle(_mx, _my, _breath_x, _breath_y, _breath_x + _breath_w, _breath_y + _breath_h);
@@ -269,7 +269,7 @@ function GuiModuleBottom(_ctrl) constructor {
                     _cx += _ch_w;
                 }
                 
-                draw_gui_button(_right_x, _main_y + stagger_btn_right, GUI_BTN_SIDE_W, GUI_BTN_SIDE_H, spr_button_purple, "Fate Card", c_white, fnt_gui_button_medium, ctrl.can_interact_gui);
+                draw_gui_button(_right_x, _main_y + stagger_btn_right, GUI_BTN_SIDE_W, GUI_BTN_SIDE_H, spr_button_purple, "Fate Card", c_white, fnt_main_36, ctrl.can_interact_gui);
             }
         }
     }

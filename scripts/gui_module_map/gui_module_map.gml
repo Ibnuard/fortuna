@@ -97,7 +97,7 @@ function GuiModuleMap(_ctrl) constructor {
         var _cx_sz = 64;
         var _cx_x  = _p_x + _p_w - 5; 
         var _cx_y  = _p_y + 5;         
-        if (draw_gui_button(_cx_x - _cx_sz/2, _cx_y - _cx_sz/2, _cx_sz, _cx_sz, spr_panel_close, "", c_white, fnt_main, true)) {
+        if (draw_gui_button(_cx_x - _cx_sz/2, _cx_y - _cx_sz/2, _cx_sz, _cx_sz, spr_panel_close, "", c_white, fnt_main_18, true)) {
             ctrl.map_popup_open = false;
         }
 
@@ -117,7 +117,7 @@ function GuiModuleMap(_ctrl) constructor {
         var _title_x = _p_x + _p_w/2;
         var _title_y = _p_y + 25;
         
-        draw_set_font(fnt_gui_button_large);
+        draw_set_font(fnt_main_54);
         draw_set_halign(fa_center); draw_set_valign(fa_top);
         
         // Title Shadow
@@ -254,7 +254,7 @@ function GuiModuleMap(_ctrl) constructor {
                     draw_roundrect_ext(_tx, _ty, _tx + _tw, _ty + _th, 16, 16, true);
                     
                     // Header: Ownership
-                    draw_set_font(fnt_main); draw_set_halign(fa_center);
+                    draw_set_font(fnt_main_18); draw_set_halign(fa_center);
                     draw_set_alpha(0.8 * _a);
                     draw_text(_tx + _tw/2, _ty + 15, _is_owned ? "[ OWNED ]" : "[ NOT OWNED ]");
                     

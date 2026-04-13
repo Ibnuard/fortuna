@@ -1,6 +1,6 @@
 /// @function draw_gui_button(_x, _y, _w, _h, _sprite, _text, [_text_color], [_font])
 /// @description Draws a styled button with text at the specified coordinates
-function draw_gui_button(_x, _y, _w, _h, _sprite, _text, _text_color = c_white, _font = fnt_gui_button_large, _is_interactable = true) {
+function draw_gui_button(_x, _y, _w, _h, _sprite, _text, _text_color = c_white, _font = fnt_main_54, _is_interactable = true) {
     
     // DYNAMIC SIZING: Ensure button is at least wide enough for the text
     draw_set_font(_font);
@@ -48,7 +48,8 @@ function draw_gui_button(_x, _y, _w, _h, _sprite, _text, _text_color = c_white, 
     draw_set_valign(fa_middle);
     
     var _text_x = _x + (_w / 2);
-    var _visual_offset = 6; // Move up by 6px to account for bottom bevel/shadow
+    // Sprite-based offset: Top bar buttons are flatter (0px), others have thicker shadows (6px)
+    var _visual_offset = (_sprite == spr_btn_top_bar || _sprite == spr_btn_top_bar_skills) ? 0 : 6;
     var _text_y = _y + (_h / 2) - _visual_offset; 
     
     // Text shadow

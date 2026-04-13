@@ -50,7 +50,7 @@ function GuiModuleSkills(_ctrl) constructor {
             draw_set_alpha(ctrl.skills_popup_alpha);
             draw_sprite_stretched(spr_container, 0, _p_x, _p_y, _p_w, _p_h);
             
-            draw_set_font(fnt_gui_button_large);
+            draw_set_font(fnt_main_54);
             draw_set_halign(fa_center); draw_set_valign(fa_top);
             draw_set_color(c_white);
             draw_text(_p_x + _p_w/2, _p_y + 25, "Pawn Skills");
@@ -60,7 +60,7 @@ function GuiModuleSkills(_ctrl) constructor {
             var _bar_h       = 44;
 
             // FIX 1: Measure actual text width instead of hardcoded estimate
-            draw_set_font(fnt_main);
+            draw_set_font(fnt_main_18);
             var _txt_w_est = string_width("10 / 10") + 20;
             
             var _icon_sz         = 48;
@@ -115,7 +115,7 @@ function GuiModuleSkills(_ctrl) constructor {
                 }
                 
                 // FIX 4: Text vertically centered & left aligned properly
-                draw_set_font(fnt_main);
+                draw_set_font(fnt_main_18);
                 draw_set_halign(fa_left);
                 draw_set_valign(fa_middle);
                 draw_set_color(c_white);
@@ -136,7 +136,7 @@ function GuiModuleSkills(_ctrl) constructor {
             var _cx_sz = 64;
             var _cx_x  = _p_x + _p_w - 5; 
             var _cx_y  = _p_y + 5;         
-            if (draw_gui_button(_cx_x - _cx_sz/2, _cx_y - _cx_sz/2, _cx_sz, _cx_sz, spr_panel_close, "", c_white, fnt_main, true)) {
+            if (draw_gui_button(_cx_x - _cx_sz/2, _cx_y - _cx_sz/2, _cx_sz, _cx_sz, spr_panel_close, "", c_white, fnt_main_18, true)) {
                 ctrl.skills_popup_open = false;
             }
             
@@ -159,7 +159,7 @@ function GuiModuleSkills(_ctrl) constructor {
                 var _title  = _d.name;
                 var _desc   = _d.desc;
                 
-                draw_set_font(fnt_main);
+                draw_set_font(fnt_main_18);
                 var _title_w = string_width(_title) + 10;
                 
                 var _scale           = 1.0;

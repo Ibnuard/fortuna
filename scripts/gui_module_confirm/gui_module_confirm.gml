@@ -28,7 +28,7 @@ function GuiModuleConfirm(_ctrl) constructor {
     dice_total = 0;
 
     static _draw_gold_text = function(_str, _x, _y, _alpha, _scale=1.0) {
-        draw_set_font(fnt_gui_button_large);
+        draw_set_font(fnt_main_54);
         draw_set_halign(fa_center); draw_set_valign(fa_middle); // Middle for center popping
         var _c_gold = C_PURE_GOLD;
         draw_set_color(c_black); draw_set_alpha(_alpha * 0.5);
@@ -296,24 +296,23 @@ function GuiModuleConfirm(_ctrl) constructor {
                         var _start_y = confirm_fly_start_y[f] + _bob - 40;
                         var _curr_x = lerp(_start_x, _center_x, _mt_ease);
                         var _curr_y = lerp(_start_y, _center_y, _mt_ease);
-                        _draw_gold_text(string(confirm_fly_values[f] + 1), _curr_x, _curr_y, 1.0, 1.0);
+                        _draw_gold_text(string(confirm_fly_values[f] + 1), _curr_x, _curr_y, 1.0, 1.5);
                     }
                 } else {
                     // --- GIANT RESULT POP (Balanced Large) ---
-                    var _sc = 1.0;
+                    var _sc = 2.5;
 
                     var _glow_alpha = 0;
                     if (confirm_merge_frame < 20) {
                         var _tt = (confirm_merge_frame - 12) / 8.0;
-                        _sc = 1.0;
-    
+                        _sc = 2.5 + sin(_tt * pi) * 0.5; // Extra pop on impact
                         _glow_alpha = sin(_tt * pi) * 0.9;
                     } else if (confirm_merge_frame < 26) {
                         var _tt = (confirm_merge_frame - 20) / 6.0;
-                        _sc = 1.0;
+                        _sc = 2.5;
                         _glow_alpha = lerp(0.9, 0.45, _tt);
                     } else {
-                        _sc = 1.0;
+                        _sc = 2.5;
                         _glow_alpha = 0.45;
                     }
                     
@@ -326,10 +325,10 @@ function GuiModuleConfirm(_ctrl) constructor {
                     // -- INTENSE LIGHTING EFFECT --
                     if (_glow_alpha > 0) {
                         gpu_set_blendmode(bm_add);
-                        draw_set_font(fnt_gui_button_large);
+                        draw_set_font(fnt_main_54);
                         draw_set_halign(fa_center); draw_set_valign(fa_middle);
-                        for (var g = 1; g <= 5; g++) { // More layers for intense lighting
-                            var _gsc = _sc * (1.1 + g * 0.18);
+                        for (var g = 1; g <= 8; g++) { // More layers for intense lighting
+                            var _gsc = _sc * (1.1 + g * 0.2);
                             draw_text_transformed_color(_center_x, _center_y, string(dice_total), _gsc, _gsc, 0, C_MAIN_GOLD, C_MAIN_GOLD, C_PURE_GOLD, C_PURE_GOLD, _glow_alpha * (1.0 / g));
                         }
                         gpu_set_blendmode(bm_normal);

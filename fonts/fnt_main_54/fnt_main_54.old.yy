@@ -1,6 +1,6 @@
 {
   "$GMFont":"",
-  "%Name":"fnt_gui_button_large",
+  "%Name":"fnt_main_54",
   "AntiAlias":1,
   "applyKerning":0,
   "ascender":60,
@@ -106,7 +106,7 @@
     "124":{"character":124,"h":72,"offset":0,"shift":12,"w":8,"x":168,"y":76,},
     "125":{"character":125,"h":72,"offset":0,"shift":24,"w":20,"x":146,"y":76,},
     "126":{"character":126,"h":72,"offset":0,"shift":28,"w":24,"x":168,"y":150,},
-    "9647":{"character":9647,"h":72,"offset":14,"shift":70,"w":42,"x":312,"y":298,},
+    "9647":{"character":9647,"h":72,"offset":10,"shift":44,"w":22,"x":312,"y":298,},
   },
   "hinting":0,
   "includeTTF":true,
@@ -116,7 +116,7 @@
   "last":0,
   "lineHeight":72,
   "maintainGms1Font":false,
-  "name":"fnt_gui_button_large",
+  "name":"fnt_main_54",
   "parent":{
     "name":"Font",
     "path":"folders/Font.yy",
