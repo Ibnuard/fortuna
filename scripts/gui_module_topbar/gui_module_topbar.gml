@@ -48,10 +48,58 @@ function GuiModuleTopbar(_ctrl) constructor {
         var _center_y = _draw_y_in_surf + (GUI_TOPBAR_H / 2); 
         var _visual_mid_y = _center_y + 4; // Adjusted to +4 for better centering of size 32 font
 
-        // --- Draw Map Icon (Left Side) ---
-        var _map_sc = 0.7; // Slightly smaller as requested
-        var _map_icon_x = _marg_x + 89; // 40px margin from left edge (89 = 40 + half of 0.7*140)
+        // --- Draw Map Icon & Progress Plate (Left Side) ---
+        var _map_sc     = 0.7; 
+        var _map_icon_x = _marg_x + 89; 
+        
+        // 1. Draw Plate Background (spr_container)
+        var _plate_w = 260; // Increased from 210 to 260 for better horizontal margin
+        var _plate_h = 76; 
+        var _plate_x = _map_icon_x - 30; // Integrate behind circular icon
+        var _plate_y = _center_y - (_plate_h / 2);
+        draw_sprite_stretched(spr_container, 0, _plate_x, _plate_y, _plate_w, _plate_h);
+
+        // 2. Map Icon (Circular container on top)
         draw_sprite_ext(spr_map_0, 0, _map_icon_x, _center_y, _map_sc, _map_sc, 0, c_white, 1);
+        
+        // 3. Plate Text (Horizontal Map 1/5)
+        var _cur_m = "1";
+        var _tot_m = "5";
+        if (instance_exists(obj_controller)) {
+            _cur_m = string(obj_controller.map_index);
+            _tot_m = string(obj_controller.map_total);
+        }
+        
+        var _txt_x_start = _plate_x + 105; // Shifted right for better balance
+        var _txt_y_mid   = _center_y + 4;
+        var _shd_off     = 3; // Shadow offset
+        
+        draw_set_valign(fa_middle); draw_set_halign(fa_left);
+        
+        // --- DRAW SHADOWS FIRST ---
+        draw_set_alpha(0.4); draw_set_color(c_black);
+        draw_set_font(fnt_main_18);
+        draw_text(_txt_x_start + _shd_off, _txt_y_mid + _shd_off, "Map ");
+        var _lx_s = _txt_x_start + string_width("Map ");
+        draw_set_font(fnt_main_32);
+        draw_text(_lx_s + _shd_off, _txt_y_mid + _shd_off, _cur_m + "/" + _tot_m);
+        draw_set_alpha(1.0);
+
+        // --- DRAW MAIN TEXT ---
+        // "Map " prefix
+        draw_set_font(fnt_main_18);
+        draw_set_color(c_white);
+        draw_text(_txt_x_start, _txt_y_mid - 2, "Map "); // Small -2px offset for visual alignment
+        var _lx = _txt_x_start + string_width("Map ");
+        
+        // Numbers
+        draw_set_font(fnt_main_32);
+        draw_set_color(C_MAIN_GOLD);
+        draw_text(_lx, _txt_y_mid, _cur_m);
+        var _nx = _lx + string_width(_cur_m);
+        
+        draw_set_color(c_white);
+        draw_text(_nx, _txt_y_mid, "/" + _tot_m);
         
         // --- Calculate Total Width for Centering ---
         draw_set_font(fnt_main_32); 
